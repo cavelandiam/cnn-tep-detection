@@ -1,0 +1,11 @@
+numpy
+pydicom
+pylibjpeg
+pylibjpeg-libjpeg
+pylibjpeg-openjpeg
+pylibjpeg-rle
+gdcm
+opencv-python
+tensorflow
+matplotlib
+scikit-image
