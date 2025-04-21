@@ -1,9 +1,8 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import dataset_loader # type: ignore
-from scripts.model import build_3d_cnn
-from utils.config import TRAINED_MODEL_PATH, MESSAGES
+from scripts import load_images_hucsr, process_rsna # type: ignore
+from utils.config import TRAINED_MODEL_PATH, MESSAGES, DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_DIR, DATA_DIR
 import matplotlib.pyplot as plt
 import pydicom
 
@@ -12,9 +11,18 @@ def test_pipeline():
     
     print("🚀 INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
     
-    # 1️⃣ Cargar el dataset (Imágenes + RSNA)
+    # 1️⃣ Cargar el dataset (Imágenes del HUCSR)
     print("📡 Cargando los datos...")
+
+    dataset_loader.load_dataset_hucsr("D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr", 
+                                      1, "K:/data_dicom_processed_ttep.h5")
+    dataset_loader.load_dataset_hucsr("D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr",
+                                      0, "K:/data_dicom_processed_ftep.h5")
+
     #train_file = dataset_loader.load_all_datasets()
+
+    # 1️⃣ Cargar el dataset (Imágenes RNSA)
+    #rsna_train_file = process_rsna.load_data_rsna()
     s = 2
     #print(f"✅ Datos cargados: {X_train.shape[0]} imágenes de entrenamiento, {X_val.shape[0]} imágenes de validación.\n")
 

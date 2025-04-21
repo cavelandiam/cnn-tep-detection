@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pydicom
 from tensorflow.keras.models import load_model
-from scripts.preprocess import load_dicom_image
+from scripts.process_rsna import load_dicom_image
 from utils.config import TRAINED_MODEL_PATH, MESSAGES
 
 def predict_image(dicom_path):
