@@ -11,18 +11,15 @@ def test_pipeline():
     
     print("🚀 INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
 
-    print("📡 Calcular target depth ...")
-
-    calculate_target_depth.calculate()
+    #print("📡 Calcular target depth ...")
+    #calculate_target_depth.calculate()
     
     """ 1️⃣ Cargar el dataset (Imágenes del HUCSR) """
     print("📡 Cargando las imágenes del HUCSR ...")
-
-    load_images_hucsr.load_all_datasets()
+    #load_images_hucsr.load_all_datasets()
 
     print("📡 Validando las imágenes del HUCSR ...")
-
-    # validate_load_images_hucsr.validate()
+    validate_load_images_hucsr.validate()
 
     #train_file = dataset_loader.load_all_datasets()
 

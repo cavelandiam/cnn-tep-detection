@@ -34,8 +34,6 @@ def load_all_datasets():
     Returns:
         tuple: Rutas a los archivos HDF5 de train y val.
     """
-    # analizar_num_cortes(DICOM_TEP_TRUE_DIR)
-    # analizar_num_cortes(DICOM_TEP_FALSE_DIR)
 
     DICOM_TEP_TRUE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/1/"
     DICOM_TEP_FALSE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/0/"
@@ -252,53 +250,6 @@ def load_dicom_image(dicom_path, target_size):
     except Exception as e:
         logging.error(f"Error al procesar {dicom_path}: {e}")
         return None
-
-
-def analizar_num_cortes(directory):
-    """
-    Analiza la cantidad de cortes en cada tomografía de un conjunto de datos DICOM.
-    
-    Args:
-        directory (str): Ruta de la carpeta con estudios DICOM.
-    
-    Returns:
-        dict: Estadísticas de cortes (máximo, mínimo, promedio, lista).
-    """
-    num_cortes_lista = []
-    directory = Path(directory)
-
-    for patient in directory.iterdir():
-        if not patient.is_dir():
-            continue
-        st0_path = patient / "ST0"
-        if st0_path.exists() and st0_path.is_dir():
-            # Agrupar por SeriesInstanceUID para contar cortes por serie
-            series_dict = defaultdict(list)
-            for f in st0_path.iterdir():
-                try:
-                    ds = pydicom.dcmread(f, force=True)
-                    series_dict[ds.SeriesInstanceUID].append(f)
-                except Exception as e:
-                    logging.error(f"Error al leer {f}: {e}")
-                    continue
-            # Usar la serie con más cortes
-            if series_dict:
-                max_series = max(series_dict.values(), key=len)
-                num_cortes = len(max_series)
-                num_cortes_lista.append(num_cortes)
-
-    if not num_cortes_lista:
-        logging.warning(f"No se encontraron estudios válidos en {directory}")
-        return {"max": 0, "min": 0, "mean": 0, "lista": []}
-
-    stats = {
-        "max": np.max(num_cortes_lista),
-        "min": np.min(num_cortes_lista),
-        "mean": np.mean(num_cortes_lista),
-        "lista": num_cortes_lista
-    }
-    logging.info(f"Estadísticas de cortes en {directory}: {stats}")
-    return stats
 
 def pad_or_trim_volume(volume, target_depth):
     """
