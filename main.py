@@ -1,7 +1,7 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import load_images_hucsr, process_rsna # type: ignore
+from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth
 from utils.config import TRAINED_MODEL_PATH, MESSAGES, DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_DIR, DATA_DIR
 import matplotlib.pyplot as plt
 import pydicom
@@ -10,14 +10,19 @@ def test_pipeline():
     """Ejecuta todo el flujo de trabajo: carga de datos, entrenamiento, evaluación y predicción."""
     
     print("🚀 INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
-    
-    # 1️⃣ Cargar el dataset (Imágenes del HUCSR)
-    print("📡 Cargando los datos...")
 
-    dataset_loader.load_dataset_hucsr("D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr", 
-                                      1, "K:/data_dicom_processed_ttep.h5")
-    dataset_loader.load_dataset_hucsr("D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr",
-                                      0, "K:/data_dicom_processed_ftep.h5")
+    print("📡 Calcular target depth ...")
+
+    calculate_target_depth.calculate()
+    
+    """ 1️⃣ Cargar el dataset (Imágenes del HUCSR) """
+    print("📡 Cargando las imágenes del HUCSR ...")
+
+    load_images_hucsr.load_all_datasets()
+
+    print("📡 Validando las imágenes del HUCSR ...")
+
+    # validate_load_images_hucsr.validate()
 
     #train_file = dataset_loader.load_all_datasets()
 
