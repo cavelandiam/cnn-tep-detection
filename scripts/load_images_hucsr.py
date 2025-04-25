@@ -3,7 +3,7 @@ import numpy as np
 import pydicom
 from scripts.process_rsna import load_dicom_image  # Asumo que esta función está definida
 from utils.config import (
-    DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_DIR,
+    DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_TRAIN_DIR,
     IMAGE_DICOM_RESIZE, MESSAGES, MODEL_DIR, TARGET_DEPTH,
     X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
 )

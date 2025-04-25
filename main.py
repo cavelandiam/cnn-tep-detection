@@ -1,8 +1,7 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth
-from utils.config import TRAINED_MODEL_PATH, MESSAGES, DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_DIR, DATA_DIR
+from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, load_images_rsna
 import matplotlib.pyplot as plt
 import pydicom
 
@@ -11,15 +10,19 @@ def test_pipeline():
     
     print("🚀 INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
 
-    #print("📡 Calcular target depth ...")
+    print("📡 Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()
-    
-    """ 1️⃣ Cargar el dataset (Imágenes del HUCSR) """
     print("📡 Cargando las imágenes del HUCSR ...")
     #load_images_hucsr.load_all_datasets()
-
     print("📡 Validando las imágenes del HUCSR ...")
-    validate_load_images_hucsr.validate()
+    #validate_load_images_hucsr.validate()
+
+    #print("📡 Calcular target depth RSNA...")
+    #calculate_target_depth.calculate()
+    print("📡 Cargando las imágenes del RSNA ...")
+    load_images_rsna.load_all_datasets()
+    print("📡 Validando las imágenes del RSNA ...")
+    #validate_load_images_hucsr.validate()
 
     #train_file = dataset_loader.load_all_datasets()
 

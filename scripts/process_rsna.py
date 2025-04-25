@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from skimage.transform import resize
-from utils.config import MODEL_DIR, RSNA_DATASET_DIR
+from utils.config import MODEL_DIR, RSNA_DATASET_TRAIN_DIR
 
 logging.basicConfig(
     level=logging.INFO,
