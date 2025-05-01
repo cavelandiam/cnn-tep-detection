@@ -34,12 +34,12 @@ LEARNING_RATE = 0.0001
 
 # 📌 **Mensajes del Sistema**
 MESSAGES = {
-    "data_loading": "📡 Cargando datos desde {}...",
-    "model_training": "🚀 Entrenando modelo con {} epochs...",
-    "model_saved": "✅ Modelo guardado en {}",
-    "model_loaded": "🔄 Cargando modelo desde {}",
-    "prediction_success": "🎯 Predicción completada con éxito",
-    "error_loading_dicom": "❌ Error al cargar archivo DICOM: {}",
+    "data_loading": "Cargando datos desde {}...",
+    "model_training": "Entrenando modelo con {} epochs...",
+    "model_saved": "Modelo guardado en {}",
+    "model_loaded": "Cargando modelo desde {}",
+    "prediction_success": "Predicción completada con éxito",
+    "error_loading_dicom": "Error al cargar archivo DICOM: {}",
 }
 
 # 📌 **Constantes**

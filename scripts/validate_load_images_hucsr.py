@@ -24,15 +24,15 @@ def validate():
     """Función principal para validar los archivos HDF5."""
     # Contar pacientes en los directorios originales
 
-    DICOM_TEP_TRUE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/1/"
-    DICOM_TEP_FALSE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/0/"
+    #DICOM_TEP_TRUE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/1/"
+    #DICOM_TEP_FALSE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/0/"
 
     n_tep_expected = count_patients(DICOM_TEP_TRUE_DIR)  # 45 para HUCSR
     n_no_tep_expected = count_patients(DICOM_TEP_FALSE_DIR)  # 45 para HUCSR
     logging.info(f"Pacientes esperados: TEP={n_tep_expected}, No-TEP={n_no_tep_expected}")
 
     # Validar archivo HDF5 combinado
-    hdf5_file = "K:/data_dicom_processed_train.h5"
+    hdf5_file = "K:/data_dicom_processed_hucsr.h5"
     is_valid = validate_hdf5(hdf5_file, n_tep_expected, n_no_tep_expected)
     
     if is_valid:

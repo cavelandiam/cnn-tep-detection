@@ -1,10 +1,9 @@
 import os
 import numpy as np
 import pydicom
-from scripts.process_rsna import load_dicom_image  # Asumo que esta función está definida
 from utils.config import (
-    DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, RSNA_DATASET_TRAIN_DIR,
-    IMAGE_DICOM_RESIZE, MESSAGES, MODEL_DIR, TARGET_DEPTH,
+    DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR,
+    IMAGE_DICOM_RESIZE, MESSAGES, TARGET_DEPTH,
     X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
 )
 from pathlib import Path
@@ -22,7 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/data_loading.log'),
+        logging.FileHandler('logs/load_images_hucsr.log'),
         logging.StreamHandler()
     ]
 )
@@ -35,16 +34,16 @@ def load_all_datasets():
         tuple: Rutas a los archivos HDF5 de train y val.
     """
 
-    DICOM_TEP_TRUE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/1/"
-    DICOM_TEP_FALSE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/0/"
+    #DICOM_TEP_TRUE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/1/"
+    #DICOM_TEP_FALSE_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/0/"
 
-    tep_file = "K:/data_dicom_processed_tep.h5"
-    no_tep_file = "K:/data_dicom_processed_no_tep.h5"
+    tep_file = "K:/data_dicom_processed_tep_true.h5"
+    no_tep_file = "K:/data_dicom_processed_tep_false.h5"
     
     load_dataset_hucsr(DICOM_TEP_TRUE_DIR, 1, tep_file)
     load_dataset_hucsr(DICOM_TEP_FALSE_DIR, 0, no_tep_file)
 
-    output_file = "K:/data_dicom_processed_train.h5"
+    output_file = "K:/data_dicom_processed_hucsr.h5"
 
     with h5py.File(tep_file, 'r') as tep_h5, h5py.File(no_tep_file, 'r') as no_tep_h5:
         n_tep = tep_h5[X_TRAIN_TEP].shape[0]
@@ -297,7 +296,7 @@ def resample_volume(volume, original_depth, target_depth):
     return np.expand_dims(resampled, axis=-1)
 
 
-def save_series_to_folders(series_dict, patient_name, output_dir='D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_hucsr/processed_series'):
+def save_series_to_folders(series_dict, patient_name, output_dir='K:/processed hucsr'):
     """
     Guarda cada serie DICOM en una carpeta separada por paciente.
 

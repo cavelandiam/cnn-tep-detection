@@ -8,20 +8,20 @@ import pydicom
 def test_pipeline():
     """Ejecuta todo el flujo de trabajo: carga de datos, entrenamiento, evaluación y predicción."""
     
-    print("🚀 INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
+    print("INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
 
-    print("📡 Calcular target depth HUCSR...")
+    print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()
-    print("📡 Cargando las imágenes del HUCSR ...")
-    #load_images_hucsr.load_all_datasets()
-    print("📡 Validando las imágenes del HUCSR ...")
-    #validate_load_images_hucsr.validate()
+    print("Cargando las imágenes del HUCSR ...")
+    load_images_hucsr.load_all_datasets()
+    print("Validando las imágenes del HUCSR ...")
+    validate_load_images_hucsr.validate()
 
-    #print("📡 Calcular target depth RSNA...")
+    #print("Calcular target depth RSNA...")
     #calculate_target_depth.calculate()
-    print("📡 Cargando las imágenes del RSNA ...")
-    load_images_rsna.load_all_datasets()
-    print("📡 Validando las imágenes del RSNA ...")
+    print("Cargando las imágenes del RSNA ...")
+    #load_images_rsna.load_all_datasets()
+    print("Validando las imágenes del RSNA ...")
     #validate_load_images_hucsr.validate()
 
     #train_file = dataset_loader.load_all_datasets()
