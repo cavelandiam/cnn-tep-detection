@@ -2,30 +2,30 @@ import os
 import numpy as np
 import pydicom
 import pandas as pd
-from scripts.process_rsna import load_dicom_image
 from utils.config import IMAGE_DICOM_RESIZE, MESSAGES, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
-
 from pathlib import Path
 import logging
 from skimage.transform import resize
 from concurrent.futures import ThreadPoolExecutor
 import h5py
-from collections import defaultdict
+import warnings
+
+# Suprimir advertencias específicas de pydicom para VR UI
+warnings.filterwarnings('ignore', category=UserWarning, message='Invalid value for VR UI')
 
 # Configuración de logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/data_loading_rsna.log'),
+        logging.FileHandler('logs/load_images_rsna.log'),
         logging.StreamHandler()
     ]
 )
 
 def load_all_datasets():
-    """Carga y preprocesa el dataset RSNA."""    
+    """Carga y preprocesa el dataset RSNA."""
     output_file = 'K:/data_dicom_processed_rsna.h5'
-    RSNA_DATASET_TRAIN_DIR = "D:/Trabajos Maestría/Trabajo de grado/CNN_TEP_DETECTION/data/test_code_load_images_rsna/train";
     load_dataset_rsna(RSNA_DATASET_TRAIN_DIR, RSNA_CSV_TRAIN_DIR, output_file)
 
 def load_dataset_rsna(directory, train_csv_path, output_file):
@@ -38,7 +38,7 @@ def load_dataset_rsna(directory, train_csv_path, output_file):
     
     studies = [p for p in directory.iterdir() if p.is_dir()]
     
-    with ThreadPoolExecutor(max_workers=1) as executor, h5py.File(output_file, 'w') as h5f:  # Ajusta max_workers según tu hardware
+    with ThreadPoolExecutor(max_workers=4) as executor, h5py.File(output_file, 'w') as h5f:
         volumes_dset = h5f.create_dataset('X_train', shape=(0, TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1), 
                                          maxshape=(None, TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1), 
                                          dtype=np.float32)

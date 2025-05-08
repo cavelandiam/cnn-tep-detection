@@ -1,7 +1,7 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, load_images_rsna
+from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna
 import matplotlib.pyplot as plt
 import pydicom
 
@@ -13,22 +13,24 @@ def test_pipeline():
     print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()
     print("Cargando las imágenes del HUCSR ...")
-    load_images_hucsr.load_all_datasets()
+    #load_images_hucsr.load_all_datasets()
     print("Validando las imágenes del HUCSR ...")
-    validate_load_images_hucsr.validate()
-
-    #print("Calcular target depth RSNA...")
-    #calculate_target_depth.calculate()
-    print("Cargando las imágenes del RSNA ...")
-    #load_images_rsna.load_all_datasets()
-    print("Validando las imágenes del RSNA ...")
     #validate_load_images_hucsr.validate()
 
+    #print("Calcular target depth RSNA...")
+    #calculate_target_depth.calculate() NO SE USA
+    #print("Cargando las imágenes del RSNA ...")
+    #load_images_rsna.load_all_datasets() NO SE USA
+    #print("Validando las imágenes del RSNA ...")
+    #validate_load_images_hucsr.validate() NO SE USA
+
+    print("Preentrenando el modelo RSNA ...")
+    pretrain_rsna.pretrain_model()
     #train_file = dataset_loader.load_all_datasets()
 
     # 1️⃣ Cargar el dataset (Imágenes RNSA)
     #rsna_train_file = process_rsna.load_data_rsna()
-    s = 2
+    print("EJECIÓN DEL PIPELINE COMPLETA.\n")
     #print(f"✅ Datos cargados: {X_train.shape[0]} imágenes de entrenamiento, {X_val.shape[0]} imágenes de validación.\n")
 
     # 2️⃣ Construir el modelo
