@@ -3,7 +3,7 @@ import numpy as np
 import pydicom
 from utils.config import (
     DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR,
-    IMAGE_DICOM_RESIZE, MESSAGES, TARGET_DEPTH,
+    IMAGE_SIZE, MESSAGES, TARGET_DEPTH,
     X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
 )
 from pathlib import Path
@@ -40,8 +40,8 @@ def load_all_datasets():
     tep_file = "K:/data_dicom_processed_tep_true.h5"
     no_tep_file = "K:/data_dicom_processed_tep_false.h5"
     
-    load_dataset_hucsr(DICOM_TEP_TRUE_DIR, 1, tep_file)
-    load_dataset_hucsr(DICOM_TEP_FALSE_DIR, 0, no_tep_file)
+    #load_dataset_hucsr(DICOM_TEP_TRUE_DIR, 1, tep_file)
+    #load_dataset_hucsr(DICOM_TEP_FALSE_DIR, 0, no_tep_file)
 
     output_file = "K:/data_dicom_processed_hucsr.h5"
 
@@ -50,8 +50,10 @@ def load_all_datasets():
         n_no_tep = no_tep_h5[X_TRAIN_NO_TEP].shape[0]
         total_volumes = n_tep + n_no_tep
 
+        logging.info(f"Volúmenes TTEP: {n_tep}; Volúmenes FTEP: {n_no_tep}; Volúmenes Totales: {total_volumes}")
+
         with h5py.File(output_file, 'w') as final_h5f:
-            volume_shape = (TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1)
+            volume_shape = (TARGET_DEPTH, *IMAGE_SIZE, 1)
             X_train_dset = final_h5f.create_dataset('X_train', 
                                                     shape=(0, *volume_shape), 
                                                     maxshape=(None, *volume_shape), 
@@ -93,8 +95,8 @@ def load_dataset_hucsr(directory, label, ruta_guardar_temporal):
     tag_name_y = Y_TRAIN_TEP if label == 1 else Y_TRAIN_NO_TEP
 
     with ThreadPoolExecutor(max_workers=4) as executor, h5py.File(ruta_guardar_temporal, 'w') as h5f:
-        volumes_dset = h5f.create_dataset(tag_name_X, shape=(0, TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1), 
-                                         maxshape=(None, TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1), 
+        volumes_dset = h5f.create_dataset(tag_name_X, shape=(0, TARGET_DEPTH, *IMAGE_SIZE, 1), 
+                                         maxshape=(None, TARGET_DEPTH, *IMAGE_SIZE, 1), 
                                          dtype=np.float32)
         labels_dset = h5f.create_dataset(tag_name_y, shape=(0,), maxshape=(None,), dtype=np.int32)
 
@@ -198,7 +200,7 @@ def process_series(sorted_files, patient_name, label):
     Returns:
         tuple: (volume, label).
     """
-    patient_volume = [load_dicom_image(f, IMAGE_DICOM_RESIZE) for f in sorted_files]
+    patient_volume = [load_dicom_image(f, IMAGE_SIZE) for f in sorted_files]
     patient_volume = [img for img in patient_volume if img is not None]
     
     if not patient_volume:
@@ -320,7 +322,7 @@ def save_series_to_folders(series_dict, patient_name, output_dir='K:/processed h
         # Generar una visualización del corte medio (opcional)
         try:
             middle_file = files[len(files) // 2]
-            img = load_dicom_image(middle_file, IMAGE_DICOM_RESIZE)
+            img = load_dicom_image(middle_file, IMAGE_SIZE)
             if img is not None:
                 plt.imshow(img[:, :, 0], cmap='gray')
                 plt.title(f"{patient_name} - Serie {series_uid[-8:]} - Corte medio")

@@ -2,14 +2,15 @@ import os
 import numpy as np
 import pydicom
 import pandas as pd
-from utils.config import IMAGE_DICOM_RESIZE, MESSAGES, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
+from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
 from pathlib import Path
 import logging
 from skimage.transform import resize
 from concurrent.futures import ThreadPoolExecutor
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv3D, MaxPooling3D, Flatten, Dense, Dropout
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras import Input
+from tensorflow.keras.layers import Conv3D, MaxPooling3D, GlobalAveragePooling3D, Dense, Dropout
 
 # Configuración de logging
 logging.basicConfig(
@@ -42,17 +43,26 @@ def pretrain_model():
     logging.info("Modelo preentrenado guardado en models/pretrained_rsna.keras")
 
 # Definir la arquitectura del modelo
-def create_model():
-    model = Sequential([
-        Conv3D(32, (3, 3, 3), activation='relu', input_shape=(TARGET_DEPTH, *IMAGE_DICOM_RESIZE, 1)),
-        MaxPooling3D((2, 2, 2)),
-        Conv3D(64, (3, 3, 3), activation='relu'),
-        MaxPooling3D((2, 2, 2)),
-        Flatten(),
-        Dense(128, activation='relu'),
-        Dropout(0.5),
-        Dense(1, activation='sigmoid')
-    ])
+def create_model():    
+    inputs = Input(shape=(TARGET_DEPTH, *IMAGE_SIZE, 1))
+    xx = Conv3D(32, (3, 3, 3), activation='relu')(inputs)
+    x = MaxPooling3D((2, 2, 2))(x)  # reduce a (128, 112, 112, 32)
+    
+    x = Conv3D(64, (3, 3, 3), activation='relu')(x)
+    x = MaxPooling3D((2, 2, 2))(x)  # reduce a (64, 56, 56, 64)
+    
+    x = Conv3D(128, (3, 3, 3), activation='relu')(x)
+    x = MaxPooling3D((2, 2, 2))(x)  # reduce a (32, 28, 28, 128)
+
+    x = Conv3D(256, (3, 3, 3), activation='relu')(x)
+    x = MaxPooling3D((2, 2, 2))(x)  # reduce a (16, 14, 14, 256)
+
+    x = GlobalAveragePooling3D()(x)
+    x = Dense(128, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    outputs = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs, outputs)
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
@@ -64,7 +74,7 @@ def rsna_data_generator(directory, train_csv, batch_size=4):
         X_batch = []
         y_batch = []
         
-        with ThreadPoolExecutor(max_workers=2) as executor:
+        with ThreadPoolExecutor(max_workers=1) as executor:
             futures = [executor.submit(process_study, study, train_csv) for study in batch_studies]
             for future in futures:
                 volume, label = future.result()
@@ -102,7 +112,7 @@ def process_study(study_path, train_csv):
             continue
 
     sorted_files = [f for _, f in sorted(sorted_files, key=lambda x: x[0])]
-    patient_volume = [load_dicom_image(f, IMAGE_DICOM_RESIZE) for f in sorted_files]
+    patient_volume = [load_dicom_image(f, IMAGE_SIZE) for f in sorted_files]
     patient_volume = [img for img in patient_volume if img is not None]
 
     if not patient_volume:

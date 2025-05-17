@@ -15,7 +15,7 @@ def test_pipeline():
     print("Cargando las imágenes del HUCSR ...")
     #load_images_hucsr.load_all_datasets()
     print("Validando las imágenes del HUCSR ...")
-    #validate_load_images_hucsr.validate()
+    validate_load_images_hucsr.validate()
 
     #print("Calcular target depth RSNA...")
     #calculate_target_depth.calculate() NO SE USA
@@ -25,7 +25,7 @@ def test_pipeline():
     #validate_load_images_hucsr.validate() NO SE USA
 
     print("Preentrenando el modelo RSNA ...")
-    pretrain_rsna.pretrain_model()
+    #pretrain_rsna.pretrain_model()
     #train_file = dataset_loader.load_all_datasets()
 
     # 1️⃣ Cargar el dataset (Imágenes RNSA)

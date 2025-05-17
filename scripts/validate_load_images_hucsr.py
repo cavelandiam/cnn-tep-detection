@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 from utils.config import (
     DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, 
-    IMAGE_DICOM_RESIZE, TARGET_DEPTH, 
+    IMAGE_SIZE, TARGET_DEPTH, 
     X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
 )
 
@@ -77,7 +77,7 @@ def validate_hdf5(hdf5_file, expected_tep, expected_no_tep):
             logging.info(f"Número total de muestras: {n_samples}")
 
             # 3. Verificar dimensiones de los volúmenes
-            expected_shape = (TARGET_DEPTH, IMAGE_DICOM_RESIZE[0], IMAGE_DICOM_RESIZE[1], 1)
+            expected_shape = (TARGET_DEPTH, IMAGE_SIZE[0], IMAGE_SIZE[1], 1)
             for i in range(min(n_samples, 5)):  # Verificar solo las primeras 5 muestras
                 if X_train[i].shape != expected_shape:
                     logging.error(f"Volumen {i} tiene forma incorrecta: {X_train[i].shape}, esperado: {expected_shape}")

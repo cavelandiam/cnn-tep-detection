@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 from collections import defaultdict
 import pydicom
-from utils.config import DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, IMAGE_DICOM_RESIZE
+from utils.config import DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, IMAGE_SIZE
 
 # Configuración de logging
 logging.basicConfig(
@@ -15,7 +15,7 @@ logging.basicConfig(
     ]
 )
 
-def analizar_num_cortes(directory, filter_series=True):
+def analizar_num_cortes(directory):
     """
     Analiza la cantidad de cortes en todas las series DICOM de un conjunto de datos.
     
@@ -50,12 +50,7 @@ def analizar_num_cortes(directory, filter_series=True):
                 try:
                     ds = pydicom.dcmread(files[0])
                     series_desc = ds.get('SeriesDescription', '').lower()
-                    
-                    # Filtrar series relevantes (opcional)
-                    if filter_series and not ('ctpa' in series_desc or 'contrast' in series_desc):
-                        logging.info(f"Serie {series_uid[-8:]} de {patient.name} ignorada: SeriesDescription={series_desc}")
-                        continue
-                    
+                                        
                     num_cortes = len(files)
                     num_cortes_lista.append(num_cortes)
                     
@@ -157,7 +152,7 @@ def suggest_target_depth(stats_tep, stats_no_tep, image_size, max_memory_mb=8000
 
 def calculate():
     """Calcula y sugiere un TARGET_DEPTH óptimo basado en cortes por serie."""
-    stats_tep = analizar_num_cortes(DICOM_TEP_TRUE_DIR, filter_series=True)
-    stats_no_tep = analizar_num_cortes(DICOM_TEP_FALSE_DIR, filter_series=True)
-    target_depth = suggest_target_depth(stats_tep, stats_no_tep, IMAGE_DICOM_RESIZE)
+    stats_tep = analizar_num_cortes(DICOM_TEP_TRUE_DIR)
+    stats_no_tep = analizar_num_cortes(DICOM_TEP_FALSE_DIR)
+    target_depth = suggest_target_depth(stats_tep, stats_no_tep, IMAGE_SIZE)
     logging.info(f"TARGET_DEPTH óptimo recomendado: {target_depth}")
