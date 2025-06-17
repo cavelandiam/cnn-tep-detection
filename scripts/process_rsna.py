@@ -3,17 +3,28 @@ import h5py
 import pydicom
 import logging
 import numpy as np
-import pandas as pd
+import polars as ps
 from tqdm import tqdm
 from skimage.transform import resize
-from utils.config import MODEL_DIR, RSNA_DATASET_TRAIN_DIR
+from utils.config import RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR, MODEL_DIR
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-def load_rsna_metadata(csv_path, needed_cols=None):
+def load_data_rsna_train():
+    
+    train_csv_path = os.path.join(RSNA_CSV_TRAIN_DIR)  
+
+    df = load_rsna_metadata(train_csv_path)      
+
+    graph_metadata(df)   
+    
+
+def load_rsna_metadata(train_csv_path):
     """
     Lee el CSV principal que contiene los metadatos de la competencia de RSNA.
     Filtra las columnas relevantes (StudyInstanceUID, SOPInstanceUID, etc.).
@@ -22,18 +33,38 @@ def load_rsna_metadata(csv_path, needed_cols=None):
     :param needed_cols: Lista de columnas que necesitas conservar.
     :return: DataFrame con las columnas filtradas.
     """
-    if needed_cols is None:
-        needed_cols = [
-            'StudyInstanceUID',
-            'SeriesInstanceUID',
-            'SOPInstanceUID',
-            'InstanceNumber',
-            'pe_present_on_image'
-        ]
-    logging.info(f"Leyendo CSV de metadatos: {csv_path}")
-    df = pd.read_csv(csv_path)
+    needed_cols = [
+        'StudyInstanceUID',
+        'SeriesInstanceUID',
+        'SOPInstanceUID',            
+        'pe_present_on_image',
+        'negative_exam_for_pe'
+    ]
+    
+    df = ps.read_csv(train_csv_path)
     df = df[needed_cols]
     return df
+
+def graph_metadata(df):
+
+    study_labels = df.group_by("StudyInstanceUID").agg([
+        ps.col("negative_exam_for_pe").first().alias("diagnosis")
+    ])
+    study_labels
+
+    pdf = study_labels.to_pandas()
+
+    sns.countplot(x="diagnosis", data=pdf, hue='diagnosis')
+    plt.title("Distribution of Negative vs. Positive studies for PE - RSNA Dataset")
+    plt.xlabel("PE")
+    plt.ylabel("Number of studies")
+    plt.xticks(['No Exist PE', 'Exist PE'], ["Negative", "Positive"])
+
+    plt.savefig(MODEL_DIR / 'distribution_pe_true_false_rsna.png', bbox_inches='tight')
+    plt.close()
+
+    plt.show()
+
 
 def load_dicom_image(dicom_path, skip_color_images=True):
     """
@@ -60,14 +91,6 @@ def load_dicom_image(dicom_path, skip_color_images=True):
     
     return img
 
-
-def resize_image(img, target_size=(512, 512)):
-    """
-    Redimensiona la imagen 2D a la resolución deseada.
-    Ajusta el modo de interpolación si lo requieres.
-    """
-    resized = resize(img, output_shape=target_size, mode='constant', preserve_range=True)
-    return resized.astype(np.float32)
 
 
 def process_study(study_id, df_study, base_dir, target_size=(512, 512)):
@@ -206,25 +229,3 @@ def load_rsna_dataset_to_hdf5(
     # Cerrar archivo
     hdf5_file.close()
     logging.info(f"[4/4] Proceso finalizado. Archivo guardado en: {output_hdf5_path}")
-
-
-def load_data_rsna():
-    """
-    Ejemplo de uso directo desde CLI o punto de entrada.
-    Ajusta las rutas a tu entorno.
-    """
-    # Ajusta estos paths y parámetros:
-    train_csv_path = os.path.join(MODEL_DIR,"rsna-str-pulmonary-embolism-detection", "train.csv")
-    rsna_train_data = os.path.join(RSNA_DATASET_DIR, "rsna-str-pulmonary-embolism-detection", "train")
-    output_hdf5_path = "rsna_train_data.h5"
-    
-    # Llamada principal
-    load_rsna_dataset_to_hdf5(
-        train_csv_path=train_csv_path,
-        base_dicom_dir=rsna_train_data,
-        output_hdf5_path=output_hdf5_path,
-        target_size=(512, 512),
-        max_studies=None,      # O un número para test
-        parallel=True,         # Si quieres usar multiprocessing
-        num_workers=8          # Ajusta según tu CPU/GPU
-    )

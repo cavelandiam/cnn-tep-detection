@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pydicom
-import pandas as pd
+import polars as ps
 from utils.config import IMAGE_DICOM_RESIZE, MESSAGES, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
 from pathlib import Path
 import logging
@@ -34,7 +34,7 @@ def load_dataset_rsna(directory, train_csv_path, output_file):
     """
     logging.info(MESSAGES["data_loading"].format(directory))
     directory = Path(directory)
-    train_csv = pd.read_csv(train_csv_path)
+    train_csv = ps.read_csv(train_csv_path)
     
     studies = [p for p in directory.iterdir() if p.is_dir()]
     

@@ -13,6 +13,7 @@ RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmon
 RSNA_DATASET_TEST_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "test")
 RSNA_CSV_TEST_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "test.csv")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "train.csv")
+RSNA_CSV_TRAIN_PROCESSED_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "train_processed.csv")
 
 # 📂 **Rutas de Modelos**
 TRAINED_MODEL_PATH = os.path.join(MODEL_DIR, "trained_model.keras")

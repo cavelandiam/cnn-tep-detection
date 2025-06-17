@@ -11,3 +11,4 @@ matplotlib
 scikit-image
 pandas
 tqdm
+polars

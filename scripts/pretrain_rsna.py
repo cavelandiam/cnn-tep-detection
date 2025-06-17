@@ -13,7 +13,13 @@ from tensorflow.keras import Input
 from tensorflow.keras.layers import Conv3D, MaxPooling3D, GlobalAveragePooling3D, Dense, Dropout
 import warnings
 
-# Suprimir advertencias específicas de pydicom para VR UI
+# Filtro para ocultar solo "Invalid value for VR UI"
+class IgnoreInvalidVRUIFilter(logging.Filter):
+    def filter(self, record):
+        return "Invalid value for VR UI" not in record.getMessage()
+
+logging.getLogger("pydicom").addFilter(IgnoreInvalidVRUIFilter())
+
 warnings.filterwarnings('ignore', category=UserWarning, message='Invalid value for VR UI')
 
 # Configuración de logging
@@ -31,13 +37,24 @@ def pretrain_model():
     train_csv = pd.read_csv(RSNA_CSV_TRAIN_DIR)
     model = create_model()
     
-    batch_size = 1  # Ajusta según tu RAM
+    batch_size = 2
     steps_per_epoch = len([p for p in Path(RSNA_DATASET_TRAIN_DIR).iterdir() if p.is_dir()]) // batch_size
+
+    # Calcular pesos de clase para manejar desbalance (64% TEP, 36% No-TEP)
+    n_samples = len(train_csv)
+    n_positive = len(train_csv[train_csv['negative_exam_for_pe'] == 1])
+    n_negative = len(train_csv[train_csv['negative_exam_for_pe'] == 0])
+    class_weight = {0: n_samples / (2 * n_negative), 1: n_samples / (2 * n_positive)}
+    logging.info(f"Pesos de clase: No-TEP={class_weight[0]:.2f}, TEP={class_weight[1]:.2f}")
+    logging.info(f"Peso de clase 1 ={class_weight[1]}, PEso de clase 0={class_weight[0]}")
+    
     
     model.fit(
-        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size),
+        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size, class_weight=class_weight),
         steps_per_epoch=steps_per_epoch,
-        epochs=1  # Ajusta según tus necesidades
+        epochs=5,
+        #class_weight=class_weight,        
+        verbose=1
     )
     
     # Guardar el modelo en formato .keras
@@ -67,17 +84,21 @@ def create_model():
     outputs = Dense(1, activation='sigmoid')(x)
 
     model = Model(inputs, outputs)
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),#'adam', 
+        loss='binary_crossentropy', 
+        metrics=['accuracy',tf.keras.metrics.Recall(name='recall'), tf.keras.metrics.AUC(name='auc')])
     return model
 
 # Generador de datos para RSNA
-def rsna_data_generator(directory, train_csv, batch_size):
+def rsna_data_generator(directory, train_csv, batch_size, class_weight):
     studies = [p for p in Path(directory).iterdir() if p.is_dir()]
     for i in range(0, len(studies), batch_size):
         batch_studies = studies[i:i + batch_size]
         X_batch = []
         y_batch = []
-        
+        sample_weights = []
+        '''
         with ThreadPoolExecutor(max_workers=1) as executor:
             futures = [executor.submit(process_study, study, train_csv) for study in batch_studies]
             for future in futures:
@@ -85,9 +106,18 @@ def rsna_data_generator(directory, train_csv, batch_size):
                 if volume is not None:
                     X_batch.append(volume)
                     y_batch.append(label)
-        
+                    sample_weights.append(class_weight[label])
+        '''
+        for study in batch_studies:
+            volume, label = process_study(study, train_csv)
+            if volume is not None:
+                X_batch.append(volume)
+                y_batch.append(label)
+                sample_weights.append(class_weight[label])
+
         if X_batch:
-            yield np.array(X_batch), np.array(y_batch)
+            #yield np.array(X_batch), np.array(y_batch), np.array(sample_weights)
+            yield tf.convert_to_tensor(X_batch), tf.convert_to_tensor(y_batch), tf.convert_to_tensor(sample_weights)
 
 # Función para procesar un estudio completo
 def process_study(study_path, train_csv):
