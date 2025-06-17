@@ -12,6 +12,7 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras import Input
 from tensorflow.keras.layers import Conv3D, MaxPooling3D, GlobalAveragePooling3D, Dense, Dropout
 import warnings
+import matplotlib.pyplot as plt
 
 # Filtro para ocultar solo "Invalid value for VR UI"
 class IgnoreInvalidVRUIFilter(logging.Filter):
@@ -49,13 +50,16 @@ def pretrain_model():
     logging.info(f"Peso de clase 1 ={class_weight[1]}, PEso de clase 0={class_weight[0]}")
     
     
-    model.fit(
+    history = model.fit(
         rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size, class_weight=class_weight),
         steps_per_epoch=steps_per_epoch,
         epochs=5,
         #class_weight=class_weight,        
         verbose=1
     )
+
+    # Graficar después del entrenamiento
+    plot_training_curves(history)
     
     # Guardar el modelo en formato .keras
     modelSaved = "K:/pretrained_rsna.keras"
@@ -199,3 +203,20 @@ def pad_or_trim_volume(volume, target_depth):
         trim_before = trim_size // 2
         trim_after = trim_size - trim_before
         return volume[trim_before:D - trim_after, :, :, :]
+    
+def plot_training_curves(history):
+    metrics = ['loss', 'accuracy', 'recall', 'auc']
+    plt.figure(figsize=(12, 8))
+
+    for i, metric in enumerate(metrics):
+        plt.subplot(2, 2, i+1)
+        plt.plot(history.history[metric], label=metric, color='blue')
+        plt.title(metric.capitalize())
+        plt.xlabel('Epoch')
+        plt.ylabel(metric)
+        plt.grid(True)
+        plt.legend()
+
+    plt.tight_layout()
+    plt.savefig("logs/training_curves.png")
+    plt.show()
