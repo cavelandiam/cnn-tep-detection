@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pydicom
-import pandas as pd
+import polars as ps
 from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
 from pathlib import Path
 import logging
@@ -36,23 +36,24 @@ logging.basicConfig(
 
 # Entrenar el modelo
 def pretrain_model():
-    train_csv = pd.read_csv(RSNA_CSV_TRAIN_DIR)
+    #train_csv = ps.read_csv(RSNA_CSV_TRAIN_DIR)
+    patients_by_study, train_csv = grouped_patients_by_study()
     model = create_model()
     
     batch_size = 4
-    n_studies = len([p for p in Path(RSNA_DATASET_TRAIN_DIR).iterdir() if p.is_dir()])
-    steps_per_epoch = n_studies // batch_size
+    #n_studies = len([p for p in Path(RSNA_DATASET_TRAIN_DIR).iterdir() if p.is_dir()])    
+    n_studies = len(patients_by_study)  # 7279 estudios
+    steps_per_epoch = int(n_studies * 0.8 // batch_size)  # 80% para entrenamiento (~1456 pasos)
+    validation_steps = int(n_studies * 0.2 // batch_size)  # 20% para validación (~364 pasos)
 
     # Calcular pesos de clase para manejar desbalance (64% TEP, 36% No-TEP)
-    n_samples = len(train_csv)
-    n_positive = len(train_csv[train_csv['negative_exam_for_pe'] == 1])
-    n_negative = len(train_csv[train_csv['negative_exam_for_pe'] == 0])
+    n_samples = n_studies
+    n_positive = len(patients_by_study[patients_by_study['diagnosis'] == 1])  # Estudios con TEP (~4500)
+    n_negative = len(patients_by_study[patients_by_study['diagnosis'] == 0])  # Estudios sin TEP (~2500)
     class_weight = {0: n_samples / (2 * n_negative), 1: n_samples / (2 * n_positive)}
+    logging.info(f"Número de estudios totales: {n_samples}")
+    logging.info(f"Estudios No-TEP: {n_negative}, Estudios TEP: {n_positive}")
     logging.info(f"Pesos de clase: No-TEP={class_weight[0]:.2f}, TEP={class_weight[1]:.2f}")
-    logging.info(f"Peso de clase 1 ={class_weight[1]}, PEso de clase 0={class_weight[0]}")
-        
-    steps_per_epoch = int(n_studies * 0.8 // batch_size)  # 80% para entrenamiento
-    validation_steps = int(n_studies * 0.2 // batch_size)  # 20% para validación
 
     # Callbacks
     early_stopping = tf.keras.callbacks.EarlyStopping(
@@ -69,7 +70,7 @@ def pretrain_model():
     )
 
     history = model.fit(
-        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size, class_weight=class_weight),        
+        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, patients_by_study, train_csv, batch_size=batch_size, class_weight=class_weight),        
         epochs=100,          
         verbose=1,
         steps_per_epoch=steps_per_epoch,
@@ -85,6 +86,22 @@ def pretrain_model():
     #modelSaved = "models/pretrained_rsna.keras"
     model.save(modelSaved)
     logging.info("Modelo preentrenado guardado en models/pretrained_rsna.keras")
+
+def grouped_patients_by_study():
+    df = ps.read_csv(RSNA_CSV_TRAIN_DIR)
+    needed_cols = [
+        'StudyInstanceUID',
+        'SeriesInstanceUID',
+        'SOPInstanceUID',
+        'pe_present_on_image',
+        'negative_exam_for_pe'
+    ]
+
+    df = df[needed_cols]
+    study_labels = df.group_by("StudyInstanceUID").agg([
+        ps.col("negative_exam_for_pe").first().alias("diagnosis")
+    ])
+    return study_labels.to_pandas(), df.to_pandas()
 
 # Definir la arquitectura del modelo
 def create_model():    
@@ -117,7 +134,7 @@ def create_model():
     return model
 
 # Generador de datos para RSNA
-def rsna_data_generator(directory, train_csv, batch_size, class_weight):
+def rsna_data_generator(directory, patients_by_study, train_csv, batch_size, class_weight):
     studies = [p for p in Path(directory).iterdir() if p.is_dir()]
     studies = shuffle(studies, random_state=42)
     for i in range(0, len(studies), batch_size):

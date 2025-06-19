@@ -1,11 +1,8 @@
 import os
 import numpy as np
 import pydicom
-from utils.config import (
-    DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR,
-    IMAGE_SIZE, MESSAGES, TARGET_DEPTH,
-    X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
-)
+from utils.config import DICOM_TEP_TRUE_DIR, DICOM_TEP_FALSE_DIR, IMAGE_SIZE, MESSAGES, TARGET_DEPTH, X_TRAIN_NO_TEP, X_TRAIN_TEP, Y_TRAIN_NO_TEP, Y_TRAIN_TEP
+
 from pathlib import Path
 import logging
 from skimage.transform import resize

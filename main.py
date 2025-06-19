@@ -1,7 +1,7 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
+from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna, improved_3dcnn_tep
 import matplotlib.pyplot as plt
 import pydicom
 
@@ -28,7 +28,9 @@ def test_pipeline():
     #process_rsna.load_data_rsna_train()
 
     print("Preentrenando el modelo RSNA ...")
-    pretrain_rsna.pretrain_model()
+    #pretrain_rsna.pretrain_model()
+    improved_3dcnn_tep.pretrain_model()
+    
     #train_file = dataset_loader.load_all_datasets()
 
     # 1️⃣ Cargar el dataset (Imágenes RNSA)
