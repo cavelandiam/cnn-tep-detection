@@ -13,6 +13,7 @@ from tensorflow.keras import Input
 from tensorflow.keras.layers import Conv3D, MaxPooling3D, GlobalAveragePooling3D, Dense, Dropout
 import warnings
 import matplotlib.pyplot as plt
+from sklearn.utils import shuffle
 
 # Filtro para ocultar solo "Invalid value for VR UI"
 class IgnoreInvalidVRUIFilter(logging.Filter):
@@ -38,8 +39,9 @@ def pretrain_model():
     train_csv = pd.read_csv(RSNA_CSV_TRAIN_DIR)
     model = create_model()
     
-    batch_size = 2
-    steps_per_epoch = len([p for p in Path(RSNA_DATASET_TRAIN_DIR).iterdir() if p.is_dir()]) // batch_size
+    batch_size = 4
+    n_studies = len([p for p in Path(RSNA_DATASET_TRAIN_DIR).iterdir() if p.is_dir()])
+    steps_per_epoch = n_studies // batch_size
 
     # Calcular pesos de clase para manejar desbalance (64% TEP, 36% No-TEP)
     n_samples = len(train_csv)
@@ -48,14 +50,31 @@ def pretrain_model():
     class_weight = {0: n_samples / (2 * n_negative), 1: n_samples / (2 * n_positive)}
     logging.info(f"Pesos de clase: No-TEP={class_weight[0]:.2f}, TEP={class_weight[1]:.2f}")
     logging.info(f"Peso de clase 1 ={class_weight[1]}, PEso de clase 0={class_weight[0]}")
-    
-    
+        
+    steps_per_epoch = int(n_studies * 0.8 // batch_size)  # 80% para entrenamiento
+    validation_steps = int(n_studies * 0.2 // batch_size)  # 20% para validación
+
+    # Callbacks
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor='val_auc',
+        patience=10,
+        restore_best_weights=True,
+        mode='max'
+    )
+    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-6
+    )
+
     history = model.fit(
-        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size, class_weight=class_weight),
+        rsna_data_generator(RSNA_DATASET_TRAIN_DIR, train_csv, batch_size=batch_size, class_weight=class_weight),        
+        epochs=100,          
+        verbose=1,
         steps_per_epoch=steps_per_epoch,
-        epochs=5,
-        #class_weight=class_weight,        
-        verbose=1
+        validation_steps=validation_steps,
+        callbacks=[early_stopping, reduce_lr]
     )
 
     # Graficar después del entrenamiento
@@ -70,26 +89,29 @@ def pretrain_model():
 # Definir la arquitectura del modelo
 def create_model():    
     inputs = Input(shape=(TARGET_DEPTH, *IMAGE_SIZE, 1))
-    x = Conv3D(32, (3, 3, 3), activation='relu')(inputs)
+    x = Conv3D(32, (3, 3, 3), activation='relu', padding='same')(inputs)
     x = MaxPooling3D((2, 2, 2))(x)  # reduce a (128, 112, 112, 32)
     
-    x = Conv3D(64, (3, 3, 3), activation='relu')(x)
+    x = Conv3D(64, (3, 3, 3), activation='relu', padding='same')(x)
     x = MaxPooling3D((2, 2, 2))(x)  # reduce a (64, 56, 56, 64)
     
-    x = Conv3D(128, (3, 3, 3), activation='relu')(x)
+    x = Conv3D(128, (3, 3, 3), activation='relu', padding='same')(x)
     x = MaxPooling3D((2, 2, 2))(x)  # reduce a (32, 28, 28, 128)
 
-    x = Conv3D(256, (3, 3, 3), activation='relu')(x)
+    x = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(x)
     x = MaxPooling3D((2, 2, 2))(x)  # reduce a (16, 14, 14, 256)
 
+    x = Conv3D(512, (3, 3, 3), activation='relu', padding='same')(x)  # Nueva capa
+    x = MaxPooling3D((2, 2, 2))(x) # reduce a (8, 7, 7, 512)
+
     x = GlobalAveragePooling3D()(x)
-    x = Dense(128, activation='relu')(x)
+    x = Dense(256, activation='relu')(x)
     x = Dropout(0.5)(x)
     outputs = Dense(1, activation='sigmoid')(x)
 
     model = Model(inputs, outputs)
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),#'adam', 
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
         loss='binary_crossentropy', 
         metrics=['accuracy',tf.keras.metrics.Recall(name='recall'), tf.keras.metrics.AUC(name='auc')])
     return model
@@ -97,13 +119,14 @@ def create_model():
 # Generador de datos para RSNA
 def rsna_data_generator(directory, train_csv, batch_size, class_weight):
     studies = [p for p in Path(directory).iterdir() if p.is_dir()]
+    studies = shuffle(studies, random_state=42)
     for i in range(0, len(studies), batch_size):
         batch_studies = studies[i:i + batch_size]
         X_batch = []
         y_batch = []
         sample_weights = []
-        '''
-        with ThreadPoolExecutor(max_workers=1) as executor:
+        
+        with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(process_study, study, train_csv) for study in batch_studies]
             for future in futures:
                 volume, label = future.result()
@@ -118,10 +141,10 @@ def rsna_data_generator(directory, train_csv, batch_size, class_weight):
                 X_batch.append(volume)
                 y_batch.append(label)
                 sample_weights.append(class_weight[label])
-
+        '''
         if X_batch:
-            #yield np.array(X_batch), np.array(y_batch), np.array(sample_weights)
-            yield tf.convert_to_tensor(X_batch), tf.convert_to_tensor(y_batch), tf.convert_to_tensor(sample_weights)
+            yield np.array(X_batch), np.array(y_batch), np.array(sample_weights)
+            #yield tf.convert_to_tensor(X_batch), tf.convert_to_tensor(y_batch), tf.convert_to_tensor(sample_weights)
 
 # Función para procesar un estudio completo
 def process_study(study_path, train_csv):
@@ -220,3 +243,10 @@ def plot_training_curves(history):
     plt.tight_layout()
     plt.savefig("logs/training_curves.png")
     plt.show()
+
+    '''
+    Accuracy	> 0.80
+    AUC	        > 0.85
+    Loss	    < 0.5 (disminuyendo)
+    Recall	    > 0.7 (idealmente > 0.85)
+    '''
