@@ -21,7 +21,7 @@ import gc
 
 # Configuración optimizada de TensorFlow
 tf.config.experimental.enable_memory_growth = True
-tf.keras.mixed_precision.set_global_policy('mixed_float16')
+#tf.keras.mixed_precision.set_global_policy('mixed_float16')
 
 # Filtro para ocultar solo "Invalid value for VR UI"
 class IgnoreInvalidVRUIFilter(logging.Filter):
@@ -70,57 +70,57 @@ def create_improved_model():
     inputs = Input(shape=(TARGET_DEPTH, *IMAGE_SIZE, 1))
     
     # Bloque inicial
-    x = Conv3D(32, (3, 3, 3), padding='same')(inputs)
+    x = Conv3D(32, (3, 3, 3), padding='same', dtype=tf.float32)(inputs)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = MaxPooling3D((2, 2, 2))(x)  # (128, 112, 112, 32)
+    x = MaxPooling3D((2, 2, 2), dtype=tf.float32)(x)  # (128, 112, 112, 32)
     
     # Bloque residual 1
-    shortcut = Conv3D(64, (1, 1, 1), padding='same')(x)
+    shortcut = Conv3D(64, (1, 1, 1), padding='same', dtype=tf.float32)(x)
     shortcut = BatchNormalization()(shortcut)
     
-    x = Conv3D(64, (3, 3, 3), padding='same')(x)
+    x = Conv3D(64, (3, 3, 3), padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = Conv3D(64, (3, 3, 3), padding='same')(x)
+    x = Conv3D(64, (3, 3, 3), padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Add()([x, shortcut])
     x = Activation('relu')(x)
-    x = MaxPooling3D((2, 2, 2))(x)  # (64, 56, 56, 64)
+    x = MaxPooling3D((2, 2, 2), dtype=tf.float32)(x)  # (64, 56, 56, 64)
     
     # Bloque residual 2
-    shortcut = Conv3D(128, (1, 1, 1), padding='same')(x)
+    shortcut = Conv3D(128, (1, 1, 1), padding='same', dtype=tf.float32)(x)
     shortcut = BatchNormalization()(shortcut)
     
-    x = Conv3D(128, (3, 3, 3), padding='same')(x)
+    x = Conv3D(128, (3, 3, 3), padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = Conv3D(128, (3, 3, 3), padding='same')(x)
+    x = Conv3D(128, (3, 3, 3), padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Add()([x, shortcut])
     x = Activation('relu')(x)
-    x = MaxPooling3D((2, 2, 2))(x)  # (32, 28, 28, 128)
+    x = MaxPooling3D((2, 2, 2), dtype=tf.float32)(x)  # (32, 28, 28, 128)
     
     # Capas adicionales
-    x = Conv3D(256, (3, 3, 3), activation='relu', padding='same')(x)
+    x = Conv3D(256, (3, 3, 3), activation='relu', padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
-    x = MaxPooling3D((2, 2, 2))(x)  # (16, 14, 14, 256)
+    x = MaxPooling3D((2, 2, 2), dtype=tf.float32)(x)  # (16, 14, 14, 256)
     x = Dropout(0.3)(x)
     
-    x = Conv3D(512, (3, 3, 3), activation='relu', padding='same')(x)
+    x = Conv3D(512, (3, 3, 3), activation='relu', padding='same', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
-    x = MaxPooling3D((2, 2, 2))(x)  # (8, 7, 7, 512)
+    x = MaxPooling3D((2, 2, 2), dtype=tf.float32)(x)  # (8, 7, 7, 512)
     x = Dropout(0.4)(x)
     
     # Cabeza de clasificación
     x = GlobalAveragePooling3D()(x)
-    x = Dense(512, activation='relu')(x)
+    x = Dense(512, activation='relu', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Dropout(0.5)(x)
-    x = Dense(256, activation='relu')(x)
+    x = Dense(256, activation='relu', dtype=tf.float32)(x)
     x = BatchNormalization()(x)
     x = Dropout(0.3)(x)
-    outputs = Dense(1, activation='sigmoid', dtype='float32')(x)  # Mixed precision fix
+    outputs = Dense(1, activation='sigmoid', dtype=tf.float32)(x)  # Mixed precision fix
     
     model = Model(inputs, outputs)
     
@@ -140,8 +140,7 @@ def create_improved_model():
             'accuracy',
             tf.keras.metrics.Precision(name='precision'),
             tf.keras.metrics.Recall(name='recall'),
-            tf.keras.metrics.AUC(name='auc'),
-            tf.keras.metrics.F1Score(name='f1_score')
+            tf.keras.metrics.AUC(name='auc')           
         ]
     )
     
@@ -332,7 +331,8 @@ def pad_or_trim_volume_robust(volume, target_depth):
 class ImprovedDataGenerator(tf.keras.utils.Sequence):
     """Generador de datos mejorado con tf.keras.utils.Sequence"""
     
-    def __init__(self, studies, train_csv, batch_size=4, shuffle=True, augment=False):
+    def __init__(self, studies, train_csv, batch_size=8, shuffle=True, augment=False, **kwargs):
+        super().__init__(**kwargs)  # Llamar al constructor padre
         self.studies = studies
         self.train_csv = train_csv
         self.batch_size = batch_size
@@ -455,7 +455,7 @@ def pretrain_model():
     model.summary()
     
     # Configurar generadores de datos
-    batch_size = 4  # Reducido para ajustarse a la RAM
+    batch_size = 8  # Reducido para ajustarse a la RAM
     train_gen, val_gen = create_balanced_generators(valid_studies, train_csv, batch_size)
     
     logging.info(f"Batches de entrenamiento: {len(train_gen)}")
@@ -523,7 +523,7 @@ def pretrain_model():
 
 def plot_training_curves_improved(history):
     """Función mejorada para graficar curvas de entrenamiento"""
-    metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1_score']
+    metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc']
     
     plt.figure(figsize=(15, 10))
     
