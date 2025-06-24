@@ -9,7 +9,7 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 # 📂 **Rutas de Datos**
 DICOM_TEP_TRUE_DIR = os.path.join(DATA_DIR, "patients_tep_true")
 DICOM_TEP_FALSE_DIR = os.path.join(DATA_DIR, "patients_tep_false")
-RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "train")
+RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "train2")
 RSNA_DATASET_TEST_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "test")
 RSNA_CSV_TEST_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "test.csv")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna_dataset", "rsna-str-pulmonary-embolism-detection", "train.csv")
