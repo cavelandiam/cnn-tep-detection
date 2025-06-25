@@ -28,9 +28,9 @@ IMAGE_SIZE = (224, 224)
 TARGET_DEPTH = 128 #512
 
 # 📌 **Hiperparámetros del Modelo**
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 EPOCHS = 10
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 1e-6
 
 # 📌 **Mensajes del Sistema**
 MESSAGES = {

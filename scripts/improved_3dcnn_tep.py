@@ -20,7 +20,7 @@ from tensorflow.keras.layers import (Input, Conv3D, BatchNormalization, Activati
                                     Dropout, Dense)
 
 # Configuración desde utils.config
-from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR
+from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR, BATCH_SIZE, EPOCHS, LEARNING_RATE
 
 # --- CONFIGURACIÓN DE TENSORFLOW Y LOGGING ---
 
@@ -339,8 +339,7 @@ def pretrain_model():
         1: (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0,
     }
     logging.info(f"Pesos de clase calculados -> 0: {class_weight[0]:.2f}, 1: {class_weight[1]:.2f}")
-    
-    BATCH_SIZE = 4
+        
     step_per_epoch = max(1, len(train_df) // BATCH_SIZE)
     validation_steps = max(1, len(val_df) // BATCH_SIZE)
     train_dataset = create_optimized_tf_dataset(train_df, BATCH_SIZE, is_training=True, class_weights=class_weight)
@@ -354,7 +353,7 @@ def pretrain_model():
             'models/best_model_auc.keras', monitor='val_auc', save_best_only=True, mode='max', verbose=1
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.2, patience=5, min_lr=1e-6, verbose=1
+            monitor='val_loss', factor=0.2, patience=5, min_lr=LEARNING_RATE, verbose=1
         ),
         
         #tf.keras.callbacks.EarlyStopping(
@@ -368,7 +367,7 @@ def pretrain_model():
     history = model.fit(
         train_dataset,
         validation_data=val_dataset,
-        epochs=200,
+        epochs=EPOCHS,
         steps_per_epoch=step_per_epoch,
         validation_steps=validation_steps,
         batch_size=1,
