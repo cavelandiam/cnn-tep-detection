@@ -1,3 +1,15 @@
+Se ha instalado Python 3.9.13, que viene con la versión pip 22.0.4
+
+Se crea el ambiente virtual con el comando: python -m venv venv/env-cnn-tep-detection
+
+Se activa el ambiente virtual: .\venv\env-cnn-tep-detection\Scripts\activate
+ si sale un error, ejecutar: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+
+Esto te permitirá ejecutar scripts .ps1 que hayan sido creados localmente, como los de los entornos virtuales.
+
+🔒 Es seguro si solo ejecutas scripts en los que confías.
+✅ Solo afecta a tu usuario, no al sistema completo.
+
 ```bash
 CNN-TEP-DETECTION/
 │── data/                               # 📂 Carpeta de datos (imágenes DICOM)

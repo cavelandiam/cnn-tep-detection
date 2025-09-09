@@ -29,7 +29,7 @@ def test_pipeline():
 
     print("Preentrenando el modelo RSNA ...")
     #pretrain_rsna.pretrain_model()
-    improved_3dcnn_tep.pretrain_model()
+    #improved_3dcnn_tep.pretrain_model()
     
     #train_file = dataset_loader.load_all_datasets()
 

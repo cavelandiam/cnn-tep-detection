@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "activateVirtualEnv",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/env-cnn-tep-detection/Scripts/activate",
+      "windows": {
+        "command": "${workspaceFolder}\\venv\\env-cnn-tep-detection\\Scripts\\activate.bat"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
