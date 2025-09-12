@@ -1,27 +1,70 @@
-Se ha instalado Python 3.9.13, que viene con la versión pip 22.0.4
 
-Se crea el ambiente virtual con el comando: python -m venv venv/env-cnn-tep-detection
+# Introducción a WSL2 para Ubuntu 22.04 LTS
 
-Se activa el ambiente virtual: .\venv\env-cnn-tep-detection\Scripts\activate
- si sale un error, ejecutar: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+Para garantizar compatibilidad plena con las bibliotecas de aprendizaje profundo y aprovechar el rendimiento de las GPUs NVIDIA, este proyecto se desarrolla en un entorno basado en Windows Subsystem for Linux 2 (WSL2) ejecutando Ubuntu 22.04 LTS.
 
-Esto te permitirá ejecutar scripts .ps1 que hayan sido creados localmente, como los de los entornos virtuales.
+A partir de TensorFlow 2.11, Google dejó de ofrecer soporte oficial para CUDA en Windows nativo, lo que impide el uso directo de la GPU en sistemas operativos Windows convencionales. Para superar esta limitación, se optó por WSL2, una capa de virtualización integrada en Windows 11 que permite ejecutar una distribución Linux completa con acceso directo a los drivers NVIDIA instalados en el host.
 
-🔒 Es seguro si solo ejecutas scripts en los que confías.
-✅ Solo afecta a tu usuario, no al sistema completo.
+Ubuntu 22.04 fue seleccionado por su estabilidad, amplia compatibilidad con herramientas de ciencia de datos y soporte oficial para las versiones de CUDA requeridas por TensorFlow. Esta configuración no solo habilita el entrenamiento eficiente de redes neuronales convolucionales en GPU, sino que también asegura coherencia con los entornos de producción y investigación en entornos Linux, facilitando la reproducibilidad y el despliegue futuro.
 
+Así, aunque el desarrollo se realiza en un equipo con Windows 11, el código se ejecuta bajo un entorno Linux auténtico — combinando la comodidad del sistema anfitrión con el poder y la confiabilidad del ecosistema de deep learning en Linux.
 
- para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecuta el comando: pip install -r .\requirements.txt
+## Instalación de WSL y Ubuntu 22.04 LTS
 
+Desde una consola de PowerShell abierta como administrador, se ejecutan los siguientes comandos para la instalación:
 
- USANDO WSL 
-
+```bash
  wsl --install
  wsl --update
  wsl --list --online
  wsl --install -d Ubuntu-22.04
+```
+## Configuración de Ubuntu 22.04 LTS
 
- Una vez se abra el ubuntu, se descarga el repositorio
+Luego de la instalación, se ejecutan los siguientes comandos que permitirán actualizar el sistema operativo, instalar el administrador de paquetes "pip", e instalar el paquete para crear ambientes virtuales:
+
+```bash
+ sudo apt update
+ sudo apt install python3-pip
+ pip install --upgrade pip
+ sudo apt install python3.10-venv
+```
+
+Después de realizar la configuración necesaria, se descarga el repositorio.
+
+NOTA: La versión que se está usando para este proyecto es Python 3.10.12 y pip 25.2
+
+## Preparación del proyecto
+
+Se crea el ambiente virtual con el siguiente comando: 
+```bash
+ python3 -m venv venv/env-cnn-tep-detection
+```
+
+Se activa el ambiente virtual: 
+```bash
+ .\venv\env-cnn-tep-detection\Scripts\activate
+```
+
+Si sale un error, ejecutar: 
+
+```bash
+ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+```
+
+Esto te permitirá ejecutar scripts .ps1 que hayan sido creados localmente, como los de los entornos virtuales.
+
+- 🔒 Es seguro si solo ejecutas scripts en los que confías.
+- ✅ Solo afecta a tu usuario, no al sistema completo.
+
+
+Para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecuta el siguiente comando: 
+
+```bash
+ pip install -r .\requirements.txt
+```
+
+## Estructura del Proyecto
 
 ```bash
 CNN-TEP-DETECTION/
