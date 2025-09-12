@@ -24,6 +24,10 @@ from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATA
 
 # --- CONFIGURACIÓN DE TENSORFLOW Y LOGGING ---
 
+print("Versión de TensorFlow:", tf.__version__)
+print("Dispositivos físicos:", tf.config.list_physical_devices('GPU'))
+print("Dispositivos lógicos:", tf.config.list_logical_devices('GPU'))
+
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -34,6 +38,7 @@ if gpus:
         logging.error(f"Error al configurar la memoria de la GPU: {e}")
 
 tf.keras.mixed_precision.set_global_policy('mixed_float16')
+tf.debugging.set_log_device_placement(True)
 logging.info("Política de precisión mixta de Keras establecida en 'mixed_float16'.")
 
 class IgnoreInvalidVRUIFilter(logging.Filter):

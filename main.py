@@ -1,7 +1,7 @@
 import numpy as np
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna, improved_3dcnn_tep
+from scripts import improved_3dcnn_tep #load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna, 
 import matplotlib.pyplot as plt
 import pydicom
 

@@ -5,6 +5,8 @@ Se crea el ambiente virtual con el comando: python -m venv venv/env-cnn-tep-dete
 Se activa el ambiente virtual: .\venv\env-cnn-tep-detection\Scripts\activate
  si sale un error, ejecutar: Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 
+ para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecuta el comando: pip install -r .\requirements.txt
+
 Esto te permitirá ejecutar scripts .ps1 que hayan sido creados localmente, como los de los entornos virtuales.
 
 🔒 Es seguro si solo ejecutas scripts en los que confías.
