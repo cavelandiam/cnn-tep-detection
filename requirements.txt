@@ -2,7 +2,6 @@ numpy
 pydicom
 scikit-image
 polars
-tensorflow
 scikit-learn
 scipy
 matplotlib

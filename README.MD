@@ -9,9 +9,11 @@ Ubuntu 22.04 fue seleccionado por su estabilidad, amplia compatibilidad con herr
 
 Así, aunque el desarrollo se realiza en un equipo con Windows 11, el código se ejecuta bajo un entorno Linux auténtico — combinando la comodidad del sistema anfitrión con el poder y la confiabilidad del ecosistema de deep learning en Linux.
 
+Fuente: https://www.tensorflow.org/install/pip?hl=es-419#windows-wsl2
+
 ## Instalación de WSL y Ubuntu 22.04 LTS
 
-Desde una consola de PowerShell abierta como administrador, se ejecutan los siguientes comandos para la instalación:
+En Windows 11, desde una consola de PowerShell abierta como administrador, se ejecutan los siguientes comandos para la instalación:
 
 ```bash
  wsl --install
@@ -21,18 +23,14 @@ Desde una consola de PowerShell abierta como administrador, se ejecutan los sigu
 ```
 ## Configuración de Ubuntu 22.04 LTS
 
-Luego de la instalación, se ejecutan los siguientes comandos que permitirán actualizar el sistema operativo, instalar el administrador de paquetes "pip", e instalar el paquete para crear ambientes virtuales:
+Luego de la instalación, se busca la aplicación instalada con el nombre de "Ubuntu 22.04 LTS" para iniciar el sistema operativo y se ejecutan los siguientes comandos que permitirán: actualizar el sistema operativo, instalar el administrador de paquetes "pip", e instalar el paquete para crear ambientes virtuales:
 
 ```bash
- sudo apt update
- sudo apt install python3-pip
- pip install --upgrade pip
- sudo apt install python3.10-venv
+ sudo apt update && sudo apt upgrade -y
+ sudo apt update && sudo apt upgrade -y python3-pip python3-venv
 ```
 
 Después de realizar la configuración necesaria, se descarga el repositorio.
-
-NOTA: La versión que se está usando para este proyecto es Python 3.10.12 y pip 25.2
 
 ## Preparación del proyecto
 
@@ -41,27 +39,30 @@ Se crea el ambiente virtual con el siguiente comando:
  python3 -m venv venv/env-cnn-tep-detection
 ```
 
-Se activa el ambiente virtual: 
+Se activa el ambiente virtual, se actualiza el paquete "pip" y se instala tensorflow con los siguientes comandos: 
 ```bash
- .\venv\env-cnn-tep-detection\Scripts\activate
+ source ./venv/env-cnn-tep-detection/bin/activate
+ pip install --upgrade pip 
+ pip install tensorflow[and-cuda]
 ```
 
-Si sale un error, ejecutar: 
+Para verificar que se reconoce la GPU de windows se ejecuta el siguiente comando:
 
 ```bash
- Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+ python -c "
+import tensorflow as tf
+print('TensorFlow:', tf.__version__)
+print('GPU disponible:', tf.config.list_physical_devices('GPU'))
+print('Num GPUs Available: ', len(tf.config.list_physical_devices('GPU')))
+"
 ```
 
-Esto te permitirá ejecutar scripts .ps1 que hayan sido creados localmente, como los de los entornos virtuales.
-
-- 🔒 Es seguro si solo ejecutas scripts en los que confías.
-- ✅ Solo afecta a tu usuario, no al sistema completo.
 
 
 Para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecuta el siguiente comando: 
 
 ```bash
- pip install -r .\requirements.txt
+ pip install -r ./requirements.txt
 ```
 
 ## Estructura del Proyecto
