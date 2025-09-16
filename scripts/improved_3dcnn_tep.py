@@ -19,43 +19,45 @@ from tensorflow.keras.layers import (Input, Conv3D, BatchNormalization, Activati
                                     MaxPooling3D, Add, GlobalAveragePooling3D, 
                                     Dropout, Dense)
 
-# Configuración desde utils.config
-from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR, BATCH_SIZE, EPOCHS, LEARNING_RATE
+from utils import (logger, config)
+
+#from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR, BATCH_SIZE, EPOCHS, LEARNING_RATE
 
 # --- CONFIGURACIÓN DE TENSORFLOW Y LOGGING ---
 
-print("Versión de TensorFlow:", tf.__version__)
-print("Dispositivos físicos:", tf.config.list_physical_devices('GPU'))
-print("Dispositivos lógicos:", tf.config.list_logical_devices('GPU'))
+logger.init_logger("Prueba_de_log")
+
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s - %(levelname)s - %(message)s',
+#     handlers=[
+#         logging.FileHandler('logs/train_rsna.log'),
+#         logging.StreamHandler()
+#     ]
+# )
+
+# class IgnoreInvalidVRUIFilter(logging.Filter):
+#     def filter(self, record):
+#         return "Invalid value for VR UI" not in record.getMessage()
+
+# logging.getLogger("pydicom").addFilter(IgnoreInvalidVRUIFilter())
+# warnings.filterwarnings('ignore', category=UserWarning, message='Invalid value for VR UI')
+
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
-        logging.info(f"Crecimiento de memoria habilitado para {len(gpus)} GPU(s).")
+        logger.info(f"Crecimiento de memoria habilitado para {len(gpus)} GPU(s).")
     except RuntimeError as e:
-        logging.error(f"Error al configurar la memoria de la GPU: {e}")
+        logger.error(f"Error al configurar la memoria de la GPU: {e}")
 
 tf.keras.mixed_precision.set_global_policy('mixed_float16')
 tf.debugging.set_log_device_placement(True)
-logging.info("Política de precisión mixta de Keras establecida en 'mixed_float16'.")
+logger.info("Política de precisión mixta de Keras establecida en 'mixed_float16'.")
 
-class IgnoreInvalidVRUIFilter(logging.Filter):
-    def filter(self, record):
-        return "Invalid value for VR UI" not in record.getMessage()
 
-logging.getLogger("pydicom").addFilter(IgnoreInvalidVRUIFilter())
-warnings.filterwarnings('ignore', category=UserWarning, message='Invalid value for VR UI')
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('logs/train_rsna.log'),
-        logging.StreamHandler()
-    ]
-)
 
 # --- FUNCIONES DE PROCESAMIENTO DE DATOS ---
 
@@ -73,7 +75,7 @@ def _process_dicom_image(ds: pydicom.FileDataset):
     img = np.clip(img, img_min, img_max)
     
     img = (img - img_min) / (img_max - img_min)
-    img_resized = resize(img, IMAGE_SIZE, anti_aliasing=True)
+    img_resized = resize(img, config.IMAGE_SIZE, anti_aliasing=True)
     return np.expand_dims(img_resized, axis=-1)
 
 def _resize_depth(volume, target_depth):
@@ -100,18 +102,18 @@ def _parse_dicom_study(study_path: bytes):
         
         if not study_path_obj.exists() or not study_path_obj.is_dir():
             logging.warning(f"Study folder {study_path_str} does not exist or is not a directory")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         series_dirs = [p for p in study_path_obj.iterdir() if p.is_dir()]
         if not series_dirs:
             logging.warning(f"No series found for study {study_path_str}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         series_dir = max(series_dirs, key=lambda p: len(list(p.glob('*.dcm'))))
         dicom_files = list(series_dir.glob('*.dcm'))
         if not dicom_files:
             logging.warning(f"No DICOM files found in {series_dir}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         dicom_data = []
         for f in dicom_files:
@@ -127,7 +129,7 @@ def _parse_dicom_study(study_path: bytes):
         
         if not dicom_data:
             logging.warning(f"No valid DICOM data in {study_path_str}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         dicom_data.sort(key=lambda x: float(x.get('SliceLocation', 0.0)))
         volume = [_process_dicom_image(ds) for ds in dicom_data]
@@ -135,31 +137,31 @@ def _parse_dicom_study(study_path: bytes):
         
         if not volume:
             logging.warning(f"No valid images in {study_path_str}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         volume_np = np.stack(volume, axis=0)
         logging.info(f"Original volume shape for {study_path_str}: {volume_np.shape}")
         
         if volume_np.shape[0] < 1:
             logging.warning(f"Volume has no valid slices in {study_path_str}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
-        resized_volume = _resize_depth(volume_np, TARGET_DEPTH)
+        resized_volume = _resize_depth(volume_np, config.TARGET_DEPTH)
         logging.info(f"Resized volume shape for {study_path_str}: {resized_volume.shape}")
         
-        if resized_volume.shape != (TARGET_DEPTH, *IMAGE_SIZE, 1):
+        if resized_volume.shape != (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1):
             logging.warning(f"Invalid resized volume shape for {study_path_str}: {resized_volume.shape}")
-            return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         return resized_volume.astype(np.float32)
     
     except Exception as e:
         logging.error(f"Error processing study {study_path_str}: {e}")
-        return np.zeros((TARGET_DEPTH, *IMAGE_SIZE, 1), dtype=np.float32)
+        return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
 
 @tf.function
 def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor):
-    volume_shape = (TARGET_DEPTH, *IMAGE_SIZE, 1)
+    volume_shape = (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
     volume = tf.py_function(_parse_dicom_study, [path], tf.float32)
     volume.set_shape(volume_shape)
     
@@ -169,7 +171,7 @@ def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor):
 
 @tf.function
 def _augment_volume(volume, label):
-    expected_shape = (TARGET_DEPTH, *IMAGE_SIZE, 1)
+    expected_shape = (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
     volume_shape = tf.shape(volume)
     shape_matches = tf.reduce_all(tf.equal(volume_shape, expected_shape))
     
@@ -299,12 +301,12 @@ def pretrain_model():
     tf.keras.backend.clear_session()
     gc.collect()
     
-    df = pl.read_csv(RSNA_CSV_TRAIN_DIR)
+    df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
     studies_df = df.group_by("StudyInstanceUID").agg(
         pl.col("negative_exam_for_pe").first()
     ).with_columns(
         pl.col("StudyInstanceUID").map_elements(
-            lambda uid: str(Path(RSNA_DATASET_TRAIN_DIR) / uid), 
+            lambda uid: str(Path(config.RSNA_DATASET_TRAIN_DIR) / uid), 
             return_dtype=pl.String
         ).alias("study_path"),
         (1 - pl.col("negative_exam_for_pe")).alias("label")
@@ -345,12 +347,12 @@ def pretrain_model():
     }
     logging.info(f"Pesos de clase calculados -> 0: {class_weight[0]:.2f}, 1: {class_weight[1]:.2f}")
         
-    step_per_epoch = max(1, len(train_df) // BATCH_SIZE)
-    validation_steps = max(1, len(val_df) // BATCH_SIZE)
-    train_dataset = create_optimized_tf_dataset(train_df, BATCH_SIZE, is_training=True, class_weights=class_weight)
-    val_dataset = create_optimized_tf_dataset(val_df, BATCH_SIZE, is_training=False)
+    step_per_epoch = max(1, len(train_df) // config.BATCH_SIZE)
+    validation_steps = max(1, len(val_df) // config.BATCH_SIZE)
+    train_dataset = create_optimized_tf_dataset(train_df, config.BATCH_SIZE, is_training=True, class_weights=class_weight)
+    val_dataset = create_optimized_tf_dataset(val_df, config.BATCH_SIZE, is_training=False)
     
-    model = _build_resnet3d_model(input_shape=(TARGET_DEPTH, *IMAGE_SIZE, 1))
+    model = _build_resnet3d_model(input_shape=(config.TARGET_DEPTH, *config.IMAGE_SIZE, 1))
     model.summary()
     
     callbacks = [
@@ -358,7 +360,7 @@ def pretrain_model():
             'models/best_model_auc.keras', monitor='val_auc', save_best_only=True, mode='max', verbose=1
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.2, patience=5, min_lr=LEARNING_RATE, verbose=1
+            monitor='val_loss', factor=0.2, patience=5, min_lr=config.LEARNING_RATE, verbose=1
         ),
         
         #tf.keras.callbacks.EarlyStopping(
@@ -372,7 +374,7 @@ def pretrain_model():
     history = model.fit(
         train_dataset,
         validation_data=val_dataset,
-        epochs=EPOCHS,
+        epochs=config.EPOCHS,
         steps_per_epoch=step_per_epoch,
         validation_steps=validation_steps,
         batch_size=1,

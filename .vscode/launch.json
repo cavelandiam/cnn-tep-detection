@@ -10,7 +10,7 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             },
-            "python": "${workspaceFolder}/venv/env-cnn-tep-detection/Scripts/python.exe",
+            "python": "${workspaceFolder}/venv/env-cnn-tep-detection/bin/python",
             "justMyCode": false,
             "preLaunchTask": "activateVirtualEnv"
         }

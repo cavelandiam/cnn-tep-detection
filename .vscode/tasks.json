@@ -4,9 +4,14 @@
     {
       "label": "activateVirtualEnv",
       "type": "shell",
-      "command": "${workspaceFolder}/venv/env-cnn-tep-detection/Scripts/activate",
-      "windows": {
-        "command": "${workspaceFolder}\\venv\\env-cnn-tep-detection\\Scripts\\activate.bat"
+      "command": "source ${workspaceFolder}/venv/env-cnn-tep-detection/bin/activate",
+      "options": {
+        "shell": {
+          "executable": "/bin/bash",
+          "args": [
+            "-c"
+          ]
+        }
       },
       "problemMatcher": []
     }
