@@ -1,20 +1,28 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import os
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-from scripts import improved_3dcnn_tep #load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna, 
-import matplotlib.pyplot as plt
 import pydicom
 
-def test_pipeline():
-    """Ejecuta todo el flujo de trabajo: carga de datos, entrenamiento, evaluación y predicción."""
-    
-    print("INICIANDO PRUEBA DEL PIPELINE COMPLETO...\n")
+from scripts import improved_3dcnn_tep_pt  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
+from utils import logger
 
-    print("Calcular target depth HUCSR...")
+# Configuración de TensorFlow para reproducibilidad
+#os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+logger.init_logger("log_main_cnn")
+
+def test_pipeline():
+    
+    logger.info("INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION")
+    logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
+
+    improved_3dcnn_tep_pt.pretrain_model()
+
+    #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()
-    print("Cargando las imágenes del HUCSR ...")
+    #print("Cargando las imágenes del HUCSR ...")
     #load_images_hucsr.load_all_datasets()
-    print("Validando las imágenes del HUCSR ...")
+    #print("Validando las imágenes del HUCSR ...")
     #validate_load_images_hucsr.validate()
 
     #print("Calcular target depth RSNA...")
@@ -24,18 +32,13 @@ def test_pipeline():
     #print("Validando las imágenes del RSNA ...")
     #validate_load_images_hucsr.validate() NO SE USA
 
-    print("Procesando datos de entrenamiento RSNA ...")
-    #process_rsna.load_data_rsna_train()
-
-    print("Preentrenando el modelo RSNA ...")
-    #pretrain_rsna.pretrain_model()
-    #improved_3dcnn_tep.pretrain_model()
+    
     
     #train_file = dataset_loader.load_all_datasets()
 
     # 1️⃣ Cargar el dataset (Imágenes RNSA)
     #rsna_train_file = process_rsna.load_data_rsna()
-    print("EJECIÓN DEL PIPELINE COMPLETA.\n")
+    print("FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION")
     #print(f"✅ Datos cargados: {X_train.shape[0]} imágenes de entrenamiento, {X_val.shape[0]} imágenes de validación.\n")
 
     # 2️⃣ Construir el modelo

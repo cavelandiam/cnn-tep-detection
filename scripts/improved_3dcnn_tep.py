@@ -1,8 +1,6 @@
-# Imports optimizados y organizados
-import os
 import gc
-import logging
-import warnings
+import os
+import random
 from pathlib import Path
 
 import numpy as np
@@ -11,38 +9,29 @@ import pydicom
 import tensorflow as tf
 from skimage.transform import resize
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, f1_score
 from scipy.ndimage import zoom
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (Input, Conv3D, BatchNormalization, Activation, 
-                                    MaxPooling3D, Add, GlobalAveragePooling3D, 
-                                    Dropout, Dense)
+                                     MaxPooling3D, Add, GlobalAveragePooling3D, 
+                                     Dropout, Dense)
+from tensorflow.keras import backend as K
 
-from utils import (logger, config)
+from utils import logger, config
 
-#from utils.config import IMAGE_SIZE, TARGET_DEPTH, RSNA_CSV_TRAIN_DIR, RSNA_DATASET_TRAIN_DIR, BATCH_SIZE, EPOCHS, LEARNING_RATE
+# --- CONFIGURACIÓN PARA REPRODUCIBILIDAD ---
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+os.environ['PYTHONHASHSEED'] = str(SEED)
+tf.config.experimental.enable_op_determinism()  # Para TF >= 2.7, mayor reproducibilidad
 
 # --- CONFIGURACIÓN DE TENSORFLOW Y LOGGING ---
-
-logger.init_logger("Prueba_de_log")
-
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         logging.FileHandler('logs/train_rsna.log'),
-#         logging.StreamHandler()
-#     ]
-# )
-
-# class IgnoreInvalidVRUIFilter(logging.Filter):
-#     def filter(self, record):
-#         return "Invalid value for VR UI" not in record.getMessage()
-
-# logging.getLogger("pydicom").addFilter(IgnoreInvalidVRUIFilter())
-# warnings.filterwarnings('ignore', category=UserWarning, message='Invalid value for VR UI')
-
+logger.init_logger("log_process_data_rsna")
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -54,14 +43,10 @@ if gpus:
         logger.error(f"Error al configurar la memoria de la GPU: {e}")
 
 tf.keras.mixed_precision.set_global_policy('mixed_float16')
-tf.debugging.set_log_device_placement(True)
 logger.info("Política de precisión mixta de Keras establecida en 'mixed_float16'.")
 
-
-
 # --- FUNCIONES DE PROCESAMIENTO DE DATOS ---
-
-def _process_dicom_image(ds: pydicom.FileDataset):
+def _process_dicom_image(ds: pydicom.FileDataset) -> np.ndarray | None:
     if ds.pixel_array.ndim != 2:
         return None
     
@@ -78,10 +63,10 @@ def _process_dicom_image(ds: pydicom.FileDataset):
     img_resized = resize(img, config.IMAGE_SIZE, anti_aliasing=True)
     return np.expand_dims(img_resized, axis=-1)
 
-def _resize_depth(volume, target_depth):
+def _resize_depth(volume: np.ndarray, target_depth: int) -> np.ndarray:
     current_depth = volume.shape[0]
     if current_depth < 1:
-        logging.warning(f"Invalid volume depth {current_depth}, returning zeros")
+        logger.warning(f"Invalid volume depth {current_depth}, returning zeros")
         return np.zeros((target_depth, *volume.shape[1:]), dtype=np.float32)
     
     if current_depth == target_depth:
@@ -90,29 +75,29 @@ def _resize_depth(volume, target_depth):
     scale = target_depth / current_depth
     resized = zoom(volume, (scale, 1, 1, 1), order=1)
     if resized.shape != (target_depth, *volume.shape[1:]):
-        logging.warning(f"Invalid resized shape {resized.shape}, returning zeros")
+        logger.warning(f"Invalid resized shape {resized.shape}, returning zeros")
         return np.zeros((target_depth, *volume.shape[1:]), dtype=np.float32)
     
     return resized.astype(np.float32)
 
-def _parse_dicom_study(study_path: bytes):
+def _parse_dicom_study(study_path: bytes) -> np.ndarray:
     try:
-        study_path_str = study_path.decode('utf-8') if isinstance(study_path, bytes) else study_path.numpy().decode('utf-8')
+        study_path_str = study_path.decode('utf-8') if isinstance(study_path, bytes) else study_path
         study_path_obj = Path(study_path_str)
         
         if not study_path_obj.exists() or not study_path_obj.is_dir():
-            logging.warning(f"Study folder {study_path_str} does not exist or is not a directory")
+            logger.warning(f"Study folder {study_path_str} does not exist or is not a directory")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         series_dirs = [p for p in study_path_obj.iterdir() if p.is_dir()]
         if not series_dirs:
-            logging.warning(f"No series found for study {study_path_str}")
+            logger.warning(f"No series found for study {study_path_str}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         series_dir = max(series_dirs, key=lambda p: len(list(p.glob('*.dcm'))))
         dicom_files = list(series_dir.glob('*.dcm'))
         if not dicom_files:
-            logging.warning(f"No DICOM files found in {series_dir}")
+            logger.warning(f"No DICOM files found in {series_dir}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         dicom_data = []
@@ -122,13 +107,12 @@ def _parse_dicom_study(study_path: bytes):
                 if hasattr(ds, 'pixel_array') and ds.pixel_array.ndim == 2:
                     dicom_data.append(ds)
                 else:
-                    logging.warning(f"DICOM file {f} has no valid pixel data or incorrect dimensions")
+                    logger.warning(f"DICOM file {f} has no valid pixel data or incorrect dimensions")
             except Exception as e:
-                logging.warning(f"Failed to read DICOM file {f}: {e}")
-                continue
+                logger.warning(f"Failed to read DICOM file {f}: {e}")
         
         if not dicom_data:
-            logging.warning(f"No valid DICOM data in {study_path_str}")
+            logger.warning(f"No valid DICOM data in {study_path_str}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         dicom_data.sort(key=lambda x: float(x.get('SliceLocation', 0.0)))
@@ -136,31 +120,31 @@ def _parse_dicom_study(study_path: bytes):
         volume = [img for img in volume if img is not None]
         
         if not volume:
-            logging.warning(f"No valid images in {study_path_str}")
+            logger.warning(f"No valid images in {study_path_str}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         volume_np = np.stack(volume, axis=0)
-        logging.info(f"Original volume shape for {study_path_str}: {volume_np.shape}")
+        logger.info(f"Original volume shape for {study_path_str}: {volume_np.shape}")
         
         if volume_np.shape[0] < 1:
-            logging.warning(f"Volume has no valid slices in {study_path_str}")
+            logger.warning(f"Volume has no valid slices in {study_path_str}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         resized_volume = _resize_depth(volume_np, config.TARGET_DEPTH)
-        logging.info(f"Resized volume shape for {study_path_str}: {resized_volume.shape}")
+        logger.info(f"Resized volume shape for {study_path_str}: {resized_volume.shape}")
         
         if resized_volume.shape != (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1):
-            logging.warning(f"Invalid resized volume shape for {study_path_str}: {resized_volume.shape}")
+            logger.warning(f"Invalid resized volume shape for {study_path_str}: {resized_volume.shape}")
             return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
         
         return resized_volume.astype(np.float32)
     
     except Exception as e:
-        logging.error(f"Error processing study {study_path_str}: {e}")
+        logger.error(f"Error processing study {study_path_str}: {e}")
         return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
 
 @tf.function
-def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor):
+def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
     volume_shape = (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
     volume = tf.py_function(_parse_dicom_study, [path], tf.float32)
     volume.set_shape(volume_shape)
@@ -170,27 +154,37 @@ def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor):
     return volume, label, is_valid
 
 @tf.function
-def _augment_volume(volume, label):
-    expected_shape = (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
+def _augment_volume(volume: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
+    expected_shape = tf.constant([config.TARGET_DEPTH, config.IMAGE_SIZE[0], config.IMAGE_SIZE[1], 1], dtype=tf.int32)
     volume_shape = tf.shape(volume)
     shape_matches = tf.reduce_all(tf.equal(volume_shape, expected_shape))
     
-    def true_fn():
+    def augment_fn():
+        augmented = volume
+        # Flip horizontal
+        if tf.random.uniform([]) > 0.5:
+            augmented = tf.reverse(augmented, axis=[2])
+        # Rotación aleatoria en plano axial (simple, hasta 20 grados)
+        if tf.random.uniform([]) > 0.5:
+            angle = tf.random.uniform([], minval=-20 * np.pi / 180, maxval=20 * np.pi / 180)
+            augmented = tf.image.rot90(augmented, k=tf.cast(angle / (np.pi / 2), tf.int32))  # Aprox para 3D, aplica por slice
+        # Ajuste de brillo/contraste
+        if tf.random.uniform([]) > 0.5:
+            augmented = tf.image.random_contrast(augmented, lower=0.8, upper=1.2)
+            augmented = tf.image.random_brightness(augmented, max_delta=0.1)
+        # Noise
+        if tf.random.uniform([]) > 0.5:
+            noise = tf.random.normal(shape=tf.shape(augmented), mean=0.0, stddev=0.02, dtype=tf.float32)
+            augmented = tf.clip_by_value(augmented + noise, 0.0, 1.0)
+        return augmented, label
+    
+    def no_augment_fn():
         tf.print("Invalid volume shape in augmentation, returning unchanged")
         return volume, label
     
-    def false_fn():
-        augmented_volume = volume
-        if tf.random.uniform([]) > 0.5:
-            augmented_volume = tf.reverse(augmented_volume, axis=[2])
-        if tf.random.uniform([]) > 0.5:
-            noise = tf.random.normal(shape=tf.shape(augmented_volume), mean=0.0, stddev=0.02, dtype=tf.float32)
-            augmented_volume = tf.clip_by_value(augmented_volume + noise, 0.0, 1.0)
-        return augmented_volume, label
-    
-    return tf.cond(shape_matches, false_fn, true_fn)
+    return tf.cond(shape_matches, augment_fn, no_augment_fn)
 
-def create_optimized_tf_dataset(df: pl.DataFrame, batch_size: int, is_training: bool, class_weights: dict = None):
+def create_optimized_tf_dataset(df: pl.DataFrame, batch_size: int, is_training: bool, class_weights: dict = None) -> tf.data.Dataset:
     dataset = tf.data.Dataset.from_tensor_slices((df["study_path"].to_list(), df["label"].to_list()))
     
     if is_training:
@@ -204,11 +198,11 @@ def create_optimized_tf_dataset(df: pl.DataFrame, batch_size: int, is_training: 
         dataset = dataset.map(_augment_volume, num_parallel_calls=tf.data.AUTOTUNE)
     
     cache_path = Path(f'./cache/{"train" if is_training else "val"}_tfdata_cache')
-    cache_path.parent.mkdir(exist_ok=True)
+    cache_path.parent.mkdir(exist_ok=True, parents=True)
     dataset = dataset.cache(str(cache_path))
     
     if is_training:
-        dataset = dataset.repeat()  # Repetir el dataset para el entrenamiento
+        dataset = dataset.repeat()
     
     dataset = dataset.batch(batch_size)
     
@@ -221,9 +215,19 @@ def create_optimized_tf_dataset(df: pl.DataFrame, batch_size: int, is_training: 
     
     return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
 
-# --- FUNCIONES DE MODELO Y ENTRENAMIENTO ---
+# --- MÉTRICA PERSONALIZADA: F1-SCORE ---
+def f1(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
+    y_pred = K.round(y_pred)
+    tp = K.sum(K.cast(y_true * y_pred, 'float'), axis=0)
+    fp = K.sum(K.cast((1 - y_true) * y_pred, 'float'), axis=0)
+    fn = K.sum(K.cast(y_true * (1 - y_pred), 'float'), axis=0)
+    p = tp / (tp + fp + K.epsilon())
+    r = tp / (tp + fn + K.epsilon())
+    f1 = 2 * p * r / (p + r + K.epsilon())
+    return K.mean(f1)
 
-def _build_resnet3d_model(input_shape, learning_rate=1e-4):
+# --- FUNCIONES DE MODELO Y ENTRENAMIENTO ---
+def _build_resnet3d_model(input_shape: tuple, learning_rate: float = 1e-4) -> Model:
     def res_block(x, filters, kernel_size=(3, 3, 3), strides=1):
         shortcut = x
         if strides > 1 or x.shape[-1] != filters:
@@ -269,14 +273,15 @@ def _build_resnet3d_model(input_shape, learning_rate=1e-4):
             tf.keras.metrics.AUC(name='auc'),
             tf.keras.metrics.Precision(name='precision'),
             tf.keras.metrics.Recall(name='recall'),
-            'accuracy'
+            'accuracy',
+            f1
         ]
     )
     return model
 
 def plot_training_curves_improved(history):
-    metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc']
-    plt.figure(figsize=(18, 10))
+    metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']
+    plt.figure(figsize=(18, 12))
     for i, metric in enumerate(metrics):
         plt.subplot(2, 3, i+1)
         if metric in history.history:
@@ -293,8 +298,23 @@ def plot_training_curves_improved(history):
     plt.savefig("logs/training_curves_improved.png", dpi=300)
     plt.show()
 
+def plot_confusion_matrix(val_df: pl.DataFrame, model: Model, val_dataset: tf.data.Dataset):
+    predictions = model.predict(val_dataset)
+    true_labels = val_df["label"].to_numpy()
+    pred_labels = (predictions > 0.5).astype(int).flatten()
+    
+    cm = confusion_matrix(true_labels, pred_labels)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title('Matriz de Confusión')
+    plt.xlabel('Predicción')
+    plt.ylabel('Verdadero')
+    plt.savefig("logs/confusion_matrix.png")
+    plt.show()
+    
+    logger.info(f"F1-Score en validación: {f1_score(true_labels, pred_labels):.4f}")
+
 def pretrain_model():
-    logging.info("Iniciando preentrenamiento optimizado del modelo 3D-CNN.")
+    logger.info("Iniciando preentrenamiento optimizado del modelo 3D-CNN.")
     
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
     
@@ -318,25 +338,27 @@ def pretrain_model():
             return_dtype=pl.Boolean
         )
     )
-    logging.info(f"Metadatos cargados para {len(studies_df)} estudios con carpetas existentes.")
+    logger.info(f"Metadatos cargados para {len(studies_df)} estudios con carpetas existentes.")
     if len(studies_df) == 0:
-        logging.error("No se encontraron carpetas de estudios válidas. Verifica RSNA_DATASET_TRAIN_DIR.")
+        logger.error("No se encontraron carpetas de estudios válidas. Verifica RSNA_DATASET_TRAIN_DIR.")
         raise ValueError("No hay estudios válidos para procesar.")
     
     missing_studies = df.filter(
         ~df["StudyInstanceUID"].is_in(studies_df["StudyInstanceUID"])
     )["StudyInstanceUID"].to_list()
     if missing_studies:
-        logging.warning(f"Se omitieron {len(missing_studies)} estudios porque sus carpetas no existen: {missing_studies[:10]}...")
+        logger.warning(f"Se omitieron {len(missing_studies)} estudios porque sus carpetas no existen: {missing_studies[:10]}...")
     
     train_df, val_df = train_test_split(
-        studies_df,
+        studies_df.to_pandas(),  # Convert to pandas for sklearn compatibility
         test_size=0.2,
-        random_state=42,
+        random_state=SEED,
         stratify=studies_df["label"]
     )
-    logging.info(f"Datos divididos: {len(train_df)} para entrenamiento, {len(val_df)} para validación.")
-    print(f"Estudios de entrenamiento: {len(train_df)}, Estudios de validación: {len(val_df)}")
+    train_df = pl.from_pandas(train_df)  # Back to polars if needed
+    val_df = pl.from_pandas(val_df)
+    logger.info(f"Datos divididos: {len(train_df)} para entrenamiento, {len(val_df)} para validación.")
+    logger.info(f"Estudios de entrenamiento: {len(train_df)}, Estudios de validación: {len(val_df)}")
     
     n_total = len(train_df)
     n_neg = len(train_df.filter(pl.col("label") == 0))
@@ -345,9 +367,9 @@ def pretrain_model():
         0: (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
         1: (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0,
     }
-    logging.info(f"Pesos de clase calculados -> 0: {class_weight[0]:.2f}, 1: {class_weight[1]:.2f}")
+    logger.info(f"Pesos de clase calculados -> 0: {class_weight[0]:.2f}, 1: {class_weight[1]:.2f}")
         
-    step_per_epoch = max(1, len(train_df) // config.BATCH_SIZE)
+    steps_per_epoch = max(1, len(train_df) // config.BATCH_SIZE)
     validation_steps = max(1, len(val_df) // config.BATCH_SIZE)
     train_dataset = create_optimized_tf_dataset(train_df, config.BATCH_SIZE, is_training=True, class_weights=class_weight)
     val_dataset = create_optimized_tf_dataset(val_df, config.BATCH_SIZE, is_training=False)
@@ -360,32 +382,29 @@ def pretrain_model():
             'models/best_model_auc.keras', monitor='val_auc', save_best_only=True, mode='max', verbose=1
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.2, patience=5, min_lr=config.LEARNING_RATE, verbose=1
+            monitor='val_loss', factor=0.2, patience=5, min_lr=1e-6, verbose=1
         ),
-        
-        #tf.keras.callbacks.EarlyStopping(
-        #    monitor='val_auc', patience=15, mode='max', restore_best_weights=True, verbose=1
-        #),
+        tf.keras.callbacks.TensorBoard(log_dir='logs/tensorboard', histogram_freq=1, write_graph=True),
         tf.keras.callbacks.CSVLogger('logs/training_log.csv'),
         tf.keras.callbacks.TerminateOnNaN()
     ]
     
-    logging.info("Iniciando el entrenamiento del modelo...")
+    logger.info("Iniciando el entrenamiento del modelo...")
     history = model.fit(
         train_dataset,
         validation_data=val_dataset,
         epochs=config.EPOCHS,
-        steps_per_epoch=step_per_epoch,
+        steps_per_epoch=steps_per_epoch,
         validation_steps=validation_steps,
-        batch_size=1,
         callbacks=callbacks,
         verbose=1
     )
     
     model.save("models/pretrained_rsna_final.keras")
     plot_training_curves_improved(history)
+    plot_confusion_matrix(val_df, model, val_dataset)
     
-    logging.info("Entrenamiento completado exitosamente.")
+    logger.info("Entrenamiento completado exitosamente.")
     
     del model, history, train_dataset, val_dataset
     gc.collect()
