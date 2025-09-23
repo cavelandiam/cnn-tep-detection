@@ -1,5 +1,7 @@
 numpy
-pydicom
+pydicom[pillow]
+pylibjpeg pylibjpeg-libjpeg
+gdcm
 scikit-image
 polars
 scikit-learn

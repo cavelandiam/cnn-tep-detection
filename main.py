@@ -16,7 +16,9 @@ def test_pipeline():
     logger.info("INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION")
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
-    improved_3dcnn_tep_pt.pretrain_model()
+    
+    history, best_auc = improved_3dcnn_tep_pt.pretrain_model()
+    print(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
 
     #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()

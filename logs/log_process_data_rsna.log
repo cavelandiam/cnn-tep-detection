@@ -1,4 +1,0 @@
-
-2025-09-18 18:53:24,018 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
-2025-09-18 18:53:32,015 - INFO - Usando dispositivo: cuda
-2025-09-18 18:53:34,308 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria: 17.09 GB
