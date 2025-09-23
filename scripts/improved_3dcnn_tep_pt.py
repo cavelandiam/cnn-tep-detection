@@ -15,7 +15,7 @@ from torch.cuda.amp import GradScaler, autocast
 from monai.transforms import Compose, LoadImageD, ScaleIntensityRangeD, ResizeD, RandFlipD, RandRotateD, RandAdjustContrastD, RandGaussianNoiseD
 from torchmetrics.classification import BinaryAUROC, BinaryPrecision, BinaryRecall, BinaryAccuracy, BinaryF1Score
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, sklearn_f1
+from sklearn.metrics import confusion_matrix, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.ndimage import zoom
@@ -162,7 +162,7 @@ def parse_dicom_study(study_path: Union[str, bytes]) -> np.ndarray:
             except Exception as e:
                 compression_errors += 1
                 error_type = classify_dicom_error(str(e))
-                logger.debug(f"Error {error_type} en {dcm_file.name}: {e}")
+                logger.info(f"Error {error_type} en {dcm_file.name}: {e}")
                 continue
         
         success_rate = len(valid_images) / total_files * 100 if total_files > 0 else 0
@@ -171,13 +171,13 @@ def parse_dicom_study(study_path: Union[str, bytes]) -> np.ndarray:
         
         # Crear volumen
         volume = np.stack(valid_images[:config.TARGET_DEPTH], axis=0)
-        logger.debug(f"Volumen inicial: {volume.shape}")
+        logger.info(f"Volumen inicial: {volume.shape}")
         
         # Redimensionar profundidad
         resized_volume = resize_volume_depth(volume, config.TARGET_DEPTH)
         
         if resized_volume.shape == (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1):
-            logger.debug(f"Volumen final: {resized_volume.shape}")
+            logger.info(f"Volumen final: {resized_volume.shape}")
             return resized_volume.astype(np.float32)
         else:
             logger.warning(f"Forma inválida: {resized_volume.shape}")
@@ -433,44 +433,78 @@ def create_metrics(device: torch.device):
 
 def train_epoch(model: nn.Module, train_loader: DataLoader, optimizer: optim.Optimizer,
                 criterion: nn.Module, class_weights: torch.Tensor, device: torch.device,
-                metrics: Dict[str, nn.Module], epoch: int) -> Dict[str, float]:
+                metrics: Dict[str, nn.Module], epoch: int, scaler: Optional[GradScaler] = None) -> Dict[str, float]:
     """Entrena una época"""
     model.train()
     total_loss = 0.0
     num_batches = 0
     
-    # Reset métricas
+    logger.info(f"Iniciando época {epoch}, total de lotes esperados: {len(train_loader)}")
+    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
+    
     for metric in metrics.values():
         metric.reset()
     
-    for batch_idx, (images, labels) in enumerate(train_loader):
-        images, labels = images.to(device), labels.to(device)
+    try:
+        for batch_idx, (images, labels) in enumerate(train_loader):
+            logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}, "
+                       f"dispositivo imágenes: {images.device}, dispositivo etiquetas: {labels.device}")
+            
+            images, labels = images.to(device), labels.to(device)
+            logger.debug(f"Memoria GPU antes de forward: {torch.cuda.memory_allocated()/1e9:.2f} GB" if torch.cuda.is_available() else "Usando CPU")
+            
+            optimizer.zero_grad()
+            
+            try:
+                if device.type == 'cuda' and scaler is not None:
+                    with autocast(device_type='cuda', dtype=torch.float16):
+                        logger.debug(f"Ejecutando model.forward...")
+                        outputs = model(images)
+                        logger.debug(f"Salida del modelo: {outputs.shape}")
+                        outputs = outputs.squeeze(-1)
+                        logger.debug(f"Salida después de squeeze: {outputs.shape}")
+                        loss = criterion(outputs, labels)
+                        loss = (loss * class_weights[labels.long()]).mean()
+                    
+                    logger.debug(f"Memoria GPU después de forward: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    logger.debug(f"Ejecutando model.forward...")
+                    outputs = model(images)
+                    logger.debug(f"Salida del modelo: {outputs.shape}")
+                    outputs = outputs.squeeze(-1)
+                    logger.debug(f"Salida después de squeeze: {outputs.shape}")
+                    loss = criterion(outputs, labels)
+                    loss = (loss * class_weights[labels.long()]).mean()
+                    
+                    logger.debug(f"Memoria GPU después de forward: {torch.cuda.memory_allocated()/1e9:.2f} GB" if torch.cuda.is_available() else "Usando CPU")
+                    loss.backward()
+                    optimizer.step()
+                
+                total_loss += loss.item()
+                num_batches += 1
+                
+                for name, metric in metrics.items():
+                    metric.update(outputs, labels.int())
+                
+                logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
+                logger.debug(f"Memoria GPU después de backward: {torch.cuda.memory_allocated()/1e9:.2f} GB" if torch.cuda.is_available() else "Usando CPU")
+            
+            except Exception as e:
+                logger.error(f"Error en lote {batch_idx} durante forward/backward: {str(e)}")
+                raise
         
-        optimizer.zero_grad()
-        
-        with autocast(device_type=device.type, dtype=torch.float16 if device.type == 'cuda' else torch.float32):
-            outputs = model(images).squeeze(-1)
-            loss = criterion(outputs, labels)
-            loss = (loss * class_weights[labels.long()]).mean()
-        
-        loss.backward()
-        optimizer.step()
-        
-        total_loss += loss.item()
-        num_batches += 1
-        
-        # Update métricas
-        for name, metric in metrics.items():
-            metric.update(outputs, labels.int())
-        
-        if batch_idx % 10 == 0:
-            logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
+    except Exception as e:
+        logger.error(f"Error en train_epoch, lote {batch_idx}: {str(e)}")
+        raise
     
-    # Calcular métricas finales
-    epoch_metrics = {'loss': total_loss / num_batches}
+    epoch_metrics = {'loss': total_loss / num_batches if num_batches > 0 else 0.0}
     for name, metric in metrics.items():
         epoch_metrics[name] = metric.compute().item()
     
+    logger.info(f"Época {epoch} completada: {num_batches} lotes procesados, pérdida promedio: {epoch_metrics['loss']:.4f}")
     return epoch_metrics
 
 def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Module,
@@ -541,6 +575,7 @@ def pretrain_model():
     # 1. CARGAR Y PREPARAR DATOS
     logger.info("1. Cargando metadatos...")
     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
+    logger.info(f"Total de estudios en CSV: {len(df['StudyInstanceUID'].unique())}")
     
     # Crear DataFrame de estudios
     studies_df = df.group_by("StudyInstanceUID").agg(
@@ -591,12 +626,14 @@ def pretrain_model():
     val_df = pl.from_pandas(val_df_pd)
     
     logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
+    logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
+    logger.info(f"Estudios en val_df: {val_df['StudyInstanceUID'].to_list()}")
     
     # Estadísticas de clases
     train_pos = len(train_df.filter(pl.col("label") == 1))
     train_neg = len(train_df) - train_pos
     logger.info(f"   Clases train: {train_pos} positivos ({train_pos/len(train_df)*100:.1f}%), "
-               f"{train_neg} negativos")
+               f"{train_neg} negativos ({train_neg/len(train_df)*100:.1f}%)")
     
     # 3. CALCULAR PESOS DE CLASE
     logger.info("3. Calculando pesos de clase...")
@@ -616,11 +653,25 @@ def pretrain_model():
     
     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False, num_workers=0)
+
+    logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
+    logger.info(f"Batch size: {config.BATCH_SIZE}")
+    logger.info(f"Esperado número de lotes: {len(train_loader)}")
     
     steps_per_epoch = len(train_loader)
     validation_steps = len(val_loader)
     
     logger.info(f"✅ Dataloaders: {steps_per_epoch} batches train, {validation_steps} batches val")
+
+
+    # # Depuración: Probar train_loader
+    # logger.info("Depurando train_loader...")
+    # for batch_idx, (images, labels) in enumerate(train_loader):
+    #     logger.info(f"Batch {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
+    #     if batch_idx >= 5:  # Limitar para depuración
+    #         break
+
+
     
     # 5. CREAR MODELO
     logger.info("5. Creando modelo ResNet3D...")
