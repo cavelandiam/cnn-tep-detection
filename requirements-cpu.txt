@@ -1,6 +1,7 @@
 numpy
 pydicom[pillow]
-pylibjpeg pylibjpeg-libjpeg
+pylibjpeg 
+pylibjpeg-libjpeg
 gdcm
 scikit-image
 polars
@@ -9,7 +10,8 @@ scipy
 matplotlib
 seaborn
 pyarrow
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+torch 
+torchvision --index-url https://download.pytorch.org/whl/cpu
 monai
 torchmetrics
 psutil

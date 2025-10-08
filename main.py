@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pydicom
+import torch
 
 from scripts import improved_3dcnn_tep_pt  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
 from utils import logger
@@ -18,7 +19,7 @@ def test_pipeline():
 
     
     history, best_auc = improved_3dcnn_tep_pt.pretrain_model()
-    print(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
+    logger.info(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
 
     #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()
@@ -90,4 +91,4 @@ def visualizar_imagen_dicom(ruta_directorio):
     plt.show()
 
 if __name__ == "__main__":
-    test_pipeline()
+    test_pipeline()    
