@@ -34,10 +34,19 @@ Después de realizar la configuración necesaria, se descarga el repositorio y s
 
 ## Preparación del proyecto
 
+Se crea la carpeta raiz del proyecto y se ingresa:
+
+```bash
+ mkdir cnn-tep-detection
+ cd cnn-tep-detection
+```
+
 Se crea el ambiente virtual con el siguiente comando: 
 ```bash
  python3 -m venv venv/env-cnn-tep-detection
 ```
+
+### Opción 1: Instalar Tensorflow
 
 Se activa el ambiente virtual, se actualiza el paquete "pip" y se instala tensorflow con los siguientes comandos: 
 ```bash
@@ -57,7 +66,24 @@ print('Num GPUs Available: ', len(tf.config.list_physical_devices('GPU')))
 "
 ```
 
+### Opción 2: Instalar Pythorch
 
+Se activa el ambiente virtual, se actualiza el paquete "pip" y se instala tensorflow con los siguientes comandos: 
+```bash
+ source ./venv/env-cnn-tep-detection/bin/activate
+ pip install --upgrade pip 
+ pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+```
+
+Para verificar que se reconoce la GPU de windows se ejecuta el siguiente comando:
+
+```bash
+ python -c "
+import torch
+print('Pythorch:', torch.__version__)
+print('GPU disponible:', [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())])
+"
+```
 
 Para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecuta el siguiente comando: 
 
