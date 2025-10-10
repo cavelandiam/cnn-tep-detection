@@ -2,23 +2,26 @@ import gc
 import os
 import random
 from pathlib import Path
+from typing import Dict, Optional, Tuple, Union, List
 
 import numpy as np
 import polars as pl
 import pydicom
-import tensorflow as tf
-from skimage.transform import resize
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader
+from torch.cuda.amp import GradScaler, autocast
+from monai.transforms import Compose, RandFlipD, RandRotateD, RandAdjustContrastD, RandGaussianNoiseD
+from torchmetrics.classification import BinaryAUROC, BinaryPrecision, BinaryRecall, BinaryAccuracy, BinaryF1Score
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, f1_score
-from scipy.ndimage import zoom
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import (Input, Conv3D, BatchNormalization, Activation, 
-                                     MaxPooling3D, Add, GlobalAveragePooling3D, 
-                                     Dropout, Dense)
-from tensorflow.keras import backend as K
+from scipy.ndimage import zoom
+from skimage.transform import resize
+import psutil
+import torch.multiprocessing as mp  # Importar torch.multiprocessing
 
 from utils import logger, config
 
@@ -26,311 +29,599 @@ from utils import logger, config
 SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
-tf.random.set_seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
 os.environ['PYTHONHASHSEED'] = str(SEED)
-tf.config.experimental.enable_op_determinism()  # Para TF >= 2.7, mayor reproducibilidad
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = True  # Optimizado para GPU
 
-# --- CONFIGURACIÓN DE TENSORFLOW Y LOGGING ---
+# --- CONFIGURACIÓN DE LOGGING Y DISPOSITIVO ---
 logger.init_logger("log_process_data_rsna")
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    try:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        logger.info(f"Crecimiento de memoria habilitado para {len(gpus)} GPU(s).")
-    except RuntimeError as e:
-        logger.error(f"Error al configurar la memoria de la GPU: {e}")
+# Configurar el método de inicio de multiprocessing a 'spawn'
+try:
+    mp.set_start_method('spawn', force=True)
+    logger.info("✅ Método de inicio de multiprocessing configurado a 'spawn'")
+except RuntimeError as e:
+    logger.warning(f"⚠️ No se pudo configurar el método 'spawn': {str(e)}")
 
-tf.keras.mixed_precision.set_global_policy('mixed_float16')
-logger.info("Política de precisión mixta de Keras establecida en 'mixed_float16'.")
+# Selección dinámica del dispositivo
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+logger.info(f"Usando dispositivo: {device}")
+logger.info(f"¿CUDA disponible?: {torch.cuda.is_available()}")
+if device.type == "cuda":
+    try:
+        logger.info(f"GPU: {torch.cuda.get_device_name(0)}, Memoria total: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+        logger.info(f"Memoria GPU disponible: {(torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_reserved(0)) / 1e9:.2f} GB")
+    except Exception as e:
+        logger.error(f"Error al obtener información de GPU: {str(e)}")
+else:
+    logger.info("Usando CPU para entrenamiento")
+    logger.info(f"RAM disponible: {psutil.virtual_memory().available / 1e9:.2f} GB")
+
+logger.info(f"PyTorch version: {torch.__version__}")
+logger.info(f"CUDA version: {torch.version.cuda}")
+logger.info(f"Device capability: {torch.cuda.get_device_capability() if torch.cuda.is_available() else 'N/A'}")
 
 # --- FUNCIONES DE PROCESAMIENTO DE DATOS ---
-def _process_dicom_image(ds: pydicom.FileDataset) -> np.ndarray | None:
+
+def process_dicom_image(ds: pydicom.FileDataset) -> Optional[np.ndarray]:
+    """Procesa una imagen DICOM individual"""
+    if not hasattr(ds, 'pixel_array') or ds.pixel_array is None:
+        return None
+    
     if ds.pixel_array.ndim != 2:
         return None
     
     img = ds.pixel_array.astype(np.float32)
-    if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
-        img = img * float(ds.RescaleSlope) + float(ds.RescaleIntercept)
     
-    window_center, window_width = -600, 1600
+    if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
+        try:
+            slope = float(ds.RescaleSlope)
+            intercept = float(ds.RescaleIntercept)
+            img = img * slope + intercept
+        except (ValueError, TypeError):
+            pass
+    
+    window_center, window_width = -600, 1600 if ds.Modality == 'CT' else (40, 400)
     img_min = window_center - window_width // 2
     img_max = window_center + window_width // 2
     img = np.clip(img, img_min, img_max)
-    
     img = (img - img_min) / (img_max - img_min)
-    img_resized = resize(img, config.IMAGE_SIZE, anti_aliasing=True)
-    return np.expand_dims(img_resized, axis=-1)
+    
+    if img.shape != config.IMAGE_SIZE:
+        try:
+            img_resized = resize(img, config.IMAGE_SIZE, anti_aliasing=True, preserve_range=True)
+            img = img_resized.astype(np.float32)
+        except:
+            pass
+    
+    img = np.clip(img, 0.0, 1.0)
+    return np.expand_dims(img, axis=-1)
 
-def _resize_depth(volume: np.ndarray, target_depth: int) -> np.ndarray:
+def resize_volume_depth(volume: np.ndarray, target_depth: int) -> np.ndarray:
+    """Redimensiona el volumen a la profundidad objetivo"""
     current_depth = volume.shape[0]
     if current_depth < 1:
-        logger.warning(f"Invalid volume depth {current_depth}, returning zeros")
+        logger.warning(f"Volumen inválido con profundidad {current_depth}")
         return np.zeros((target_depth, *volume.shape[1:]), dtype=np.float32)
     
     if current_depth == target_depth:
         return volume
     
     scale = target_depth / current_depth
-    resized = zoom(volume, (scale, 1, 1, 1), order=1)
-    if resized.shape != (target_depth, *volume.shape[1:]):
-        logger.warning(f"Invalid resized shape {resized.shape}, returning zeros")
+    try:
+        resized = zoom(volume, (scale, 1, 1, 1), order=1)
+        if resized.shape[0] == target_depth:
+            return resized.astype(np.float32)
+        else:
+            logger.warning(f"Redimensionado falló: {resized.shape}")
+            return np.zeros((target_depth, *volume.shape[1:]), dtype=np.float32)
+    except Exception as e:
+        logger.warning(f"Error en zoom: {e}")
         return np.zeros((target_depth, *volume.shape[1:]), dtype=np.float32)
-    
-    return resized.astype(np.float32)
 
-def _parse_dicom_study(study_path: bytes) -> np.ndarray:
+def parse_dicom_study(study_path: Union[str, bytes]) -> np.ndarray:
+    """Parsea un estudio DICOM completo a volumen 3D"""
     try:
         study_path_str = study_path.decode('utf-8') if isinstance(study_path, bytes) else study_path
         study_path_obj = Path(study_path_str)
         
         if not study_path_obj.exists() or not study_path_obj.is_dir():
-            logger.warning(f"Study folder {study_path_str} does not exist or is not a directory")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+            logger.warning(f"Carpeta de estudio no existe: {study_path_str}")
+            return create_zero_volume()
         
         series_dirs = [p for p in study_path_obj.iterdir() if p.is_dir()]
         if not series_dirs:
-            logger.warning(f"No series found for study {study_path_str}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+            logger.warning(f"No se encontraron series en {study_path_str}")
+            return create_zero_volume()
         
         series_dir = max(series_dirs, key=lambda p: len(list(p.glob('*.dcm'))))
-        dicom_files = list(series_dir.glob('*.dcm'))
+        dicom_files = sorted(series_dir.glob('*.dcm'), 
+                            key=lambda f: float(pydicom.dcmread(f, stop_before_pixels=True).get('SliceLocation', 0)))
+        
         if not dicom_files:
-            logger.warning(f"No DICOM files found in {series_dir}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+            logger.warning(f"No se encontraron archivos DICOM en {series_dir}")
+            return create_zero_volume()
         
-        dicom_data = []
-        for f in dicom_files:
+        logger.info(f"Procesando {len(dicom_files)} archivos DICOM en {series_dir.name}")
+        
+        valid_images = []
+        total_files = len(dicom_files)
+        compression_errors = 0
+        
+        for i, dcm_file in enumerate(dicom_files):
             try:
-                ds = pydicom.dcmread(str(f), force=True)
-                if hasattr(ds, 'pixel_array') and ds.pixel_array.ndim == 2:
-                    dicom_data.append(ds)
-                else:
-                    logger.warning(f"DICOM file {f} has no valid pixel data or incorrect dimensions")
+                ds = pydicom.dcmread(str(dcm_file), force=True)
+                processed_img = process_dicom_image(ds)
+                if processed_img is not None:
+                    valid_images.append(processed_img)
+                del ds, processed_img
+                gc.collect()
+                
+                if (i + 1) % 50 == 0 or i == total_files - 1:
+                    success_rate = len(valid_images) / (i + 1) * 100
+                    logger.info(f"Progreso: {i+1}/{total_files} ({success_rate:.1f}% éxito)")
+                    
             except Exception as e:
-                logger.warning(f"Failed to read DICOM file {f}: {e}")
+                compression_errors += 1
+                error_type = classify_dicom_error(str(e))
+                logger.info(f"Error {error_type} en {dcm_file.name}: {e}")
+                continue
         
-        if not dicom_data:
-            logger.warning(f"No valid DICOM data in {study_path_str}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+        success_rate = len(valid_images) / total_files * 100 if total_files > 0 else 0
+        logger.info(f"Estudio {Path(study_path_str).name}: {len(valid_images)}/{total_files} "
+                   f"imágenes válidas ({success_rate:.1f}%)")
         
-        dicom_data.sort(key=lambda x: float(x.get('SliceLocation', 0.0)))
-        volume = [_process_dicom_image(ds) for ds in dicom_data]
-        volume = [img for img in volume if img is not None]
+        volume = np.stack(valid_images[:config.TARGET_DEPTH], axis=0)
+        logger.info(f"Volumen inicial: {volume.shape}")
         
-        if not volume:
-            logger.warning(f"No valid images in {study_path_str}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+        resized_volume = resize_volume_depth(volume, config.TARGET_DEPTH)
         
-        volume_np = np.stack(volume, axis=0)
-        logger.info(f"Original volume shape for {study_path_str}: {volume_np.shape}")
-        
-        if volume_np.shape[0] < 1:
-            logger.warning(f"Volume has no valid slices in {study_path_str}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
-        
-        resized_volume = _resize_depth(volume_np, config.TARGET_DEPTH)
-        logger.info(f"Resized volume shape for {study_path_str}: {resized_volume.shape}")
-        
-        if resized_volume.shape != (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1):
-            logger.warning(f"Invalid resized volume shape for {study_path_str}: {resized_volume.shape}")
-            return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
-        
-        return resized_volume.astype(np.float32)
-    
+        if resized_volume.shape == (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1):
+            logger.info(f"Volumen final: {resized_volume.shape}")
+            return resized_volume.astype(np.float32)
+        else:
+            logger.warning(f"Forma inválida: {resized_volume.shape}")
+            return create_zero_volume()
+            
     except Exception as e:
-        logger.error(f"Error processing study {study_path_str}: {e}")
-        return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
+        logger.error(f"Error crítico procesando {study_path_str}: {e}")
+        return create_zero_volume()
 
-@tf.function
-def _tf_load_and_process_study(path: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-    volume_shape = (config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
-    volume = tf.py_function(_parse_dicom_study, [path], tf.float32)
-    volume.set_shape(volume_shape)
-    
-    is_valid = tf.reduce_any(tf.not_equal(volume, 0)) & \
-               tf.reduce_all(tf.equal(tf.shape(volume), volume_shape))
-    return volume, label, is_valid
+def create_zero_volume() -> np.ndarray:
+    """Crea volumen vacío con forma esperada"""
+    return np.zeros((config.TARGET_DEPTH, *config.IMAGE_SIZE, 1), dtype=np.float32)
 
-@tf.function
-def _augment_volume(volume: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
-    expected_shape = tf.constant([config.TARGET_DEPTH, config.IMAGE_SIZE[0], config.IMAGE_SIZE[1], 1], dtype=tf.int32)
-    volume_shape = tf.shape(volume)
-    shape_matches = tf.reduce_all(tf.equal(volume_shape, expected_shape))
-    
-    def augment_fn():
-        augmented = volume
-        # Flip horizontal
-        if tf.random.uniform([]) > 0.5:
-            augmented = tf.reverse(augmented, axis=[2])
-        # Rotación aleatoria en plano axial (simple, hasta 20 grados)
-        if tf.random.uniform([]) > 0.5:
-            angle = tf.random.uniform([], minval=-20 * np.pi / 180, maxval=20 * np.pi / 180)
-            augmented = tf.image.rot90(augmented, k=tf.cast(angle / (np.pi / 2), tf.int32))  # Aprox para 3D, aplica por slice
-        # Ajuste de brillo/contraste
-        if tf.random.uniform([]) > 0.5:
-            augmented = tf.image.random_contrast(augmented, lower=0.8, upper=1.2)
-            augmented = tf.image.random_brightness(augmented, max_delta=0.1)
-        # Noise
-        if tf.random.uniform([]) > 0.5:
-            noise = tf.random.normal(shape=tf.shape(augmented), mean=0.0, stddev=0.02, dtype=tf.float32)
-            augmented = tf.clip_by_value(augmented + noise, 0.0, 1.0)
-        return augmented, label
-    
-    def no_augment_fn():
-        tf.print("Invalid volume shape in augmentation, returning unchanged")
-        return volume, label
-    
-    return tf.cond(shape_matches, augment_fn, no_augment_fn)
+def classify_dicom_error(error_msg: str) -> str:
+    """Clasifica errores de DICOM para mejor logging"""
+    error_lower = error_msg.lower()
+    if any(word in error_lower for word in ['decompress', 'compression', 'jpeg', 'j2k']):
+        return "COMPRESIÓN"
+    elif 'pixel_array' in error_lower or 'pixel data' in error_lower:
+        return "PIXEL_DATA"
+    elif 'file' in error_lower or 'read' in error_lower:
+        return "LECTURA"
+    else:
+        return "DESCONOCIDO"
 
-def create_optimized_tf_dataset(df: pl.DataFrame, batch_size: int, is_training: bool, class_weights: dict = None) -> tf.data.Dataset:
-    dataset = tf.data.Dataset.from_tensor_slices((df["study_path"].to_list(), df["label"].to_list()))
-    
-    if is_training:
-        dataset = dataset.shuffle(buffer_size=len(df), reshuffle_each_iteration=True)
-    
-    dataset = dataset.map(_tf_load_and_process_study, num_parallel_calls=tf.data.AUTOTUNE)
-    dataset = dataset.filter(lambda volume, label, is_valid: is_valid)
-    dataset = dataset.map(lambda volume, label, is_valid: (volume, label), num_parallel_calls=tf.data.AUTOTUNE)
-    
-    if is_training:
-        dataset = dataset.map(_augment_volume, num_parallel_calls=tf.data.AUTOTUNE)
-    
-    cache_path = Path(f'./cache/{"train" if is_training else "val"}_tfdata_cache')
-    cache_path.parent.mkdir(exist_ok=True, parents=True)
-    dataset = dataset.cache(str(cache_path))
-    
-    if is_training:
-        dataset = dataset.repeat()
-    
-    dataset = dataset.batch(batch_size)
-    
-    if is_training and class_weights:
-        def apply_sample_weights(volume, label):
-            sample_weight = tf.gather(tf.constant([class_weights[0], class_weights[1]], dtype=tf.float32), 
-                                      tf.cast(label, tf.int32))
-            return volume, label, sample_weight
-        dataset = dataset.map(apply_sample_weights, num_parallel_calls=tf.data.AUTOTUNE)
-    
-    return dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
+# --- DATASET ---
 
-# --- MÉTRICA PERSONALIZADA: F1-SCORE ---
-def f1(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
-    y_pred = K.round(y_pred)
-    tp = K.sum(K.cast(y_true * y_pred, 'float'), axis=0)
-    fp = K.sum(K.cast((1 - y_true) * y_pred, 'float'), axis=0)
-    fn = K.sum(K.cast(y_true * (1 - y_pred), 'float'), axis=0)
-    p = tp / (tp + fp + K.epsilon())
-    r = tp / (tp + fn + K.epsilon())
-    f1 = 2 * p * r / (p + r + K.epsilon())
-    return K.mean(f1)
-
-# --- FUNCIONES DE MODELO Y ENTRENAMIENTO ---
-def _build_resnet3d_model(input_shape: tuple, learning_rate: float = 1e-4) -> Model:
-    def res_block(x, filters, kernel_size=(3, 3, 3), strides=1):
-        shortcut = x
-        if strides > 1 or x.shape[-1] != filters:
-            shortcut = Conv3D(filters, (1, 1, 1), strides=strides, padding='same', kernel_initializer='he_normal')(shortcut)
-            shortcut = BatchNormalization()(shortcut)
-
-        y = Conv3D(filters, kernel_size, strides=strides, padding='same', kernel_initializer='he_normal')(x)
-        y = BatchNormalization()(y)
-        y = Activation('relu')(y)
+class RSNADataset(Dataset):
+    def __init__(self, data_df):
+        self.data_df = data_df
+    
+    def __len__(self):
+        return len(self.data_df)
+    
+    def __getitem__(self, idx):
+        study_path = self.data_df["study_path"][idx]
+        label = self.data_df["label"][idx]
         
-        y = Conv3D(filters, kernel_size, padding='same', kernel_initializer='he_normal')(y)
-        y = BatchNormalization()(y)
+        volume = parse_dicom_study(study_path)
+        volume_tensor = torch.from_numpy(volume).permute(3, 0, 1, 2).float()  # No mover a GPU aquí
+        label_tensor = torch.tensor(label, dtype=torch.float32)
+        
+        return volume_tensor, label_tensor
+    
+def create_validation_dataset(df: pl.DataFrame) -> Dataset:
+    """Crea dataset de validación"""
+    return RSNADataset(df)
 
-        y = Add()([shortcut, y])
-        y = Activation('relu')(y)
-        return y
+# --- MODEL COMPONENTS ---
 
-    inputs = Input(shape=input_shape, dtype=tf.float32)
-    x = Conv3D(16, (3, 3, 3), padding='same', kernel_initializer='he_normal')(inputs)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = MaxPooling3D(pool_size=(3, 3, 3))(x)
+class ResidualBlock(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, stride: int = 1):
+        super().__init__()
+        self.conv1 = nn.Conv3d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm3d(out_channels)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv3d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm3d(out_channels)
+        
+        self.shortcut = nn.Sequential()
+        if stride > 1 or in_channels != out_channels:
+            self.shortcut = nn.Sequential(
+                nn.Conv3d(in_channels, out_channels, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm3d(out_channels)
+            )
+        
+        self.relu_final = nn.ReLU(inplace=True)
+    
+    def forward(self, x):
+        logger.debug(f"ResidualBlock entrada: {x.shape}, dispositivo: {x.device}")
+        out = self.conv1(x)
+        logger.debug(f"Después de conv1: {out.shape}, dispositivo: {out.device}")
+        out = self.bn1(out)
+        out = self.relu1(out)
+        out = self.conv2(out)
+        out = self.bn2(out)
+        
+        shortcut_out = self.shortcut(x)
+        logger.debug(f"Shortcut salida: {shortcut_out.shape}, dispositivo: {shortcut_out.device}")
+        
+        if out.shape != shortcut_out.shape:
+            logger.error(f"Forma de main path {out.shape} != shortcut {shortcut_out.shape}")
+            raise ValueError("Desajuste de formas en ResidualBlock")
+        
+        out += shortcut_out
+        out = self.relu_final(out)
+        logger.debug(f"ResidualBlock salida: {out.shape}, dispositivo: {out.device}")
+        return out
 
-    x = res_block(x, 32)
-    x = res_block(x, 64, strides=2)
-    x = res_block(x, 128, strides=2)
+class ResNet3D(nn.Module):
+    def __init__(self, input_channels: int = 1, num_classes: int = 1):
+        super().__init__()
+        self.initial_block = nn.Sequential(
+            nn.Conv3d(input_channels, 16, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm3d(16),
+            nn.ReLU(inplace=True),
+            nn.MaxPool3d(kernel_size=3, stride=1, padding=1)
+        )
+        self.layer1 = ResidualBlock(16, 32)
+        self.layer2 = ResidualBlock(32, 64, stride=2)
+        self.layer3 = ResidualBlock(64, 128, stride=2)
+        self.global_pool = nn.AdaptiveAvgPool3d(1)
+        self.dropout1 = nn.Dropout(0.5)
+        self.fc1 = nn.Linear(128, 256)
+        self.relu = nn.ReLU(inplace=True)
+        self.dropout2 = nn.Dropout(0.3)
+        self.fc2 = nn.Linear(256, num_classes)
+        # Nota: No se incluye sigmoid, ya que BCEWithLogitsLoss lo maneja internamente
     
-    x = GlobalAveragePooling3D()(x)
-    x = Dropout(0.5)(x)
-    x = Dense(256, activation='relu', kernel_initializer='he_normal')(x)
-    x = Dropout(0.3)(x)
+    def forward(self, x):
+        logger.debug(f"Entrada al modelo: {x.shape}, dispositivo: {x.device}")
+        try:
+            x = self.initial_block(x)
+            logger.debug(f"Después de initial_block: {x.shape}, dispositivo: {x.device}")
+            x = self.layer1(x)
+            logger.debug(f"Después de layer1: {x.shape}, dispositivo: {x.device}")
+            x = self.layer2(x)
+            logger.debug(f"Después de layer2: {x.shape}, dispositivo: {x.device}")
+            x = self.layer3(x)
+            logger.debug(f"Después de layer3: {x.shape}, dispositivo: {x.device}")
+            x = self.global_pool(x)
+            logger.debug(f"Después de global_pool: {x.shape}, dispositivo: {x.device}")
+            x = x.view(x.size(0), -1)
+            logger.debug(f"Después de flatten: {x.shape}, dispositivo: {x.device}")
+            x = self.dropout1(x)
+            x = self.fc1(x)
+            logger.debug(f"Después de fc1: {x.shape}, dispositivo: {x.device}")
+            x = self.relu(x)
+            x = self.dropout2(x)
+            x = self.fc2(x)
+            logger.debug(f"Salida final: {x.shape}, dispositivo: {x.device}")
+            return x  # Sin sigmoid, BCEWithLogitsLoss lo maneja
+        except Exception as e:
+            logger.error(f"Error en ResNet3D.forward: {str(e)}")
+            raise
+
+def initialize_model_weights(model: nn.Module):
+    """Inicializa pesos del modelo en el dispositivo correcto"""
+    for m in model.modules():
+        if isinstance(m, nn.Conv3d):
+            nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            m.weight.data = m.weight.data.to(device)
+        elif isinstance(m, nn.BatchNorm3d):
+            nn.init.constant_(m.weight, 1)
+            nn.init.constant_(m.bias, 0)
+            m.weight.data = m.weight.data.to(device)
+            m.bias.data = m.bias.data.to(device)
+        elif isinstance(m, nn.Linear):
+            nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            m.weight.data = m.weight.data.to(device)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+                m.bias.data = m.bias.data.to(device)
+
+def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Module:
+    logger.info(f"Creando ResNet3D: input_channels={input_channels}, num_classes={num_classes}")
     
-    outputs = Dense(1, activation='sigmoid', dtype='float32')(x)
+    # Crear modelo y moverlo a GPU inmediatamente
+    model = ResNet3D(input_channels, num_classes).to(device)
+    logger.info(f"Modelo creado en dispositivo: {next(model.parameters()).device}")
     
-    model = Model(inputs, outputs)
+    # Inicializar pesos en GPU
+    initialize_model_weights(model)
     
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    # Probar modelo con entrada de prueba en GPU
+    test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)  # Usar batch_size=2
+    logger.debug(f"Probando modelo con entrada: {test_input.shape}, dispositivo: {test_input.device}")
     
-    model.compile(
-        optimizer=optimizer,
-        loss='binary_crossentropy',
-        metrics=[
-            tf.keras.metrics.AUC(name='auc'),
-            tf.keras.metrics.Precision(name='precision'),
-            tf.keras.metrics.Recall(name='recall'),
-            'accuracy',
-            f1
-        ]
-    )
+    model.eval()
+    with torch.no_grad():
+        try:
+            test_output = model(test_input)
+            logger.debug(f"Salida del modelo: {test_output.shape}, dispositivo: {test_output.device}")
+            if test_output.shape != torch.Size([2, num_classes]):
+                logger.error(f"Forma de salida inesperada: {test_output.shape}, esperado: [2, {num_classes}]")
+                raise ValueError("Forma de salida del modelo incorrecta")
+        except Exception as e:
+            logger.error(f"Error al probar modelo: {str(e)}")
+            raise
+    
+    model.train()
     return model
 
-def plot_training_curves_improved(history):
+# --- TRANSFORMACIONES ---
+
+def create_train_transforms() -> Compose:
+    return Compose([
+        RandFlipD(keys="image", spatial_axis=2, prob=0.5),
+        RandRotateD(keys="image", range_x=20, prob=0.5),
+        RandAdjustContrastD(keys="image", gamma=(0.8, 1.2), prob=0.5),
+        RandGaussianNoiseD(keys="image", std=0.02, prob=0.5)
+    ])
+
+def create_val_transforms() -> Compose:
+    return Compose([])
+
+# --- MÉTRICAS Y VISUALIZACIÓN ---
+
+def plot_training_curves(history: Dict[str, List[float]]):
     metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']
-    plt.figure(figsize=(18, 12))
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     for i, metric in enumerate(metrics):
-        plt.subplot(2, 3, i+1)
-        if metric in history.history:
-            plt.plot(history.history[metric], label=f'Train {metric}', color='royalblue')
-        val_metric = f'val_{metric}'
-        if val_metric in history.history:
-            plt.plot(history.history[val_metric], label=f'Val {metric}', color='orangered', linestyle='--')
-        plt.title(f'Evolución de {metric.capitalize()}')
-        plt.xlabel('Epoch')
-        plt.ylabel(metric.capitalize())
-        plt.legend()
-        plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+        ax = axes[i//3, i%3]
+        ax.plot(history[metric], label=f'Train {metric}', color='royalblue', linewidth=2)
+        ax.plot(history[f'val_{metric}'], label=f'Val {metric}', color='orangered', linestyle='--', linewidth=2)
+        ax.set_title(f'{metric.capitalize()}')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel(metric.capitalize())
+        ax.legend()
+        ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig("logs/training_curves_improved.png", dpi=300)
+    plt.savefig("logs/training_curves.png", dpi=300, bbox_inches='tight')
     plt.show()
 
-def plot_confusion_matrix(val_df: pl.DataFrame, model: Model, val_dataset: tf.data.Dataset):
-    predictions = model.predict(val_dataset)
-    true_labels = val_df["label"].to_numpy()
-    pred_labels = (predictions > 0.5).astype(int).flatten()
+def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loader: DataLoader, device: torch.device):
+    model.eval()
+    predictions, labels = [], []
+    with torch.no_grad():
+        for images, batch_labels in val_loader:
+            images = images.to(device, non_blocking=True)
+            outputs = model(images).squeeze(-1)
+            predictions.extend(torch.sigmoid(outputs).cpu().numpy())  # Aplicar sigmoid para métricas
+            labels.extend(batch_labels.cpu().numpy())
     
-    cm = confusion_matrix(true_labels, pred_labels)
+    pred_binary = (np.array(predictions) > 0.5).astype(int)
+    true_binary = np.array(labels).astype(int)
+    cm = confusion_matrix(true_binary, pred_binary)
+    plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
     plt.title('Matriz de Confusión')
     plt.xlabel('Predicción')
-    plt.ylabel('Verdadero')
-    plt.savefig("logs/confusion_matrix.png")
+    plt.ylabel('Real')
+    plt.savefig("logs/confusion_matrix.png", dpi=300)
     plt.show()
+    f1_val = f1_score(true_binary, pred_binary)
+    logger.info(f"F1-Score validación: {f1_val:.4f}")
+    return f1_val
+
+# --- ENTRENAMIENTO ---
+
+def create_optimizer(model: nn.Module, learning_rate: float) -> optim.Optimizer:
+    return optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+
+def create_criterion(class_weights: torch.Tensor) -> nn.Module:
+    return nn.BCEWithLogitsLoss(reduction='none')  # Usar BCEWithLogitsLoss
+
+def create_metrics(device: torch.device):
+    return {
+        'auc': BinaryAUROC().to(device),
+        'precision': BinaryPrecision().to(device),
+        'recall': BinaryRecall().to(device),
+        'accuracy': BinaryAccuracy().to(device),
+        'f1': BinaryF1Score().to(device)
+    }
+
+def train_epoch(model: nn.Module, train_loader: DataLoader, optimizer: optim.Optimizer,
+                criterion: nn.Module, class_weights: torch.Tensor, device: torch.device,
+                metrics: Dict[str, nn.Module], epoch: int, scaler: GradScaler) -> Dict[str, float]:
+    model.train()
+    total_loss = 0.0
+    num_batches = 0
     
-    logger.info(f"F1-Score en validación: {f1_score(true_labels, pred_labels):.4f}")
+    logger.info(f"Iniciando época {epoch}, total de lotes esperados: {len(train_loader)}")
+    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
+    
+    for metric in metrics.values():
+        metric.reset()
+    
+    try:
+        for batch_idx, (images, labels) in enumerate(train_loader):
+            # Mover tensores a GPU aquí para evitar problemas con multiprocessing
+            images = images.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+            
+            # Verificar dispositivo de los tensores
+            if images.device != device or labels.device != device:
+                logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
+                raise ValueError("Tensores no están en el dispositivo correcto")
+            
+            logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}, "
+                       f"dispositivo imágenes: {images.device}, dispositivo etiquetas: {labels.device}")
+            
+            logger.info(f"Memoria antes de forward: {'GPU: ' + str(torch.cuda.memory_allocated(device)/1e9) + ' GB' if device.type == 'cuda' else 'RAM: ' + str(psutil.virtual_memory().used / 1e9) + ' GB'}")
+            
+            optimizer.zero_grad(set_to_none=True)
+            
+            try:
+                with autocast():
+                    logger.debug(f"Ejecutando model.forward...")
+                    outputs = model(images)
+                    logger.debug(f"Salida del modelo: {outputs.shape}")
+                    outputs = outputs.squeeze(-1)
+                    logger.debug(f"Salida después de squeeze: {outputs.shape}")
+                    loss = criterion(outputs, labels)
+                    loss = (loss * class_weights[labels.long()]).mean()
+                
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+                
+                total_loss += loss.item()
+                num_batches += 1
+                
+                # Aplicar sigmoid para métricas
+                outputs_sigmoid = torch.sigmoid(outputs)
+                for name, metric in metrics.items():
+                    metric.update(outputs_sigmoid, labels.int())
+                
+                logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
+                logger.info(f"Memoria después de forward: {'GPU: ' + str(torch.cuda.memory_allocated(device)/1e9) + ' GB' if device.type == 'cuda' else 'RAM: ' + str(psutil.virtual_memory().used / 1e9) + ' GB'}")
+                
+                del images, labels, outputs, outputs_sigmoid, loss
+                gc.collect()
+                if device.type == 'cuda':
+                    torch.cuda.empty_cache()
+            
+            except Exception as e:
+                logger.error(f"Error en lote {batch_idx} durante forward/backward: {str(e)}")
+                raise
+        
+    except Exception as e:
+        logger.error(f"Error en train_epoch: {str(e)}")  # Eliminada referencia a batch_idx
+        raise
+    
+    epoch_metrics = {'loss': total_loss / num_batches if num_batches > 0 else 0.0}
+    for name, metric in metrics.items():
+        epoch_metrics[name] = metric.compute().item()
+    
+    logger.info(f"Época {epoch} completada: {num_batches} lotes procesados, pérdida promedio: {epoch_metrics['loss']:.4f}")
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()
+    return epoch_metrics
+
+def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Module,
+                  device: torch.device, metrics: Dict[str, nn.Module]) -> Dict[str, float]:
+    model.eval()
+    total_loss = 0.0
+    num_batches = 0
+    
+    for metric in metrics.values():
+        metric.reset()
+    
+    with torch.no_grad():
+        with autocast():
+            for images, labels in val_loader:
+                images = images.to(device, non_blocking=True)  # Mover a GPU
+                labels = labels.to(device, non_blocking=True)  # Mover a GPU
+                
+                if images.device != device or labels.device != device:
+                    logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
+                    raise ValueError("Tensores no están en el dispositivo correcto")
+                
+                outputs = model(images).squeeze(-1)
+                loss = criterion(outputs, labels).mean()
+                
+                total_loss += loss.item()
+                num_batches += 1
+                
+                # Aplicar sigmoid para métricas
+                outputs_sigmoid = torch.sigmoid(outputs)
+                for name, metric in metrics.items():
+                    metric.update(outputs_sigmoid, labels.int())
+    
+    epoch_metrics = {'loss': total_loss / num_batches}
+    for name, metric in metrics.items():
+        epoch_metrics[name] = metric.compute().item()
+    
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()
+    return epoch_metrics
+
+def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    torch.save({
+        'model_state_dict': model.state_dict(),
+        'val_auc': val_auc,
+        'epoch': epoch,
+    }, path)
+    logger.info(f"Checkpoint guardado: {path} (AUC: {val_auc:.4f}, Epoch: {epoch})")
+
+def load_model_checkpoint(model: nn.Module, path: str) -> Optional[float]:
+    if not Path(path).exists():
+        return None
+    checkpoint = torch.load(path, map_location=device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    logger.info(f"Checkpoint cargado: {path} (AUC: {checkpoint.get('val_auc', 0):.4f})")
+    return checkpoint.get('val_auc', 0)
+
+def test_model(device: torch.device):
+    logger.info("Probando modelo con lote de ejemplo...")
+    test_images = torch.randn(2, 1, 128, 224, 224).to(device)  # Usar batch_size=2
+    test_labels = torch.tensor([1.0, 0.0]).to(device)
+    
+    logger.info(f"Lote de prueba: {test_images.shape}, etiquetas {test_labels.tolist()}")
+    model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
+    
+    with torch.no_grad():
+        try:
+            outputs = model(test_images)
+            logger.info(f"Salida del modelo: {outputs.shape}")
+            outputs = outputs.squeeze(-1)
+            logger.info(f"Después de squeeze: {outputs.shape}")
+            logger.info("✅ Modelo funciona correctamente")
+        except Exception as e:
+            logger.error(f"Error al probar modelo: {str(e)}")
+            raise
+    del model, test_images, test_labels
+    gc.collect()
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()
 
 def pretrain_model():
-    logger.info("Iniciando preentrenamiento optimizado del modelo 3D-CNN.")
+    logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) ===")
+
+    # Verificar compatibilidad CUDA
+    if device.type == 'cuda':
+        major, minor = torch.cuda.get_device_capability()
+        if major < 7:  # Ajustado a sm_75 (mínimo para CUDA 12.8)
+            logger.warning(f"⚠️ La GPU tiene arquitectura sm_{major}.{minor}, puede no ser compatible con PyTorch {torch.__version__}")
+        else:
+            logger.info(f"✅ Arquitectura GPU sm_{major}.{minor} compatible con PyTorch {torch.__version__}")
+
+    # Verificar dispositivo del modelo
+    logger.info("5. Creando modelo ResNet3D...")
+    model = build_resnet3d_model(input_channels=1, num_classes=1)
+    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
+
+    test_model(device)    
     
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-    
-    tf.keras.backend.clear_session()
-    gc.collect()
-    
+    logger.info("1. Cargando metadatos...")
     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
+    logger.info(f"Total de estudios en CSV: {len(df['StudyInstanceUID'].unique())}")
+    
     studies_df = df.group_by("StudyInstanceUID").agg(
-        pl.col("negative_exam_for_pe").first()
-    ).with_columns(
+        pl.col("negative_exam_for_pe").first().alias("negative_exam")
+    ).with_columns([
         pl.col("StudyInstanceUID").map_elements(
             lambda uid: str(Path(config.RSNA_DATASET_TRAIN_DIR) / uid), 
             return_dtype=pl.String
         ).alias("study_path"),
-        (1 - pl.col("negative_exam_for_pe")).alias("label")
-    )
+        (1 - pl.col("negative_exam")).alias("label")
+    ]).drop("negative_exam")
     
     studies_df = studies_df.filter(
         pl.col("study_path").map_elements(
@@ -338,74 +629,142 @@ def pretrain_model():
             return_dtype=pl.Boolean
         )
     )
-    logger.info(f"Metadatos cargados para {len(studies_df)} estudios con carpetas existentes.")
-    if len(studies_df) == 0:
-        logger.error("No se encontraron carpetas de estudios válidas. Verifica RSNA_DATASET_TRAIN_DIR.")
-        raise ValueError("No hay estudios válidos para procesar.")
+    
+    total_studies = len(studies_df)
+    logger.info(f"✅ Metadatos cargados: {total_studies} estudios válidos")
+    
+    if total_studies == 0:
+        logger.error("No se encontraron estudios válidos. Verifica rutas.")
+        raise ValueError("Dataset vacío")
     
     missing_studies = df.filter(
         ~df["StudyInstanceUID"].is_in(studies_df["StudyInstanceUID"])
-    )["StudyInstanceUID"].to_list()
-    if missing_studies:
-        logger.warning(f"Se omitieron {len(missing_studies)} estudios porque sus carpetas no existen: {missing_studies[:10]}...")
+    )["StudyInstanceUID"].n_unique()
+    if missing_studies > 0:
+        logger.warning(f"⚠️ {missing_studies} estudios sin carpetas físicas")
     
-    train_df, val_df = train_test_split(
-        studies_df.to_pandas(),  # Convert to pandas for sklearn compatibility
+    logger.info("2. Dividiendo datos...")
+    train_df_pd, val_df_pd = train_test_split(
+        studies_df.to_pandas(),
         test_size=0.2,
         random_state=SEED,
         stratify=studies_df["label"]
     )
-    train_df = pl.from_pandas(train_df)  # Back to polars if needed
-    val_df = pl.from_pandas(val_df)
-    logger.info(f"Datos divididos: {len(train_df)} para entrenamiento, {len(val_df)} para validación.")
-    logger.info(f"Estudios de entrenamiento: {len(train_df)}, Estudios de validación: {len(val_df)}")
     
-    n_total = len(train_df)
-    n_neg = len(train_df.filter(pl.col("label") == 0))
-    n_pos = n_total - n_neg
-    class_weight = {
-        0: (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
-        1: (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0,
+    train_df = pl.from_pandas(train_df_pd)
+    val_df = pl.from_pandas(val_df_pd)
+    
+    logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
+    logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
+    
+    train_pos = len(train_df.filter(pl.col("label") == 1))
+    train_neg = len(train_df) - train_pos
+    logger.info(f"   Clases train: {train_pos} positivos ({train_pos/len(train_df)*100:.1f}%), "
+               f"{train_neg} negativos ({train_neg/len(train_df)*100:.1f}%)")
+    
+    logger.info("3. Calculando pesos de clase...")
+    n_total, n_neg, n_pos = len(train_df), train_neg, train_pos
+    class_weights = torch.tensor([
+        (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
+        (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0
+    ], device=device)
+    logger.info(f"✅ Pesos: clase 0={class_weights[0]:.2f}, clase 1={class_weights[1]:.2f}")
+
+    logger.info("4. Creando datasets...")
+    train_dataset = RSNADataset(train_df)
+    val_dataset = create_validation_dataset(val_df)
+    
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, 
+                             num_workers=4, pin_memory=True)  # Optimizado para GPU
+    val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False, 
+                            num_workers=4, pin_memory=True)
+    
+    logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
+    logger.info(f"Batch size: {config.BATCH_SIZE}")
+    logger.info(f"Esperado número de lotes: {len(train_loader)}")
+    
+    logger.info("5. Creando modelo ResNet3D...")
+    model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    logger.info(f"✅ Modelo creado: {total_params/1e6:.1f}M params total, {trainable_params/1e6:.1f}M entrenables")
+    
+    optimizer = create_optimizer(model, config.LEARNING_RATE)
+    criterion = create_criterion(class_weights)
+    metrics = create_metrics(device)
+    
+    use_mixed_precision = True if device.type == 'cuda' else False
+    scaler = GradScaler() if use_mixed_precision else None
+    logger.info(f"✅ Optimizador: Adam(lr={config.LEARNING_RATE}), Mixed precision: {use_mixed_precision}")
+    
+    history = {
+        'loss': [], 'accuracy': [], 'precision': [], 'recall': [], 'auc': [], 'f1': [],
+        'val_loss': [], 'val_accuracy': [], 'val_precision': [], 'val_recall': [], 'val_auc': [], 'val_f1': []
     }
-    logger.info(f"Pesos de clase calculados -> 0: {class_weight[0]:.2f}, 1: {class_weight[1]:.2f}")
+    
+    best_val_auc = 0.0
+    patience = 5
+    no_improve_count = 0
+    
+    logger.info(f"🎯 Iniciando entrenamiento por {config.EPOCHS} épocas...")
+    for epoch in range(config.EPOCHS):
+        logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
         
-    steps_per_epoch = max(1, len(train_df) // config.BATCH_SIZE)
-    validation_steps = max(1, len(val_df) // config.BATCH_SIZE)
-    train_dataset = create_optimized_tf_dataset(train_df, config.BATCH_SIZE, is_training=True, class_weights=class_weight)
-    val_dataset = create_optimized_tf_dataset(val_df, config.BATCH_SIZE, is_training=False)
+        train_metrics = train_epoch(
+            model, train_loader, optimizer, criterion, 
+            class_weights, device, metrics, epoch+1, scaler
+        )
+        
+        val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
+        
+        for key in ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']:
+            history[key].append(train_metrics[key])
+            history[f'val_{key}'].append(val_metrics[key])
+        
+        logger.info(f"RESULTADOS ÉPOCA {epoch+1}:")
+        logger.info(f"  Train - Loss: {train_metrics['loss']:.4f}, AUC: {train_metrics['auc']:.4f}, "
+                   f"Acc: {train_metrics['accuracy']:.3f}, F1: {train_metrics['f1']:.3f}")
+        logger.info(f"  Valid - Loss: {val_metrics['loss']:.4f}, AUC: {val_metrics['auc']:.4f}, "
+                   f"Acc: {val_metrics['accuracy']:.3f}, F1: {val_metrics['f1']:.3f}")
+        
+        current_val_auc = val_metrics['auc']
+        if current_val_auc > best_val_auc:
+            best_val_auc = current_val_auc
+            save_model_checkpoint(model, 'models/best_model_auc.pth', best_val_auc, epoch+1)
+            no_improve_count = 0
+            logger.info(f"🌟 NUEVO MEJOR MODELO: AUC = {best_val_auc:.4f}")
+        else:
+            no_improve_count += 1
+        
+        if no_improve_count >= patience:
+            for g in optimizer.param_groups:
+                g['lr'] *= 0.5
+                logger.info(f"📉 LR reducido a {g['lr']:.6f}")
+            no_improve_count = 0
+        
+        if no_improve_count >= 10:
+            logger.info(f"🛑 Early stopping en época {epoch+1}")
+            break
     
-    model = _build_resnet3d_model(input_shape=(config.TARGET_DEPTH, *config.IMAGE_SIZE, 1))
-    model.summary()
+    logger.info(f"\n=== ENTRENAMIENTO COMPLETADO ===")
+    logger.info(f"Mejor AUC validación: {best_val_auc:.4f}")
     
-    callbacks = [
-        tf.keras.callbacks.ModelCheckpoint(
-            'models/best_model_auc.keras', monitor='val_auc', save_best_only=True, mode='max', verbose=1
-        ),
-        tf.keras.callbacks.ReduceLROnPlateau(
-            monitor='val_loss', factor=0.2, patience=5, min_lr=1e-6, verbose=1
-        ),
-        tf.keras.callbacks.TensorBoard(log_dir='logs/tensorboard', histogram_freq=1, write_graph=True),
-        tf.keras.callbacks.CSVLogger('logs/training_log.csv'),
-        tf.keras.callbacks.TerminateOnNaN()
-    ]
+    final_model_path = 'models/pretrained_rsna_final.pth'
+    torch.save(model.state_dict(), final_model_path)
+    logger.info(f"💾 Modelo final guardado: {final_model_path}")
     
-    logger.info("Iniciando el entrenamiento del modelo...")
-    history = model.fit(
-        train_dataset,
-        validation_data=val_dataset,
-        epochs=config.EPOCHS,
-        steps_per_epoch=steps_per_epoch,
-        validation_steps=validation_steps,
-        callbacks=callbacks,
-        verbose=1
-    )
+    logger.info("📊 Generando visualizaciones...")
+    plot_training_curves(history)
+    final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
     
-    model.save("models/pretrained_rsna_final.keras")
-    plot_training_curves_improved(history)
-    plot_confusion_matrix(val_df, model, val_dataset)
+    final_train_auc = history['auc'][-1]
+    final_val_auc = history['val_auc'][-1]
+    logger.info(f"📈 RESULTADOS FINALES: Train AUC: {final_train_auc:.4f}, Valid AUC: {final_val_auc:.4f}, Valid F1: {final_f1:.4f}")
     
-    logger.info("Entrenamiento completado exitosamente.")
-    
-    del model, history, train_dataset, val_dataset
+    del model, train_loader, val_loader, optimizer, criterion
     gc.collect()
-    tf.keras.backend.clear_session()
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()
+    
+    logger.info("✅ Preentrenamiento completado exitosamente")
+    return history, best_val_auc
