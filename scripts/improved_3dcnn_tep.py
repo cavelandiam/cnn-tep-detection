@@ -263,7 +263,7 @@ class RSNADataset(Dataset):
         elif not self.is_train and self.val_transforms:
             volume_tensor = self.val_transforms({"image": volume_tensor})["image"]
         
-        label_tensor = torch.tensor(label, dtype=torch.float32)
+        label_tensor = torch.tensor(label, dtype=torch.long)
         
         return volume_tensor, label_tensor
 
@@ -387,9 +387,9 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     initialize_model_weights(model)
     
     # Compilar modelo para GPUs modernas (Ampere+)
-    if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
-        model = torch.compile(model)
-        logger.info("✅ Modelo compilado con torch.compile para optimización")
+    # if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
+    #     model = torch.compile(model)
+    #     logger.info("✅ Modelo compilado con torch.compile para optimización")
     
     # Probar modelo con entrada de prueba en GPU
     test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
@@ -471,17 +471,6 @@ def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loade
     logger.info(f"F1-Score validación: {f1_val:.4f}")
     return f1_val
 
-
-# =============================================================================
-# TRAINING
-# =============================================================================
-
-def create_optimizer(model: nn.Module, learning_rate: float) -> optim.Optimizer:
-    return optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
-
-def create_criterion(class_weights: torch.Tensor) -> nn.Module:
-    return nn.BCEWithLogitsLoss(reduction='none')  # Usar BCEWithLogitsLoss
-
 def create_metrics(device: torch.device):
     return {
         'auc': BinaryAUROC().to(device),
@@ -491,101 +480,93 @@ def create_metrics(device: torch.device):
         'f1': BinaryF1Score().to(device)
     }
 
-def train_epoch(model: nn.Module, train_loader: DataLoader, optimizer: optim.Optimizer,
-                criterion: nn.Module, class_weights: torch.Tensor, device: torch.device,
-                metrics: Dict[str, nn.Module], epoch: int, scaler: GradScaler) -> Dict[str, float]:
+def calculate_metrics(labels, preds, metrics):
+    logger.debug(f"Calculando métricas: labels={labels}, preds={preds}")
+    labels = [int(label) for label in labels]  # Asegurar que sean enteros
+    labels = torch.tensor(labels, dtype=torch.long).to(metrics['accuracy'].device)
+    preds = torch.tensor(preds, dtype=torch.float).to(metrics['accuracy'].device)
+    
+    logger.debug(f"Labels convertidas: {labels.tolist()}, Preds: {preds.tolist()}")
+    return {
+        'accuracy': metrics['accuracy'](preds, labels).item(),
+        'precision': metrics['precision'](preds, labels).item(),
+        'recall': metrics['recall'](preds, labels).item(),
+        'f1': metrics['f1'](preds, labels).item(),
+        'auc': metrics['auc'](preds, labels).item()
+    }
+
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+
+def create_optimizer(model: nn.Module, learning_rate: float) -> optim.Optimizer:
+    return optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+
+def create_criterion(class_weights: torch.Tensor) -> nn.Module:
+    return nn.BCEWithLogitsLoss(pos_weight=class_weights[1], weight=class_weights[0])
+
+def train_epoch(model, data_loader, optimizer, criterion, class_weights, device, metrics, epoch, scaler=None):
     model.train()
-    total_loss = 0.0
-    num_batches = 0
+    running_loss = 0.0
+    total_batches = len(data_loader)
+    all_preds, all_labels = [], []
     
-    logger.info(f"Iniciando época {epoch}, total de lotes esperados: {len(train_loader)}")
+    logger.info(f"Iniciando época {epoch}, total de lotes esperados: {total_batches}")
     
-    for metric in metrics.values():
-        metric.reset()
-    
-    try:
-        for batch_idx, (images, labels) in enumerate(train_loader):
-            images = images.to(device, non_blocking=True)
-            labels = labels.to(device, non_blocking=True)
-            
-            if images.device != device or labels.device != device:
-                logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
-                raise ValueError("Tensores no están en el dispositivo correcto")
-            
-            logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
-            
-            optimizer.zero_grad(set_to_none=True)
-            
-            with autocast():
-                outputs = model(images)
-                outputs = outputs.squeeze(-1)
-                loss = criterion(outputs, labels)
-                loss = (loss * class_weights[labels.long()]).mean()
-            
+    for batch_idx, (images, labels) in enumerate(data_loader):
+        logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
+        images, labels = images.to(device), labels.to(device)
+        
+        optimizer.zero_grad()
+        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
+            outputs = model(images)
+            loss = criterion(outputs, labels.unsqueeze(1).float())  # Convertir a float para la pérdida
+        
+        if scaler:
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
-            
-            total_loss += loss.item()
-            num_batches += 1
-            
-            outputs_sigmoid = torch.sigmoid(outputs)
-            for name, metric in metrics.items():
-                metric.update(outputs_sigmoid, labels.int())
-            
-            logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
+        else:
+            loss.backward()
+            optimizer.step()
+        
+        running_loss += loss.item()
+        logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
+        
+        preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
+        all_preds.extend(preds)
+        all_labels.extend(labels.cpu().numpy().astype(int).flatten())  # Mantener como int para métricas
     
-    except Exception as e:
-        logger.error(f"Error en train_epoch: {str(e)}")
-        raise
+    avg_loss = running_loss / total_batches
+    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+    metrics_dict['loss'] = avg_loss
     
-    if device.type == 'cuda':
-        torch.cuda.empty_cache()  # Solo al final de la época
-    
-    epoch_metrics = {'loss': total_loss / num_batches if num_batches > 0 else 0.0}
-    for name, metric in metrics.items():
-        epoch_metrics[name] = metric.compute().item()
-    
-    logger.info(f"Época {epoch} completada: {num_batches} lotes procesados, pérdida promedio: {epoch_metrics['loss']:.4f}")
-    return epoch_metrics
+    logger.info(f"Época {epoch} completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
+    return metrics_dict
 
-def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Module,
-                  device: torch.device, metrics: Dict[str, nn.Module]) -> Dict[str, float]:
+def validate_epoch(model, data_loader, criterion, device, metrics):
     model.eval()
-    total_loss = 0.0
-    num_batches = 0
-    
-    for metric in metrics.values():
-        metric.reset()
+    running_loss = 0.0
+    total_batches = len(data_loader)
+    all_preds, all_labels = [], []
     
     with torch.no_grad():
-        with autocast():
-            for images, labels in val_loader:
-                images = images.to(device, non_blocking=True)
-                labels = labels.to(device, non_blocking=True)
-                
-                if images.device != device or labels.device != device:
-                    logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
-                    raise ValueError("Tensores no están en el dispositivo correcto")
-                
-                outputs = model(images).squeeze(-1)
-                loss = criterion(outputs, labels).mean()
-                
-                total_loss += loss.item()
-                num_batches += 1
-                
-                outputs_sigmoid = torch.sigmoid(outputs)
-                for name, metric in metrics.items():
-                    metric.update(outputs_sigmoid, labels.int())
+        for batch_idx, (images, labels) in enumerate(data_loader):
+            images, labels = images.to(device), labels.to(device)
+            with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
+                outputs = model(images)
+                loss = criterion(outputs, labels.unsqueeze(1).float())  # Convertir a float para la pérdida
+            
+            running_loss += loss.item()
+            preds = torch.sigmoid(outputs).cpu().numpy().flatten()
+            all_preds.extend(preds)
+            all_labels.extend(labels.cpu().numpy().astype(int).flatten())  # Mantener como int para métricas
     
-    if device.type == 'cuda':
-        torch.cuda.empty_cache()  # Solo al final de la época
-    
-    epoch_metrics = {'loss': total_loss / num_batches}
-    for name, metric in metrics.items():
-        epoch_metrics[name] = metric.compute().item()
-    
-    return epoch_metrics
+    avg_loss = running_loss / total_batches
+    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+    metrics_dict['loss'] = avg_loss
+    return metrics_dict
 
 def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -829,7 +810,7 @@ def pretrain_model():
     metrics = create_metrics(device)
     
     use_mixed_precision = True if device.type == 'cuda' else False
-    scaler = GradScaler() if use_mixed_precision else None
+    scaler = torch.amp.GradScaler('cuda') if use_mixed_precision and device.type == 'cuda' else None
     logger.info(f"✅ Optimizador: Adam(lr={config.LEARNING_RATE}), Mixed precision: {use_mixed_precision}")
     
     history = {
