@@ -4,7 +4,7 @@ import os
 import pydicom
 import torch
 
-from scripts import improved_3dcnn_tep_pt  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
+from scripts import improved_3dcnn_tep  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
 from utils import logger
 
 # Configuración de TensorFlow para reproducibilidad
@@ -18,8 +18,8 @@ def test_pipeline():
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
     
-    history, best_auc = improved_3dcnn_tep_pt.pretrain_model()
-    logger.info(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
+    history, best_auc = improved_3dcnn_tep.pretrain_model()
+    #logger.info(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
 
     #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()

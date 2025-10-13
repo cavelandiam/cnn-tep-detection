@@ -11,6 +11,8 @@ DICOM_TEP_TRUE_DIR = os.path.join(DATA_DIR, "hucsr", "patients_tep_true")
 DICOM_TEP_FALSE_DIR = os.path.join(DATA_DIR, "hucsr", "patients_tep_false")
 RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train.csv")
+RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_metadata.csv")
+RSNA_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_data")
 #RSNA_DATASET_TEST_DIR = os.path.join(DATA_DIR, "rsna", "test")
 #RSNA_CSV_TEST_DIR = os.path.join(DATA_DIR, "rsna", "test.csv")
 RSNA_CSV_TRAIN_PROCESSED_DIR = os.path.join(DATA_DIR, "rsna", "rsna-str-pulmonary-embolism-detection", "train_processed.csv")
@@ -31,6 +33,7 @@ TARGET_DEPTH = 128 #512
 BATCH_SIZE = 1
 EPOCHS = 10
 LEARNING_RATE = 1e-4
+NUM_WORKERS = 1
 
 # 📌 **Mensajes del Sistema**
 MESSAGES = {

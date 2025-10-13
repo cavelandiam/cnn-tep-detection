@@ -63,7 +63,9 @@ logger.info(f"PyTorch version: {torch.__version__}")
 logger.info(f"CUDA version: {torch.version.cuda}")
 logger.info(f"Device capability: {torch.cuda.get_device_capability() if torch.cuda.is_available() else 'N/A'}")
 
-# --- FUNCIONES DE PROCESAMIENTO DE DATOS ---
+# =============================================================================
+# PREPROCESAMIENTO DICOM
+# =============================================================================
 
 def process_dicom_image(ds: pydicom.FileDataset) -> Optional[np.ndarray]:
     """Procesa una imagen DICOM individual"""
@@ -138,7 +140,7 @@ def parse_dicom_study(study_path: Union[str, bytes]) -> np.ndarray:
         
         series_dir = max(series_dirs, key=lambda p: len(list(p.glob('*.dcm'))))
         dicom_files = sorted(series_dir.glob('*.dcm'), 
-                            key=lambda f: float(pydicom.dcmread(f, stop_before_pixels=True).get('SliceLocation', 0)))
+                             key=lambda f: float(pydicom.dcmread(f, stop_before_pixels=True).get('SliceLocation', 0)))
         
         if not dicom_files:
             logger.warning(f"No se encontraron archivos DICOM en {series_dir}")
@@ -171,7 +173,7 @@ def parse_dicom_study(study_path: Union[str, bytes]) -> np.ndarray:
         
         success_rate = len(valid_images) / total_files * 100 if total_files > 0 else 0
         logger.info(f"Estudio {Path(study_path_str).name}: {len(valid_images)}/{total_files} "
-                   f"imágenes válidas ({success_rate:.1f}%)")
+                    f"imágenes válidas ({success_rate:.1f}%)")
         
         volume = np.stack(valid_images[:config.TARGET_DEPTH], axis=0)
         logger.info(f"Volumen inicial: {volume.shape}")
@@ -205,30 +207,70 @@ def classify_dicom_error(error_msg: str) -> str:
     else:
         return "DESCONOCIDO"
 
-# --- DATASET ---
+def preprocess_single_study(row):
+    """Procesa un estudio individual y guarda como .npy"""
+    study_id = row['StudyInstanceUID']
+    study_path = row['study_path']
+    output_dir = config.RSNA_PREPROCESSED_DATA_TRAIN_DIR
+    Path(output_dir).mkdir(exist_ok=True)
+    npy_path = f"{output_dir}/{study_id}.npy"
+    
+    if Path(npy_path).exists():
+        logger.info(f"Volumen ya preprocesado para {study_id}")
+        return npy_path
+    
+    volume = parse_dicom_study(study_path)
+    np.save(npy_path, volume)
+    logger.info(f"Preprocesado {study_id} guardado en {npy_path}")
+    return npy_path
+
+def preprocess_all_studies(df: pl.DataFrame, num_processes: int = 2):
+    """Preprocesa todos los estudios en paralelo"""
+    logger.info("Iniciando preprocesamiento paralelo de estudios...")
+    with mp.Pool(processes=num_processes) as pool:
+        preprocessed_paths = pool.map(preprocess_single_study, [row for row in df.iter_rows(named=True)])
+    
+    df = df.with_columns(pl.Series("preprocessed_path", preprocessed_paths))
+    df.write_csv(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR)
+    logger.info(f"Preprocesamiento completado. Metadatos guardados en {config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR}")
+    return df
+
+
+# =============================================================================
+# DATASET
+# =============================================================================
 
 class RSNADataset(Dataset):
-    def __init__(self, data_df):
+    def __init__(self, data_df, is_train: bool = False):
         self.data_df = data_df
+        self.is_train = is_train
+        self.train_transforms = create_train_transforms() if is_train else None
+        self.val_transforms = create_val_transforms() if not is_train else None
     
     def __len__(self):
         return len(self.data_df)
     
     def __getitem__(self, idx):
-        study_path = self.data_df["study_path"][idx]
+        npy_path = self.data_df["preprocessed_path"][idx]
         label = self.data_df["label"][idx]
         
-        volume = parse_dicom_study(study_path)
-        volume_tensor = torch.from_numpy(volume).permute(3, 0, 1, 2).float()  # No mover a GPU aquí
+        volume = np.load(npy_path)  # Carga rápida desde .npy
+        volume_tensor = torch.from_numpy(volume).permute(3, 0, 1, 2).float()  # [C=1, D, H, W]
+        
+        # Aplicar transformaciones MONAI
+        if self.is_train and self.train_transforms:
+            volume_tensor = self.train_transforms({"image": volume_tensor})["image"]
+        elif not self.is_train and self.val_transforms:
+            volume_tensor = self.val_transforms({"image": volume_tensor})["image"]
+        
         label_tensor = torch.tensor(label, dtype=torch.float32)
         
         return volume_tensor, label_tensor
-    
-def create_validation_dataset(df: pl.DataFrame) -> Dataset:
-    """Crea dataset de validación"""
-    return RSNADataset(df)
 
-# --- MODEL COMPONENTS ---
+
+# =============================================================================
+# MODEL COMPONENTS
+# =============================================================================
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, stride: int = 1):
@@ -266,7 +308,7 @@ class ResidualBlock(nn.Module):
         
         out += shortcut_out
         out = self.relu_final(out)
-        logger.debug(f"ResidualBlock salida: {out.shape}, dispositivo: {out.device}")
+        logger.debug(f"ResidualBlock salida: {out.shape}, dispositivo: {x.device}")
         return out
 
 class ResNet3D(nn.Module):
@@ -344,8 +386,13 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     # Inicializar pesos en GPU
     initialize_model_weights(model)
     
+    # Compilar modelo para GPUs modernas (Ampere+)
+    if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
+        model = torch.compile(model)
+        logger.info("✅ Modelo compilado con torch.compile para optimización")
+    
     # Probar modelo con entrada de prueba en GPU
-    test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)  # Usar batch_size=2
+    test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
     logger.debug(f"Probando modelo con entrada: {test_input.shape}, dispositivo: {test_input.device}")
     
     model.eval()
@@ -363,7 +410,10 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     model.train()
     return model
 
-# --- TRANSFORMACIONES ---
+
+# =============================================================================
+# TRANSFORMS & AUGMENTATIONS
+# =============================================================================
 
 def create_train_transforms() -> Compose:
     return Compose([
@@ -376,7 +426,10 @@ def create_train_transforms() -> Compose:
 def create_val_transforms() -> Compose:
     return Compose([])
 
-# --- MÉTRICAS Y VISUALIZACIÓN ---
+
+# =============================================================================
+# METRICS AND VISUALIZATIONS
+# =============================================================================
 
 def plot_training_curves(history: Dict[str, List[float]]):
     metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']
@@ -418,7 +471,10 @@ def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loade
     logger.info(f"F1-Score validación: {f1_val:.4f}")
     return f1_val
 
-# --- ENTRENAMIENTO ---
+
+# =============================================================================
+# TRAINING
+# =============================================================================
 
 def create_optimizer(model: nn.Module, learning_rate: float) -> optim.Optimizer:
     return optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
@@ -443,74 +499,54 @@ def train_epoch(model: nn.Module, train_loader: DataLoader, optimizer: optim.Opt
     num_batches = 0
     
     logger.info(f"Iniciando época {epoch}, total de lotes esperados: {len(train_loader)}")
-    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
     
     for metric in metrics.values():
         metric.reset()
     
     try:
         for batch_idx, (images, labels) in enumerate(train_loader):
-            # Mover tensores a GPU aquí para evitar problemas con multiprocessing
             images = images.to(device, non_blocking=True)
             labels = labels.to(device, non_blocking=True)
             
-            # Verificar dispositivo de los tensores
             if images.device != device or labels.device != device:
                 logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
                 raise ValueError("Tensores no están en el dispositivo correcto")
             
-            logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}, "
-                       f"dispositivo imágenes: {images.device}, dispositivo etiquetas: {labels.device}")
-            
-            logger.info(f"Memoria antes de forward: {'GPU: ' + str(torch.cuda.memory_allocated(device)/1e9) + ' GB' if device.type == 'cuda' else 'RAM: ' + str(psutil.virtual_memory().used / 1e9) + ' GB'}")
+            logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
             
             optimizer.zero_grad(set_to_none=True)
             
-            try:
-                with autocast():
-                    logger.debug(f"Ejecutando model.forward...")
-                    outputs = model(images)
-                    logger.debug(f"Salida del modelo: {outputs.shape}")
-                    outputs = outputs.squeeze(-1)
-                    logger.debug(f"Salida después de squeeze: {outputs.shape}")
-                    loss = criterion(outputs, labels)
-                    loss = (loss * class_weights[labels.long()]).mean()
-                
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
-                
-                total_loss += loss.item()
-                num_batches += 1
-                
-                # Aplicar sigmoid para métricas
-                outputs_sigmoid = torch.sigmoid(outputs)
-                for name, metric in metrics.items():
-                    metric.update(outputs_sigmoid, labels.int())
-                
-                logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
-                logger.info(f"Memoria después de forward: {'GPU: ' + str(torch.cuda.memory_allocated(device)/1e9) + ' GB' if device.type == 'cuda' else 'RAM: ' + str(psutil.virtual_memory().used / 1e9) + ' GB'}")
-                
-                del images, labels, outputs, outputs_sigmoid, loss
-                gc.collect()
-                if device.type == 'cuda':
-                    torch.cuda.empty_cache()
+            with autocast():
+                outputs = model(images)
+                outputs = outputs.squeeze(-1)
+                loss = criterion(outputs, labels)
+                loss = (loss * class_weights[labels.long()]).mean()
             
-            except Exception as e:
-                logger.error(f"Error en lote {batch_idx} durante forward/backward: {str(e)}")
-                raise
-        
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+            
+            total_loss += loss.item()
+            num_batches += 1
+            
+            outputs_sigmoid = torch.sigmoid(outputs)
+            for name, metric in metrics.items():
+                metric.update(outputs_sigmoid, labels.int())
+            
+            logger.info(f"Epoch {epoch}, Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}")
+    
     except Exception as e:
-        logger.error(f"Error en train_epoch: {str(e)}")  # Eliminada referencia a batch_idx
+        logger.error(f"Error en train_epoch: {str(e)}")
         raise
+    
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()  # Solo al final de la época
     
     epoch_metrics = {'loss': total_loss / num_batches if num_batches > 0 else 0.0}
     for name, metric in metrics.items():
         epoch_metrics[name] = metric.compute().item()
     
     logger.info(f"Época {epoch} completada: {num_batches} lotes procesados, pérdida promedio: {epoch_metrics['loss']:.4f}")
-    if device.type == 'cuda':
-        torch.cuda.empty_cache()
     return epoch_metrics
 
 def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Module,
@@ -525,8 +561,8 @@ def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Modul
     with torch.no_grad():
         with autocast():
             for images, labels in val_loader:
-                images = images.to(device, non_blocking=True)  # Mover a GPU
-                labels = labels.to(device, non_blocking=True)  # Mover a GPU
+                images = images.to(device, non_blocking=True)
+                labels = labels.to(device, non_blocking=True)
                 
                 if images.device != device or labels.device != device:
                     logger.error(f"Error: imágenes en {images.device}, etiquetas en {labels.device}, esperado: {device}")
@@ -538,17 +574,17 @@ def validate_epoch(model: nn.Module, val_loader: DataLoader, criterion: nn.Modul
                 total_loss += loss.item()
                 num_batches += 1
                 
-                # Aplicar sigmoid para métricas
                 outputs_sigmoid = torch.sigmoid(outputs)
                 for name, metric in metrics.items():
                     metric.update(outputs_sigmoid, labels.int())
+    
+    if device.type == 'cuda':
+        torch.cuda.empty_cache()  # Solo al final de la época
     
     epoch_metrics = {'loss': total_loss / num_batches}
     for name, metric in metrics.items():
         epoch_metrics[name] = metric.compute().item()
     
-    if device.type == 'cuda':
-        torch.cuda.empty_cache()
     return epoch_metrics
 
 def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
@@ -591,6 +627,14 @@ def test_model(device: torch.device):
     if device.type == 'cuda':
         torch.cuda.empty_cache()
 
+
+
+
+
+# =============================================================================
+# INITIATE TRAINING
+# =============================================================================
+
 def pretrain_model():
     logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) ===")
 
@@ -601,15 +645,8 @@ def pretrain_model():
             logger.warning(f"⚠️ La GPU tiene arquitectura sm_{major}.{minor}, puede no ser compatible con PyTorch {torch.__version__}")
         else:
             logger.info(f"✅ Arquitectura GPU sm_{major}.{minor} compatible con PyTorch {torch.__version__}")
-
-    # Verificar dispositivo del modelo
-    logger.info("5. Creando modelo ResNet3D...")
-    model = build_resnet3d_model(input_channels=1, num_classes=1)
-    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
-
-    test_model(device)    
-    
-    logger.info("1. Cargando metadatos...")
+ 
+    logger.info("1. Preprocesando datos DICOM...")
     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
     logger.info(f"Total de estudios en CSV: {len(df['StudyInstanceUID'].unique())}")
     
@@ -642,7 +679,27 @@ def pretrain_model():
     )["StudyInstanceUID"].n_unique()
     if missing_studies > 0:
         logger.warning(f"⚠️ {missing_studies} estudios sin carpetas físicas")
+
+    # Generar archivos .npy y preprocessed_metadata.csv
+    if not Path(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR).exists():
+        logger.info("Generando preprocessed_metadata.csv...")
+        studies_df = preprocess_all_studies(studies_df, num_processes=2)
+    else:
+        logger.info("preprocessed_metadata.csv ya existe, cargando...")
+        studies_df = pl.read_csv(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR)
     
+    # Verificar que los archivos .npy existan
+    missing_npy = studies_df.filter(
+        ~pl.col("preprocessed_path").map_elements(
+            lambda p: Path(p).exists(), return_dtype=pl.Boolean
+        )
+    )
+    if len(missing_npy) > 0:
+        logger.warning(f"⚠️ {len(missing_npy)} estudios sin archivos .npy preprocesados")
+
+
+
+    # Paso 2: Dividir datos
     logger.info("2. Dividiendo datos...")
     train_df_pd, val_df_pd = train_test_split(
         studies_df.to_pandas(),
@@ -656,13 +713,35 @@ def pretrain_model():
     
     logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
     logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
+    logger.info(f"Estudios en val_df: {val_df['StudyInstanceUID'].to_list()}")
     
+    # Verificar contenido de train_df y val_df
+    logger.info(f"Columnas en train_df: {train_df.columns}")
+    logger.info(f"Primeras filas de train_df:\n{train_df.head(5)}")
+    logger.info(f"Columnas en val_df: {val_df.columns}")
+    logger.info(f"Primeras filas de val_df:\n{val_df.head(5)}")
+
+    # Verificar archivos .npy en train_df y val_df
+    logger.info("Verificando archivos .npy en train_df...")
+    for path in train_df["preprocessed_path"]:
+        if not Path(path).exists():
+            logger.error(f"Archivo .npy no encontrado: {path}")
+            raise FileNotFoundError(f"Archivo .npy no encontrado: {path}")
+    logger.info("Verificando archivos .npy en val_df...")
+    for path in val_df["preprocessed_path"]:
+        if not Path(path).exists():
+            logger.error(f"Archivo .npy no encontrado: {path}")
+            raise FileNotFoundError(f"Archivo .npy no encontrado: {path}")
+
+
+
+
+    logger.info("3. Calculando pesos de clase...")
     train_pos = len(train_df.filter(pl.col("label") == 1))
     train_neg = len(train_df) - train_pos
     logger.info(f"   Clases train: {train_pos} positivos ({train_pos/len(train_df)*100:.1f}%), "
                f"{train_neg} negativos ({train_neg/len(train_df)*100:.1f}%)")
     
-    logger.info("3. Calculando pesos de clase...")
     n_total, n_neg, n_pos = len(train_df), train_neg, train_pos
     class_weights = torch.tensor([
         (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
@@ -670,25 +749,81 @@ def pretrain_model():
     ], device=device)
     logger.info(f"✅ Pesos: clase 0={class_weights[0]:.2f}, clase 1={class_weights[1]:.2f}")
 
+
+
+
+
     logger.info("4. Creando datasets...")
-    train_dataset = RSNADataset(train_df)
-    val_dataset = create_validation_dataset(val_df)
-    
-    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, 
-                             num_workers=4, pin_memory=True)  # Optimizado para GPU
-    val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False, 
-                            num_workers=4, pin_memory=True)
+    logger.info("Creando train_dataset...")
+    train_dataset = RSNADataset(train_df, is_train=True)
+    logger.info("Creando val_dataset...")
+    val_dataset = RSNADataset(val_df, is_train=False)
     
     logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
-    logger.info(f"Batch size: {config.BATCH_SIZE}")
-    logger.info(f"Esperado número de lotes: {len(train_loader)}")
+    logger.info(f"Tamaño de val_dataset: {len(val_dataset)}")      
     
+    logger.info("Creando train_loader...")
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=config.BATCH_SIZE,
+        shuffle=True,
+        num_workers=0,  # Desactivar workers para evitar deadlocks
+        pin_memory=True if device.type == 'cuda' else False,
+        persistent_workers=False
+    )
+    logger.info("Creando val_loader...")
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=config.BATCH_SIZE,
+        shuffle=False,
+        num_workers=0,  # Desactivar workers para evitar deadlocks
+        pin_memory=True if device.type == 'cuda' else False,
+        persistent_workers=False
+    )
+    
+    logger.info(f"Esperado número de lotes: train={len(train_loader)}, val={len(val_loader)}")
+    
+    # Probar carga de un lote para depuración
+    logger.info("Probando carga de un lote de train_loader...")
+    try:
+        for batch in train_loader:
+            volumes, labels = batch
+            logger.info(f"Lote cargado: volúmenes {volumes.shape}, etiquetas {labels.shape}")
+            break
+    except Exception as e:
+        logger.error(f"Error al cargar lote de train_loader: {str(e)}")
+        raise
+    
+    logger.info("Probando carga de un lote de val_loader...")
+    try:
+        for batch in val_loader:
+            volumes, labels = batch
+            logger.info(f"Lote cargado: volúmenes {volumes.shape}, etiquetas {labels.shape}")
+            break
+    except Exception as e:
+        logger.error(f"Error al cargar lote de val_loader: {str(e)}")
+        raise
+
+
+
+
+
+
     logger.info("5. Creando modelo ResNet3D...")
-    model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
-    total_params = sum(p.numel() for p in model.parameters())
-    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    logger.info(f"✅ Modelo creado: {total_params/1e6:.1f}M params total, {trainable_params/1e6:.1f}M entrenables")
+    model = build_resnet3d_model(input_channels=1, num_classes=1)
+    logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
     
+    test_model(device)
+
+
+
+
+
+
+
+
+
+    logger.info("6. Configurando entrenamiento...")
     optimizer = create_optimizer(model, config.LEARNING_RATE)
     criterion = create_criterion(class_weights)
     metrics = create_metrics(device)
@@ -768,3 +903,192 @@ def pretrain_model():
     
     logger.info("✅ Preentrenamiento completado exitosamente")
     return history, best_val_auc
+
+
+# def pretrain_model():
+#     logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) ===")
+
+#     # Verificar compatibilidad CUDA
+#     if device.type == 'cuda':
+#         major, minor = torch.cuda.get_device_capability()
+#         if major < 7:  # Ajustado a sm_75 (mínimo para CUDA 12.8)
+#             logger.warning(f"⚠️ La GPU tiene arquitectura sm_{major}.{minor}, puede no ser compatible con PyTorch {torch.__version__}")
+#         else:
+#             logger.info(f"✅ Arquitectura GPU sm_{major}.{minor} compatible con PyTorch {torch.__version__}")
+ 
+#     logger.info("1. Preprocesando datos DICOM...")
+#     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
+#     logger.info(f"Total de estudios en CSV: {len(df['StudyInstanceUID'].unique())}")
+    
+#     studies_df = df.group_by("StudyInstanceUID").agg(
+#         pl.col("negative_exam_for_pe").first().alias("negative_exam")
+#     ).with_columns([
+#         pl.col("StudyInstanceUID").map_elements(
+#             lambda uid: str(Path(config.RSNA_DATASET_TRAIN_DIR) / uid), 
+#             return_dtype=pl.String
+#         ).alias("study_path"),
+#         (1 - pl.col("negative_exam")).alias("label")
+#     ]).drop("negative_exam")
+    
+#     studies_df = studies_df.filter(
+#         pl.col("study_path").map_elements(
+#             lambda p: Path(p).exists() and Path(p).is_dir(), 
+#             return_dtype=pl.Boolean
+#         )
+#     )
+    
+#     total_studies = len(studies_df)
+#     logger.info(f"✅ Metadatos cargados: {total_studies} estudios válidos")
+    
+#     if total_studies == 0:
+#         logger.error("No se encontraron estudios válidos. Verifica rutas.")
+#         raise ValueError("Dataset vacío")
+    
+#     missing_studies = df.filter(
+#         ~df["StudyInstanceUID"].is_in(studies_df["StudyInstanceUID"])
+#     )["StudyInstanceUID"].n_unique()
+#     if missing_studies > 0:
+#         logger.warning(f"⚠️ {missing_studies} estudios sin carpetas físicas")
+
+#     # Generar archivos .npy y preprocessed_metadata.csv
+#     if not Path(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR).exists():
+#         logger.info("Generando preprocessed_metadata.csv...")
+#         studies_df = preprocess_all_studies(studies_df, num_processes=2)
+#     else:
+#         logger.info("preprocessed_metadata.csv ya existe, cargando...")
+#         studies_df = pl.read_csv(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR)
+    
+#     # Verificar que los archivos .npy existan
+#     missing_npy = studies_df.filter(
+#         ~pl.col("preprocessed_path").map_elements(
+#             lambda p: Path(p).exists(), return_dtype=pl.Boolean
+#         )
+#     )
+#     if len(missing_npy) > 0:
+#         logger.warning(f"⚠️ {len(missing_npy)} estudios sin archivos .npy preprocesados")
+    
+#     logger.info("2. Dividiendo datos...")
+#     train_df_pd, val_df_pd = train_test_split(
+#         studies_df.to_pandas(),
+#         test_size=0.2,
+#         random_state=SEED,
+#         stratify=studies_df["label"]
+#     )
+    
+#     train_df = pl.from_pandas(train_df_pd)
+#     val_df = pl.from_pandas(val_df_pd)
+    
+#     logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
+#     logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
+    
+#     train_pos = len(train_df.filter(pl.col("label") == 1))
+#     train_neg = len(train_df) - train_pos
+#     logger.info(f"   Clases train: {train_pos} positivos ({train_pos/len(train_df)*100:.1f}%), "
+#                f"{train_neg} negativos ({train_neg/len(train_df)*100:.1f}%)")
+    
+#     logger.info("3. Calculando pesos de clase...")
+#     n_total, n_neg, n_pos = len(train_df), train_neg, train_pos
+#     class_weights = torch.tensor([
+#         (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
+#         (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0
+#     ], device=device)
+#     logger.info(f"✅ Pesos: clase 0={class_weights[0]:.2f}, clase 1={class_weights[1]:.2f}")
+
+#     logger.info("4. Creando datasets...")
+#     train_dataset = RSNADataset(train_df)
+#     val_dataset = create_validation_dataset(val_df)
+    
+#     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, 
+#                              num_workers=4, pin_memory=True)  # Optimizado para GPU
+#     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False, 
+#                             num_workers=4, pin_memory=True)
+    
+#     logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
+#     logger.info(f"Batch size: {config.BATCH_SIZE}")
+#     logger.info(f"Esperado número de lotes: {len(train_loader)}")
+    
+#     logger.info("5. Creando modelo ResNet3D...")
+#     model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
+#     total_params = sum(p.numel() for p in model.parameters())
+#     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+#     logger.info(f"✅ Modelo creado: {total_params/1e6:.1f}M params total, {trainable_params/1e6:.1f}M entrenables")
+    
+#     optimizer = create_optimizer(model, config.LEARNING_RATE)
+#     criterion = create_criterion(class_weights)
+#     metrics = create_metrics(device)
+    
+#     use_mixed_precision = True if device.type == 'cuda' else False
+#     scaler = GradScaler() if use_mixed_precision else None
+#     logger.info(f"✅ Optimizador: Adam(lr={config.LEARNING_RATE}), Mixed precision: {use_mixed_precision}")
+    
+#     history = {
+#         'loss': [], 'accuracy': [], 'precision': [], 'recall': [], 'auc': [], 'f1': [],
+#         'val_loss': [], 'val_accuracy': [], 'val_precision': [], 'val_recall': [], 'val_auc': [], 'val_f1': []
+#     }
+    
+#     best_val_auc = 0.0
+#     patience = 5
+#     no_improve_count = 0
+    
+#     logger.info(f"🎯 Iniciando entrenamiento por {config.EPOCHS} épocas...")
+#     for epoch in range(config.EPOCHS):
+#         logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
+        
+#         train_metrics = train_epoch(
+#             model, train_loader, optimizer, criterion, 
+#             class_weights, device, metrics, epoch+1, scaler
+#         )
+        
+#         val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
+        
+#         for key in ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']:
+#             history[key].append(train_metrics[key])
+#             history[f'val_{key}'].append(val_metrics[key])
+        
+#         logger.info(f"RESULTADOS ÉPOCA {epoch+1}:")
+#         logger.info(f"  Train - Loss: {train_metrics['loss']:.4f}, AUC: {train_metrics['auc']:.4f}, "
+#                    f"Acc: {train_metrics['accuracy']:.3f}, F1: {train_metrics['f1']:.3f}")
+#         logger.info(f"  Valid - Loss: {val_metrics['loss']:.4f}, AUC: {val_metrics['auc']:.4f}, "
+#                    f"Acc: {val_metrics['accuracy']:.3f}, F1: {val_metrics['f1']:.3f}")
+        
+#         current_val_auc = val_metrics['auc']
+#         if current_val_auc > best_val_auc:
+#             best_val_auc = current_val_auc
+#             save_model_checkpoint(model, 'models/best_model_auc.pth', best_val_auc, epoch+1)
+#             no_improve_count = 0
+#             logger.info(f"🌟 NUEVO MEJOR MODELO: AUC = {best_val_auc:.4f}")
+#         else:
+#             no_improve_count += 1
+        
+#         if no_improve_count >= patience:
+#             for g in optimizer.param_groups:
+#                 g['lr'] *= 0.5
+#                 logger.info(f"📉 LR reducido a {g['lr']:.6f}")
+#             no_improve_count = 0
+        
+#         if no_improve_count >= 10:
+#             logger.info(f"🛑 Early stopping en época {epoch+1}")
+#             break
+    
+#     logger.info(f"\n=== ENTRENAMIENTO COMPLETADO ===")
+#     logger.info(f"Mejor AUC validación: {best_val_auc:.4f}")
+    
+#     final_model_path = 'models/pretrained_rsna_final.pth'
+#     torch.save(model.state_dict(), final_model_path)
+#     logger.info(f"💾 Modelo final guardado: {final_model_path}")
+    
+#     logger.info("📊 Generando visualizaciones...")
+#     plot_training_curves(history)
+#     final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
+    
+#     final_train_auc = history['auc'][-1]
+#     final_val_auc = history['val_auc'][-1]
+#     logger.info(f"📈 RESULTADOS FINALES: Train AUC: {final_train_auc:.4f}, Valid AUC: {final_val_auc:.4f}, Valid F1: {final_f1:.4f}")
+    
+#     del model, train_loader, val_loader, optimizer, criterion
+#     gc.collect()
+#     if device.type == 'cuda':
+#         torch.cuda.empty_cache()
+    
+#     logger.info("✅ Preentrenamiento completado exitosamente")
+#     return history, best_val_auc
