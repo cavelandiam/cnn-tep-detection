@@ -34,6 +34,7 @@ BATCH_SIZE = 1
 EPOCHS = 10
 LEARNING_RATE = 1e-4
 NUM_WORKERS = 1
+NUM_PROCESSES = 2
 
 # 📌 **Mensajes del Sistema**
 MESSAGES = {

@@ -3,6 +3,7 @@ import numpy as np
 import os
 import pydicom
 import torch
+import multiprocessing as mp
 
 from scripts import improved_3dcnn_tep  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
 from utils import logger
@@ -10,7 +11,8 @@ from utils import logger
 # Configuración de TensorFlow para reproducibilidad
 #os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
-logger.init_logger("log_main_cnn")
+if mp.current_process().name == 'MainProcess':
+    logger.init_logger("log_main_cnn")
 
 def test_pipeline():
     

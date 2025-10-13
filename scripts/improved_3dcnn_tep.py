@@ -24,6 +24,7 @@ import psutil
 import torch.multiprocessing as mp  # Importar torch.multiprocessing
 
 from utils import logger, config
+import multiprocessing as mp
 
 # --- CONFIGURACIÓN PARA REPRODUCIBILIDAD ---
 SEED = 42
@@ -36,7 +37,8 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = True  # Optimizado para GPU
 
 # --- CONFIGURACIÓN DE LOGGING Y DISPOSITIVO ---
-logger.init_logger("log_process_data_rsna")
+if mp.current_process().name == 'MainProcess':
+    logger.init_logger("log_process_data_rsna")
 
 # Configurar el método de inicio de multiprocessing a 'spawn'
 try:
@@ -664,7 +666,7 @@ def pretrain_model():
     # Generar archivos .npy y preprocessed_metadata.csv
     if not Path(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR).exists():
         logger.info("Generando preprocessed_metadata.csv...")
-        studies_df = preprocess_all_studies(studies_df, num_processes=2)
+        studies_df = preprocess_all_studies(studies_df, num_processes=config.NUM_PROCESSES)
     else:
         logger.info("preprocessed_metadata.csv ya existe, cargando...")
         studies_df = pl.read_csv(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR)
@@ -884,192 +886,3 @@ def pretrain_model():
     
     logger.info("✅ Preentrenamiento completado exitosamente")
     return history, best_val_auc
-
-
-# def pretrain_model():
-#     logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) ===")
-
-#     # Verificar compatibilidad CUDA
-#     if device.type == 'cuda':
-#         major, minor = torch.cuda.get_device_capability()
-#         if major < 7:  # Ajustado a sm_75 (mínimo para CUDA 12.8)
-#             logger.warning(f"⚠️ La GPU tiene arquitectura sm_{major}.{minor}, puede no ser compatible con PyTorch {torch.__version__}")
-#         else:
-#             logger.info(f"✅ Arquitectura GPU sm_{major}.{minor} compatible con PyTorch {torch.__version__}")
- 
-#     logger.info("1. Preprocesando datos DICOM...")
-#     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
-#     logger.info(f"Total de estudios en CSV: {len(df['StudyInstanceUID'].unique())}")
-    
-#     studies_df = df.group_by("StudyInstanceUID").agg(
-#         pl.col("negative_exam_for_pe").first().alias("negative_exam")
-#     ).with_columns([
-#         pl.col("StudyInstanceUID").map_elements(
-#             lambda uid: str(Path(config.RSNA_DATASET_TRAIN_DIR) / uid), 
-#             return_dtype=pl.String
-#         ).alias("study_path"),
-#         (1 - pl.col("negative_exam")).alias("label")
-#     ]).drop("negative_exam")
-    
-#     studies_df = studies_df.filter(
-#         pl.col("study_path").map_elements(
-#             lambda p: Path(p).exists() and Path(p).is_dir(), 
-#             return_dtype=pl.Boolean
-#         )
-#     )
-    
-#     total_studies = len(studies_df)
-#     logger.info(f"✅ Metadatos cargados: {total_studies} estudios válidos")
-    
-#     if total_studies == 0:
-#         logger.error("No se encontraron estudios válidos. Verifica rutas.")
-#         raise ValueError("Dataset vacío")
-    
-#     missing_studies = df.filter(
-#         ~df["StudyInstanceUID"].is_in(studies_df["StudyInstanceUID"])
-#     )["StudyInstanceUID"].n_unique()
-#     if missing_studies > 0:
-#         logger.warning(f"⚠️ {missing_studies} estudios sin carpetas físicas")
-
-#     # Generar archivos .npy y preprocessed_metadata.csv
-#     if not Path(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR).exists():
-#         logger.info("Generando preprocessed_metadata.csv...")
-#         studies_df = preprocess_all_studies(studies_df, num_processes=2)
-#     else:
-#         logger.info("preprocessed_metadata.csv ya existe, cargando...")
-#         studies_df = pl.read_csv(config.RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR)
-    
-#     # Verificar que los archivos .npy existan
-#     missing_npy = studies_df.filter(
-#         ~pl.col("preprocessed_path").map_elements(
-#             lambda p: Path(p).exists(), return_dtype=pl.Boolean
-#         )
-#     )
-#     if len(missing_npy) > 0:
-#         logger.warning(f"⚠️ {len(missing_npy)} estudios sin archivos .npy preprocesados")
-    
-#     logger.info("2. Dividiendo datos...")
-#     train_df_pd, val_df_pd = train_test_split(
-#         studies_df.to_pandas(),
-#         test_size=0.2,
-#         random_state=SEED,
-#         stratify=studies_df["label"]
-#     )
-    
-#     train_df = pl.from_pandas(train_df_pd)
-#     val_df = pl.from_pandas(val_df_pd)
-    
-#     logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
-#     logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
-    
-#     train_pos = len(train_df.filter(pl.col("label") == 1))
-#     train_neg = len(train_df) - train_pos
-#     logger.info(f"   Clases train: {train_pos} positivos ({train_pos/len(train_df)*100:.1f}%), "
-#                f"{train_neg} negativos ({train_neg/len(train_df)*100:.1f}%)")
-    
-#     logger.info("3. Calculando pesos de clase...")
-#     n_total, n_neg, n_pos = len(train_df), train_neg, train_pos
-#     class_weights = torch.tensor([
-#         (1 / n_neg) * (n_total / 2.0) if n_neg > 0 else 1.0,
-#         (1 / n_pos) * (n_total / 2.0) if n_pos > 0 else 1.0
-#     ], device=device)
-#     logger.info(f"✅ Pesos: clase 0={class_weights[0]:.2f}, clase 1={class_weights[1]:.2f}")
-
-#     logger.info("4. Creando datasets...")
-#     train_dataset = RSNADataset(train_df)
-#     val_dataset = create_validation_dataset(val_df)
-    
-#     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, 
-#                              num_workers=4, pin_memory=True)  # Optimizado para GPU
-#     val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False, 
-#                             num_workers=4, pin_memory=True)
-    
-#     logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
-#     logger.info(f"Batch size: {config.BATCH_SIZE}")
-#     logger.info(f"Esperado número de lotes: {len(train_loader)}")
-    
-#     logger.info("5. Creando modelo ResNet3D...")
-#     model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
-#     total_params = sum(p.numel() for p in model.parameters())
-#     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-#     logger.info(f"✅ Modelo creado: {total_params/1e6:.1f}M params total, {trainable_params/1e6:.1f}M entrenables")
-    
-#     optimizer = create_optimizer(model, config.LEARNING_RATE)
-#     criterion = create_criterion(class_weights)
-#     metrics = create_metrics(device)
-    
-#     use_mixed_precision = True if device.type == 'cuda' else False
-#     scaler = GradScaler() if use_mixed_precision else None
-#     logger.info(f"✅ Optimizador: Adam(lr={config.LEARNING_RATE}), Mixed precision: {use_mixed_precision}")
-    
-#     history = {
-#         'loss': [], 'accuracy': [], 'precision': [], 'recall': [], 'auc': [], 'f1': [],
-#         'val_loss': [], 'val_accuracy': [], 'val_precision': [], 'val_recall': [], 'val_auc': [], 'val_f1': []
-#     }
-    
-#     best_val_auc = 0.0
-#     patience = 5
-#     no_improve_count = 0
-    
-#     logger.info(f"🎯 Iniciando entrenamiento por {config.EPOCHS} épocas...")
-#     for epoch in range(config.EPOCHS):
-#         logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
-        
-#         train_metrics = train_epoch(
-#             model, train_loader, optimizer, criterion, 
-#             class_weights, device, metrics, epoch+1, scaler
-#         )
-        
-#         val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
-        
-#         for key in ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']:
-#             history[key].append(train_metrics[key])
-#             history[f'val_{key}'].append(val_metrics[key])
-        
-#         logger.info(f"RESULTADOS ÉPOCA {epoch+1}:")
-#         logger.info(f"  Train - Loss: {train_metrics['loss']:.4f}, AUC: {train_metrics['auc']:.4f}, "
-#                    f"Acc: {train_metrics['accuracy']:.3f}, F1: {train_metrics['f1']:.3f}")
-#         logger.info(f"  Valid - Loss: {val_metrics['loss']:.4f}, AUC: {val_metrics['auc']:.4f}, "
-#                    f"Acc: {val_metrics['accuracy']:.3f}, F1: {val_metrics['f1']:.3f}")
-        
-#         current_val_auc = val_metrics['auc']
-#         if current_val_auc > best_val_auc:
-#             best_val_auc = current_val_auc
-#             save_model_checkpoint(model, 'models/best_model_auc.pth', best_val_auc, epoch+1)
-#             no_improve_count = 0
-#             logger.info(f"🌟 NUEVO MEJOR MODELO: AUC = {best_val_auc:.4f}")
-#         else:
-#             no_improve_count += 1
-        
-#         if no_improve_count >= patience:
-#             for g in optimizer.param_groups:
-#                 g['lr'] *= 0.5
-#                 logger.info(f"📉 LR reducido a {g['lr']:.6f}")
-#             no_improve_count = 0
-        
-#         if no_improve_count >= 10:
-#             logger.info(f"🛑 Early stopping en época {epoch+1}")
-#             break
-    
-#     logger.info(f"\n=== ENTRENAMIENTO COMPLETADO ===")
-#     logger.info(f"Mejor AUC validación: {best_val_auc:.4f}")
-    
-#     final_model_path = 'models/pretrained_rsna_final.pth'
-#     torch.save(model.state_dict(), final_model_path)
-#     logger.info(f"💾 Modelo final guardado: {final_model_path}")
-    
-#     logger.info("📊 Generando visualizaciones...")
-#     plot_training_curves(history)
-#     final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
-    
-#     final_train_auc = history['auc'][-1]
-#     final_val_auc = history['val_auc'][-1]
-#     logger.info(f"📈 RESULTADOS FINALES: Train AUC: {final_train_auc:.4f}, Valid AUC: {final_val_auc:.4f}, Valid F1: {final_f1:.4f}")
-    
-#     del model, train_loader, val_loader, optimizer, criterion
-#     gc.collect()
-#     if device.type == 'cuda':
-#         torch.cuda.empty_cache()
-    
-#     logger.info("✅ Preentrenamiento completado exitosamente")
-#     return history, best_val_auc
