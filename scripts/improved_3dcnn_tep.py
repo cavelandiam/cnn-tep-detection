@@ -336,8 +336,10 @@ class ResNet3D(nn.Module):
             logger.info(f"Después de initial_block: {x.shape}, dispositivo: {x.device}")
             x = self.layer1(x)
             logger.info(f"Después de layer1: {x.shape}, dispositivo: {x.device}")
+            torch.cuda.empty_cache()
             x = self.layer2(x)
             logger.info(f"Después de layer2: {x.shape}, dispositivo: {x.device}")
+            torch.cuda.empty_cache()
             x = self.layer3(x)
             logger.info(f"Después de layer3: {x.shape}, dispositivo: {x.device}")
             x = self.global_pool(x)
@@ -384,10 +386,9 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     # Inicializar pesos en GPU
     initialize_model_weights(model)
     
-    # Compilar modelo para GPUs modernas (Ampere+)
-    # if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
-    #     model = torch.compile(model)
-    #     logger.info("✅ Modelo compilado con torch.compile para optimización")
+    if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
+        model = torch.compile(model)
+        logger.info("✅ Modelo compilado con torch.compile para optimización")
     
     # Probar modelo con entrada de prueba en GPU
     test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
@@ -517,7 +518,7 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
         images, labels = images.to(device), labels.to(device)
         
         optimizer.zero_grad()
-        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
+        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu', dtype = torch.float16):
             outputs = model(images)
             loss = criterion(outputs, labels.unsqueeze(1).float())  # Convertir a float para la pérdida
         
@@ -537,8 +538,7 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
         all_preds[idx:idx + batch_size] = preds
         all_labels[idx:idx + batch_size] = labels.cpu().numpy().astype(int).flatten()
         idx += batch_size
-    
-    torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
 
     avg_loss = running_loss / total_batches
     metrics_dict = calculate_metrics(all_labels[:idx], all_preds[:idx], metrics)
@@ -558,7 +558,7 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(data_loader):
             images, labels = images.to(device), labels.to(device)
-            with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
+            with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu', dtype = torch.float16):
                 outputs = model(images)
                 loss = criterion(outputs, labels.unsqueeze(1).float())
             
@@ -760,7 +760,7 @@ def pretrain_model():
         num_workers=config.NUM_WORKERS,  # Desactivar workers para evitar deadlocks
         pin_memory=True if device.type == 'cuda' else False,
         persistent_workers=True if config.NUM_WORKERS > 0 else False,
-        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else 2
+        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else None
     )
     logger.info("Creando val_loader...")
     val_loader = DataLoader(
@@ -770,7 +770,7 @@ def pretrain_model():
         num_workers=config.NUM_WORKERS,  # Desactivar workers para evitar deadlocks
         pin_memory=True if device.type == 'cuda' else False,
         persistent_workers=True if config.NUM_WORKERS > 0 else False,
-        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else 2
+        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else None
     )
     
     logger.info(f"Esperado número de lotes: train={len(train_loader)}, val={len(val_loader)}")
