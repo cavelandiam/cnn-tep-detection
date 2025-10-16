@@ -27,8 +27,8 @@ RSNA_PRETRAINED_MODEL = os.path.join(MODEL_DIR, "rsna_pretrained_model.keras")
 LOG_FILE = os.path.join(LOGS_DIR, "training.log")
 
 # 📌 **Parámetros de Preprocesamiento**
-IMAGE_SIZE = (224, 224)
-TARGET_DEPTH = 128 #512
+IMAGE_SIZE = (128, 128) #(224, 224)
+TARGET_DEPTH = 64 #128 #512
 
 # 📌 **Hiperparámetros del Modelo**
 BATCH_SIZE = 4

@@ -11,6 +11,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.checkpoint import checkpoint
 from torch.utils.data import Dataset, DataLoader
 from torch.cuda.amp import GradScaler, autocast
 from monai.transforms import Compose, RandFlipD, RandRotateD, RandAdjustContrastD, RandGaussianNoiseD
@@ -35,20 +36,18 @@ torch.manual_seed(SEED)
 torch.cuda.manual_seed_all(SEED)
 os.environ['PYTHONHASHSEED'] = str(SEED)
 torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = True  # Optimizado para GPU
+torch.backends.cudnn.benchmark = True
 
 # --- CONFIGURACIÓN DE LOGGING Y DISPOSITIVO ---
 if mp.current_process().name == 'MainProcess':
     logger.init_logger("log_process_data_rsna")
 
-# Configurar el método de inicio de multiprocessing a 'spawn'
 try:
     mp.set_start_method('spawn', force=True)
     logger.info("✅ Método de inicio de multiprocessing configurado a 'spawn'")
 except RuntimeError as e:
     logger.warning(f"⚠️ No se pudo configurar el método 'spawn': {str(e)}")
 
-# Selección dinámica del dispositivo
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 logger.info(f"Usando dispositivo: {device}")
 logger.info(f"¿CUDA disponible?: {torch.cuda.is_available()}")
@@ -257,10 +256,9 @@ class RSNADataset(Dataset):
         npy_path = self.data_df["preprocessed_path"][idx]
         label = self.data_df["label"][idx]
         
-        volume = np.load(npy_path)  # Carga rápida desde .npy
-        volume_tensor = torch.from_numpy(volume).permute(3, 0, 1, 2).float()  # [C=1, D, H, W]
+        volume = np.load(npy_path)
+        volume_tensor = torch.from_numpy(volume).permute(3, 0, 1, 2).float()
         
-        # Aplicar transformaciones MONAI
         if self.is_train and self.train_transforms:
             volume_tensor = self.train_transforms({"image": volume_tensor})["image"]
         elif not self.is_train and self.val_transforms:
@@ -276,6 +274,7 @@ class RSNADataset(Dataset):
 # =============================================================================
 
 class ResidualBlock(nn.Module):
+    """Bloque residual 3D optimizado"""
     def __init__(self, in_channels: int, out_channels: int, stride: int = 1):
         super().__init__()
         self.conv1 = nn.Conv3d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False)
@@ -311,24 +310,26 @@ class ResidualBlock(nn.Module):
         return out
 
 class ResNet3D(nn.Module):
+    """Modelo ResNet3D optimizado para uso eficiente de memoria"""
     def __init__(self, input_channels: int = 1, num_classes: int = 1):
         super().__init__()
+        # Reducir canales iniciales de 16 a 8
         self.initial_block = nn.Sequential(
-            nn.Conv3d(input_channels, 16, kernel_size=3, padding=1, bias=False),
-            nn.BatchNorm3d(16),
+            nn.Conv3d(input_channels, 8, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm3d(8),
             nn.ReLU(inplace=True),
-            nn.MaxPool3d(kernel_size=3, stride=1, padding=1)
+            nn.MaxPool3d(kernel_size=3, stride=2, padding=1)  # Stride=2 para reducir dimensiones
         )
-        self.layer1 = ResidualBlock(16, 32)
-        self.layer2 = ResidualBlock(32, 64, stride=2)
-        self.layer3 = ResidualBlock(64, 128, stride=2)
+        # Reducir número de canales en cada capa
+        self.layer1 = ResidualBlock(8, 16)
+        self.layer2 = ResidualBlock(16, 32, stride=2)
+        self.layer3 = ResidualBlock(32, 64, stride=2)
         self.global_pool = nn.AdaptiveAvgPool3d(1)
         self.dropout1 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(128, 256)
+        self.fc1 = nn.Linear(64, 128)  # Reducir de 256 a 128
         self.relu = nn.ReLU(inplace=True)
         self.dropout2 = nn.Dropout(0.3)
-        self.fc2 = nn.Linear(256, num_classes)
-        # Nota: No se incluye sigmoid, ya que BCEWithLogitsLoss lo maneja internamente
+        self.fc2 = nn.Linear(128, num_classes)
     
     def forward(self, x):        
         x = self.initial_block(x)                     
@@ -363,21 +364,15 @@ def initialize_model_weights(model: nn.Module):
                 m.bias.data = m.bias.data.to(device)
 
 def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Module:
-    logger.info(f"Creando ResNet3D: input_channels={input_channels}, num_classes={num_classes}")
+    logger.info(f"Creando ResNet3D optimizado: input_channels={input_channels}, num_classes={num_classes}")
     
-    # Crear modelo y moverlo a GPU inmediatamente
     model = ResNet3D(input_channels, num_classes).to(device)
     logger.info(f"Modelo creado en dispositivo: {next(model.parameters()).device}")
     
-    # Inicializar pesos en GPU
     initialize_model_weights(model)
     
-    # if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
-    #     model = torch.compile(model)
-    #     logger.info("✅ Modelo compilado con torch.compile para optimización")
-    
-    # Probar modelo con entrada de prueba en GPU
-    test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
+    # Probar modelo con entrada reducida
+    test_input = torch.randn(1, input_channels, config.TARGET_DEPTH, *config.IMAGE_SIZE).to(device)
     logger.info(f"Probando modelo con entrada: {test_input.shape}, dispositivo: {test_input.device}")
     
     model.eval()
@@ -385,14 +380,17 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
         try:
             test_output = model(test_input)
             logger.info(f"Salida del modelo: {test_output.shape}, dispositivo: {test_output.device}")
-            if test_output.shape != torch.Size([2, num_classes]):
-                logger.error(f"Forma de salida inesperada: {test_output.shape}, esperado: [2, {num_classes}]")
+            if test_output.shape != torch.Size([1, num_classes]):
+                logger.error(f"Forma de salida inesperada: {test_output.shape}, esperado: [1, {num_classes}]")
                 raise ValueError("Forma de salida del modelo incorrecta")
         except Exception as e:
             logger.error(f"Error al probar modelo: {str(e)}")
             raise
     
     model.train()
+    del test_input, test_output
+    torch.cuda.empty_cache()
+    
     return model
 
 
@@ -439,8 +437,13 @@ def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loade
         for images, batch_labels in val_loader:
             images = images.to(device, non_blocking=True)
             outputs = model(images).squeeze(-1)
-            predictions.extend(torch.sigmoid(outputs).cpu().numpy())  # Aplicar sigmoid para métricas
+            predictions.extend(torch.sigmoid(outputs).cpu().numpy())
             labels.extend(batch_labels.cpu().numpy())
+            
+            # Liberar memoria
+            del images, batch_labels, outputs
+            if device.type == 'cuda':
+                torch.cuda.empty_cache()
     
     pred_binary = (np.array(predictions) > 0.5).astype(int)
     true_binary = np.array(labels).astype(int)
@@ -466,7 +469,7 @@ def create_metrics(device: torch.device):
     }
 
 def calculate_metrics(labels, preds, metrics):    
-    labels = [int(label) for label in labels]  # Asegurar que sean enteros
+    labels = [int(label) for label in labels]
     labels = torch.tensor(labels, dtype=torch.long).to(metrics['accuracy'].device)
     preds = torch.tensor(preds, dtype=torch.float).to(metrics['accuracy'].device)
         
@@ -478,6 +481,14 @@ def calculate_metrics(labels, preds, metrics):
         'auc': metrics['auc'](preds, labels).item()
     }
 
+def log_gpu_memory():
+    """Monitorea y registra uso de memoria GPU"""
+    if torch.cuda.is_available():
+        allocated = torch.cuda.memory_allocated() / 1e9
+        reserved = torch.cuda.memory_reserved() / 1e9
+        max_allocated = torch.cuda.max_memory_allocated() / 1e9
+        logger.info(f"GPU Memory - Allocated: {allocated:.2f}GB, Reserved: {reserved:.2f}GB, Max: {max_allocated:.2f}GB")
+
 
 # =============================================================================
 # TRAINING
@@ -487,9 +498,11 @@ def create_optimizer(model: nn.Module, learning_rate: float) -> optim.Optimizer:
     return optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
 def create_criterion(class_weights: torch.Tensor) -> nn.Module:
-    return nn.BCEWithLogitsLoss(pos_weight=class_weights[1], weight=class_weights[0])
+    #return nn.BCEWithLogitsLoss(pos_weight=class_weights[1], weight=class_weights[0])
+    return nn.BCEWithLogitsLoss(pos_weight=class_weights[1])
 
 def train_epoch(model, data_loader, optimizer, criterion, class_weights, device, metrics, epoch, scaler=None):
+    """Entrenamiento optimizado para memoria GPU"""
     model.train()
     running_loss = 0.0
     total_batches = len(data_loader)
@@ -498,53 +511,74 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
     
     start_time = time.time()
     logger.info(f"Iniciando época {epoch}, total de lotes esperados: {total_batches}")
+    log_gpu_memory()
     
     for batch_idx, (images, labels) in enumerate(data_loader):
         logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
         images, labels = images.to(device, non_blocking=True), labels.to(device)
         
-        optimizer.zero_grad()
-        with autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
+        # Usar set_to_none=True para liberar memoria
+        optimizer.zero_grad(set_to_none=True)
+        
+        with torch.amp.autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
             outputs = model(images)
             loss = criterion(outputs, labels.unsqueeze(1).float())
         
         if scaler:
             scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             scaler.step(optimizer)
             scaler.update()
         else:
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
         
         running_loss += loss.item()
         logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
         
+        # Calcular predicciones y liberar memoria
         preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
         all_preds.extend(preds)
         all_labels.extend(labels.cpu().numpy().astype(int).flatten())
         
-        if batch_idx % 100 == 0 and batch_idx > 0:
-            metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
-            logger.info(f"Métricas intermedias (hasta lote {batch_idx}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
-            all_preds = []  # Liberar memoria
-            all_labels = []
+        # Liberar tensores inmediatamente
+        del images, labels, outputs, loss, preds
         
+        # Limpiar cache GPU después de cada batch
         if device.type == 'cuda':
-            torch.cuda.empty_cache()  # Liberar memoria solo si es necesario
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+        
+        if batch_idx % 50 == 0 and batch_idx > 0:
+            # Calcular métricas intermedias con subset de datos
+            subset_size = min(100, len(all_preds))
+            subset_preds = all_preds[-subset_size:]
+            subset_labels = all_labels[-subset_size:]
+            metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
+            logger.info(f"Métricas intermedias (lote {batch_idx}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
+            log_gpu_memory()
         
         logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
-        start_time = time.time()  # Reiniciar temporizador
+        start_time = time.time()
     
-    torch.cuda.empty_cache()  # Limpieza final
+    # Limpieza final
+    gc.collect()
+    torch.cuda.empty_cache()
+    
     avg_loss = running_loss / total_batches
     metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
     metrics_dict['loss'] = avg_loss
     
     logger.info(f"Época {epoch} completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
     logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
+    log_gpu_memory()
+    
     return metrics_dict
 
 def validate_epoch(model, data_loader, criterion, device, metrics):
+    """Validación optimizada para memoria GPU"""
     model.eval()
     running_loss = 0.0
     total_batches = len(data_loader)
@@ -553,11 +587,13 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
     
     start_time = time.time()
     logger.info(f"Iniciando validación, total de lotes esperados: {total_batches}")
+    log_gpu_memory()
     
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(data_loader):
             images, labels = images.to(device, non_blocking=True), labels.to(device)
-            with autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
+            
+            with torch.amp.autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
                 outputs = model(images)
                 loss = criterion(outputs, labels.unsqueeze(1).float())
             
@@ -566,25 +602,34 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
             all_preds.extend(preds)
             all_labels.extend(labels.cpu().numpy().astype(int).flatten())
             
-            if batch_idx % 50 == 0 and batch_idx > 0:
-                metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
-                logger.info(f"Métricas intermedias (lote {batch_idx}/{total_batches}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
-                all_preds = []  # Liberar memoria
-                all_labels = []
+            # Liberar memoria
+            del images, labels, outputs, loss, preds
             
             if device.type == 'cuda':
-                torch.cuda.empty_cache()  # Liberar memoria solo si es necesario
+                torch.cuda.empty_cache()
+            
+            if batch_idx % 50 == 0 and batch_idx > 0:
+                subset_size = min(100, len(all_preds))
+                subset_preds = all_preds[-subset_size:]
+                subset_labels = all_labels[-subset_size:]
+                metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
+                logger.info(f"Métricas intermedias (lote {batch_idx}/{total_batches}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
             
             logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
-            start_time = time.time()  # Reiniciar temporizador
+            start_time = time.time()
     
-    torch.cuda.empty_cache()  # Limpieza final
+    # Limpieza final
+    gc.collect()
+    torch.cuda.empty_cache()
+    
     avg_loss = running_loss / total_batches
-    metrics_dict = calculate_metrics(all_labels, all_labels, metrics)  # Corrección: usar all_labels, all_preds
+    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
     metrics_dict['loss'] = avg_loss
     
     logger.info(f"Validación completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
     logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
+    log_gpu_memory()
+    
     return metrics_dict
 
 def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
@@ -605,9 +650,10 @@ def load_model_checkpoint(model: nn.Module, path: str) -> Optional[float]:
     return checkpoint.get('val_auc', 0)
 
 def test_model(device: torch.device):
+    """Prueba el modelo con datos de ejemplo"""
     logger.info("Probando modelo con lote de ejemplo...")
-    test_images = torch.randn(2, 1, 128, 224, 224).to(device)  # Usar batch_size=2
-    test_labels = torch.tensor([1.0, 0.0]).to(device)
+    test_images = torch.randn(1, 1, config.TARGET_DEPTH, *config.IMAGE_SIZE).to(device)
+    test_labels = torch.tensor([1.0]).to(device)
     
     logger.info(f"Lote de prueba: {test_images.shape}, etiquetas {test_labels.tolist()}")
     model = build_resnet3d_model(input_channels=1, num_classes=1).to(device)
@@ -622,29 +668,38 @@ def test_model(device: torch.device):
         except Exception as e:
             logger.error(f"Error al probar modelo: {str(e)}")
             raise
-    del model, test_images, test_labels
+    
+    del model, test_images, test_labels, outputs
     gc.collect()
     if device.type == 'cuda':
         torch.cuda.empty_cache()
 
-
-
-
+def clear_gpu_memory():
+    """Limpia memoria GPU antes de empezar entrenamiento"""
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        torch.cuda.reset_peak_memory_stats()
+    logger.info("✅ Memoria GPU limpiada")
 
 # =============================================================================
 # INITIATE TRAINING
 # =============================================================================
 
 def pretrain_model():
-    logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) ===")
+    logger.info("=== INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) - OPTIMIZADO PARA MEMORIA ===")
 
     # Verificar compatibilidad CUDA
     if device.type == 'cuda':
         major, minor = torch.cuda.get_device_capability()
-        if major < 7:  # Ajustado a sm_75 (mínimo para CUDA 12.8)
+        if major < 7:
             logger.warning(f"⚠️ La GPU tiene arquitectura sm_{major}.{minor}, puede no ser compatible con PyTorch {torch.__version__}")
         else:
             logger.info(f"✅ Arquitectura GPU sm_{major}.{minor} compatible con PyTorch {torch.__version__}")
+
+    # Limpiar memoria GPU al inicio
+    clear_gpu_memory()
  
     logger.info("1. Preprocesando datos DICOM...")
     df = pl.read_csv(config.RSNA_CSV_TRAIN_DIR)
@@ -714,21 +769,15 @@ def pretrain_model():
     logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
     logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
     logger.info(f"Estudios en val_df: {val_df['StudyInstanceUID'].to_list()}")
-    
-    # Verificar contenido de train_df y val_df
-    logger.info(f"Columnas en train_df: {train_df.columns}")
-    logger.info(f"Primeras filas de train_df:\n{train_df.head(5)}")
-    logger.info(f"Columnas en val_df: {val_df.columns}")
-    logger.info(f"Primeras filas de val_df:\n{val_df.head(5)}")
 
     # Verificar archivos .npy en train_df y val_df
     logger.info("Verificando archivos .npy en train_df...")
-    for path in train_df["preprocessed_path"]:
+    for path in train_df["preprocessed_path"][:5]:
         if not Path(path).exists():
             logger.error(f"Archivo .npy no encontrado: {path}")
             raise FileNotFoundError(f"Archivo .npy no encontrado: {path}")
     logger.info("Verificando archivos .npy en val_df...")
-    for path in val_df["preprocessed_path"]:
+    for path in val_df["preprocessed_path"][:5]:
         if not Path(path).exists():
             logger.error(f"Archivo .npy no encontrado: {path}")
             raise FileNotFoundError(f"Archivo .npy no encontrado: {path}")
@@ -754,15 +803,13 @@ def pretrain_model():
 
 
     logger.info("4. Creando datasets...")
-    logger.info("Creando train_dataset...")
     train_dataset = RSNADataset(train_df, is_train=True)
-    logger.info("Creando val_dataset...")
     val_dataset = RSNADataset(val_df, is_train=False)
     
     logger.info(f"Tamaño de train_dataset: {len(train_dataset)}")
-    logger.info(f"Tamaño de val_dataset: {len(val_dataset)}")      
+    logger.info(f"Tamaño de val_dataset: {len(val_dataset)}")     
     
-    logger.info("Creando train_loader...")
+    logger.info("Creando DataLoaders optimizados...")
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.BATCH_SIZE,
@@ -771,8 +818,7 @@ def pretrain_model():
         pin_memory=True if device.type == 'cuda' else False,
         persistent_workers=True if config.NUM_WORKERS > 0 else False,
         prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else None
-    )
-    logger.info("Creando val_loader...")
+    )    
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.BATCH_SIZE,
@@ -785,12 +831,13 @@ def pretrain_model():
     
     logger.info(f"Esperado número de lotes: train={len(train_loader)}, val={len(val_loader)}")
     
-    # Probar carga de un lote para depuración
+    # Probar carga de un lote
     logger.info("Probando carga de un lote de train_loader...")
     try:
         for batch in train_loader:
             volumes, labels = batch
             logger.info(f"Lote cargado: volúmenes {volumes.shape}, etiquetas {labels.shape}")
+            del volumes, labels
             break
     except Exception as e:
         logger.error(f"Error al cargar lote de train_loader: {str(e)}")
@@ -806,16 +853,17 @@ def pretrain_model():
         logger.error(f"Error al cargar lote de val_loader: {str(e)}")
         raise
 
+    clear_gpu_memory()
 
 
 
 
-
-    logger.info("5. Creando modelo ResNet3D...")
+    logger.info("5. Creando modelo ResNet3D optimizado...")
     model = build_resnet3d_model(input_channels=1, num_classes=1)
     logger.info(f"Modelo en dispositivo: {next(model.parameters()).device}")
     
     test_model(device)
+    clear_gpu_memory()
 
 
 
@@ -844,6 +892,8 @@ def pretrain_model():
     no_improve_count = 0
     
     logger.info(f"🎯 Iniciando entrenamiento por {config.EPOCHS} épocas...")
+    log_gpu_memory()
+
     for epoch in range(config.EPOCHS):
         logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
         
@@ -882,6 +932,9 @@ def pretrain_model():
         if no_improve_count >= 10:
             logger.info(f"🛑 Early stopping en época {epoch+1}")
             break
+
+        # Limpiar memoria después de cada época
+        clear_gpu_memory()
     
     logger.info(f"\n=== ENTRENAMIENTO COMPLETADO ===")
     logger.info(f"Mejor AUC validación: {best_val_auc:.4f}")
