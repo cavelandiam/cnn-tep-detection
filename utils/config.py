@@ -9,7 +9,8 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 # 📂 **Rutas de Datos**
 DICOM_TEP_TRUE_DIR = os.path.join(DATA_DIR, "hucsr", "patients_tep_true")
 DICOM_TEP_FALSE_DIR = os.path.join(DATA_DIR, "hucsr", "patients_tep_false")
-RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train")
+#RSNA_DATASET_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train")
+RSNA_DATASET_TRAIN_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/rsna/train")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train.csv")
 RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_metadata.csv")
 RSNA_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_data")
@@ -30,11 +31,12 @@ IMAGE_SIZE = (224, 224)
 TARGET_DEPTH = 128 #512
 
 # 📌 **Hiperparámetros del Modelo**
-BATCH_SIZE = 1
-EPOCHS = 10
-LEARNING_RATE = 1e-4
-NUM_WORKERS = 1
-NUM_PROCESSES = 2
+BATCH_SIZE = 16
+LEARNING_RATE = 4e-4
+NUM_WORKERS = 0
+PREFETCH_FACTOR = 2
+EPOCHS = 2
+NUM_PROCESSES = 25
 
 # 📌 **Mensajes del Sistema**
 MESSAGES = {

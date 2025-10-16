@@ -4,7 +4,7 @@
     {
       "label": "activateVirtualEnv",
       "type": "shell",
-      "command": "source ${workspaceFolder}/venv/env-cnn-tep-detection/bin/activate",
+      "command": "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True && source ${workspaceFolder}/venv/env-cnn-tep-detection/bin/activate",
       "options": {
         "shell": {
           "executable": "/bin/bash",

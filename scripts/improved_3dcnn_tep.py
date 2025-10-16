@@ -292,25 +292,21 @@ class ResidualBlock(nn.Module):
         
         self.relu_final = nn.ReLU(inplace=True)
     
-    def forward(self, x):
-        logger.debug(f"ResidualBlock entrada: {x.shape}, dispositivo: {x.device}")
-        out = self.conv1(x)
-        logger.debug(f"Después de conv1: {out.shape}, dispositivo: {out.device}")
+    def forward(self, x):        
+        out = self.conv1(x)        
         out = self.bn1(out)
         out = self.relu1(out)
         out = self.conv2(out)
         out = self.bn2(out)
         
-        shortcut_out = self.shortcut(x)
-        logger.debug(f"Shortcut salida: {shortcut_out.shape}, dispositivo: {shortcut_out.device}")
+        shortcut_out = self.shortcut(x)        
         
         if out.shape != shortcut_out.shape:
             logger.error(f"Forma de main path {out.shape} != shortcut {shortcut_out.shape}")
             raise ValueError("Desajuste de formas en ResidualBlock")
         
         out += shortcut_out
-        out = self.relu_final(out)
-        logger.debug(f"ResidualBlock salida: {out.shape}, dispositivo: {x.device}")
+        out = self.relu_final(out)        
         return out
 
 class ResNet3D(nn.Module):
@@ -334,27 +330,27 @@ class ResNet3D(nn.Module):
         # Nota: No se incluye sigmoid, ya que BCEWithLogitsLoss lo maneja internamente
     
     def forward(self, x):
-        logger.debug(f"Entrada al modelo: {x.shape}, dispositivo: {x.device}")
+        logger.info(f"Entrada al modelo: {x.shape}, dispositivo: {x.device}")
         try:
             x = self.initial_block(x)
-            logger.debug(f"Después de initial_block: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de initial_block: {x.shape}, dispositivo: {x.device}")
             x = self.layer1(x)
-            logger.debug(f"Después de layer1: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de layer1: {x.shape}, dispositivo: {x.device}")
             x = self.layer2(x)
-            logger.debug(f"Después de layer2: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de layer2: {x.shape}, dispositivo: {x.device}")
             x = self.layer3(x)
-            logger.debug(f"Después de layer3: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de layer3: {x.shape}, dispositivo: {x.device}")
             x = self.global_pool(x)
-            logger.debug(f"Después de global_pool: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de global_pool: {x.shape}, dispositivo: {x.device}")
             x = x.view(x.size(0), -1)
-            logger.debug(f"Después de flatten: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de flatten: {x.shape}, dispositivo: {x.device}")
             x = self.dropout1(x)
             x = self.fc1(x)
-            logger.debug(f"Después de fc1: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Después de fc1: {x.shape}, dispositivo: {x.device}")
             x = self.relu(x)
             x = self.dropout2(x)
             x = self.fc2(x)
-            logger.debug(f"Salida final: {x.shape}, dispositivo: {x.device}")
+            logger.info(f"Salida final: {x.shape}, dispositivo: {x.device}")
             return x  # Sin sigmoid, BCEWithLogitsLoss lo maneja
         except Exception as e:
             logger.error(f"Error en ResNet3D.forward: {str(e)}")
@@ -395,13 +391,13 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     
     # Probar modelo con entrada de prueba en GPU
     test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
-    logger.debug(f"Probando modelo con entrada: {test_input.shape}, dispositivo: {test_input.device}")
+    logger.info(f"Probando modelo con entrada: {test_input.shape}, dispositivo: {test_input.device}")
     
     model.eval()
     with torch.no_grad():
         try:
             test_output = model(test_input)
-            logger.debug(f"Salida del modelo: {test_output.shape}, dispositivo: {test_output.device}")
+            logger.info(f"Salida del modelo: {test_output.shape}, dispositivo: {test_output.device}")
             if test_output.shape != torch.Size([2, num_classes]):
                 logger.error(f"Forma de salida inesperada: {test_output.shape}, esperado: [2, {num_classes}]")
                 raise ValueError("Forma de salida del modelo incorrecta")
@@ -419,10 +415,10 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
 
 def create_train_transforms() -> Compose:
     return Compose([
-        RandFlipD(keys="image", spatial_axis=2, prob=0.5),
-        RandRotateD(keys="image", range_x=20, prob=0.5),
-        RandAdjustContrastD(keys="image", gamma=(0.8, 1.2), prob=0.5),
-        RandGaussianNoiseD(keys="image", std=0.02, prob=0.5)
+        RandFlipD(keys="image", spatial_axis=2, prob=0.2),
+        RandRotateD(keys="image", range_x=20, prob=0.2),
+        RandAdjustContrastD(keys="image", gamma=(0.8, 1.2), prob=0.2),
+        RandGaussianNoiseD(keys="image", std=0.02, prob=0.2)
     ])
 
 def create_val_transforms() -> Compose:
@@ -482,13 +478,11 @@ def create_metrics(device: torch.device):
         'f1': BinaryF1Score().to(device)
     }
 
-def calculate_metrics(labels, preds, metrics):
-    logger.debug(f"Calculando métricas: labels={labels}, preds={preds}")
+def calculate_metrics(labels, preds, metrics):    
     labels = [int(label) for label in labels]  # Asegurar que sean enteros
     labels = torch.tensor(labels, dtype=torch.long).to(metrics['accuracy'].device)
     preds = torch.tensor(preds, dtype=torch.float).to(metrics['accuracy'].device)
-    
-    logger.debug(f"Labels convertidas: {labels.tolist()}, Preds: {preds.tolist()}")
+        
     return {
         'accuracy': metrics['accuracy'](preds, labels).item(),
         'precision': metrics['precision'](preds, labels).item(),
@@ -512,7 +506,9 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
     model.train()
     running_loss = 0.0
     total_batches = len(data_loader)
-    all_preds, all_labels = [], []
+    all_preds = np.zeros(len(data_loader.dataset), dtype=np.float32)
+    all_labels = np.zeros(len(data_loader.dataset), dtype=np.int32)
+    idx = 0
     
     logger.info(f"Iniciando época {epoch}, total de lotes esperados: {total_batches}")
     
@@ -537,11 +533,15 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
         logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
         
         preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
-        all_preds.extend(preds)
-        all_labels.extend(labels.cpu().numpy().astype(int).flatten())  # Mantener como int para métricas
+        batch_size = labels.size(0)
+        all_preds[idx:idx + batch_size] = preds
+        all_labels[idx:idx + batch_size] = labels.cpu().numpy().astype(int).flatten()
+        idx += batch_size
     
+    torch.cuda.empty_cache()
+
     avg_loss = running_loss / total_batches
-    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+    metrics_dict = calculate_metrics(all_labels[:idx], all_preds[:idx], metrics)
     metrics_dict['loss'] = avg_loss
     
     logger.info(f"Época {epoch} completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
@@ -551,23 +551,30 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
     model.eval()
     running_loss = 0.0
     total_batches = len(data_loader)
-    all_preds, all_labels = [], []
+    all_preds = np.zeros(len(data_loader.dataset), dtype=np.float32)
+    all_labels = np.zeros(len(data_loader.dataset), dtype=np.int32)
+    idx = 0
     
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(data_loader):
             images, labels = images.to(device), labels.to(device)
             with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu'):
                 outputs = model(images)
-                loss = criterion(outputs, labels.unsqueeze(1).float())  # Convertir a float para la pérdida
+                loss = criterion(outputs, labels.unsqueeze(1).float())
             
             running_loss += loss.item()
-            preds = torch.sigmoid(outputs).cpu().numpy().flatten()
-            all_preds.extend(preds)
-            all_labels.extend(labels.cpu().numpy().astype(int).flatten())  # Mantener como int para métricas
+            preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
+            batch_size = labels.size(0)
+            all_preds[idx:idx + batch_size] = preds
+            all_labels[idx:idx + batch_size] = labels.cpu().numpy().astype(int).flatten()
+            idx += batch_size
     
+    torch.cuda.empty_cache()
     avg_loss = running_loss / total_batches
-    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+    metrics_dict = calculate_metrics(all_labels[:idx], all_preds[:idx], metrics)
     metrics_dict['loss'] = avg_loss
+    
+    logger.info(f"Validación completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
     return metrics_dict
 
 def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
@@ -750,18 +757,20 @@ def pretrain_model():
         train_dataset,
         batch_size=config.BATCH_SIZE,
         shuffle=True,
-        num_workers=0,  # Desactivar workers para evitar deadlocks
+        num_workers=config.NUM_WORKERS,  # Desactivar workers para evitar deadlocks
         pin_memory=True if device.type == 'cuda' else False,
-        persistent_workers=False
+        persistent_workers=True if config.NUM_WORKERS > 0 else False,
+        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else 2
     )
     logger.info("Creando val_loader...")
     val_loader = DataLoader(
         val_dataset,
         batch_size=config.BATCH_SIZE,
         shuffle=False,
-        num_workers=0,  # Desactivar workers para evitar deadlocks
+        num_workers=config.NUM_WORKERS,  # Desactivar workers para evitar deadlocks
         pin_memory=True if device.type == 'cuda' else False,
-        persistent_workers=False
+        persistent_workers=True if config.NUM_WORKERS > 0 else False,
+        prefetch_factor=config.PREFETCH_FACTOR if config.NUM_WORKERS > 0 else 2
     )
     
     logger.info(f"Esperado número de lotes: train={len(train_loader)}, val={len(val_loader)}")
