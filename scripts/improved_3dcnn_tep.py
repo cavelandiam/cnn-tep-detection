@@ -7,6 +7,7 @@ from typing import Dict, Optional, Tuple, Union, List
 import numpy as np
 import polars as pl
 import pydicom
+import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -329,34 +330,19 @@ class ResNet3D(nn.Module):
         self.fc2 = nn.Linear(256, num_classes)
         # Nota: No se incluye sigmoid, ya que BCEWithLogitsLoss lo maneja internamente
     
-    def forward(self, x):
-        logger.info(f"Entrada al modelo: {x.shape}, dispositivo: {x.device}")
-        try:
-            x = self.initial_block(x)
-            logger.info(f"Después de initial_block: {x.shape}, dispositivo: {x.device}")
-            x = self.layer1(x)
-            logger.info(f"Después de layer1: {x.shape}, dispositivo: {x.device}")
-            torch.cuda.empty_cache()
-            x = self.layer2(x)
-            logger.info(f"Después de layer2: {x.shape}, dispositivo: {x.device}")
-            torch.cuda.empty_cache()
-            x = self.layer3(x)
-            logger.info(f"Después de layer3: {x.shape}, dispositivo: {x.device}")
-            x = self.global_pool(x)
-            logger.info(f"Después de global_pool: {x.shape}, dispositivo: {x.device}")
-            x = x.view(x.size(0), -1)
-            logger.info(f"Después de flatten: {x.shape}, dispositivo: {x.device}")
-            x = self.dropout1(x)
-            x = self.fc1(x)
-            logger.info(f"Después de fc1: {x.shape}, dispositivo: {x.device}")
-            x = self.relu(x)
-            x = self.dropout2(x)
-            x = self.fc2(x)
-            logger.info(f"Salida final: {x.shape}, dispositivo: {x.device}")
-            return x  # Sin sigmoid, BCEWithLogitsLoss lo maneja
-        except Exception as e:
-            logger.error(f"Error en ResNet3D.forward: {str(e)}")
-            raise
+    def forward(self, x):        
+        x = self.initial_block(x)                     
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)            
+        x = self.global_pool(x)            
+        x = x.view(x.size(0), -1)            
+        x = self.dropout1(x)
+        x = self.fc1(x)            
+        x = self.relu(x)
+        x = self.dropout2(x)
+        x = self.fc2(x)            
+        return x
 
 def initialize_model_weights(model: nn.Module):
     """Inicializa pesos del modelo en el dispositivo correcto"""
@@ -386,9 +372,9 @@ def build_resnet3d_model(input_channels: int = 1, num_classes: int = 1) -> nn.Mo
     # Inicializar pesos en GPU
     initialize_model_weights(model)
     
-    if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
-        model = torch.compile(model)
-        logger.info("✅ Modelo compilado con torch.compile para optimización")
+    # if device.type == 'cuda' and torch.cuda.get_device_capability()[0] >= 8:
+    #     model = torch.compile(model)
+    #     logger.info("✅ Modelo compilado con torch.compile para optimización")
     
     # Probar modelo con entrada de prueba en GPU
     test_input = torch.randn(2, input_channels, 128, 224, 224).to(device)
@@ -507,20 +493,20 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
     model.train()
     running_loss = 0.0
     total_batches = len(data_loader)
-    all_preds = np.zeros(len(data_loader.dataset), dtype=np.float32)
-    all_labels = np.zeros(len(data_loader.dataset), dtype=np.int32)
-    idx = 0
+    all_preds = []
+    all_labels = []
     
+    start_time = time.time()
     logger.info(f"Iniciando época {epoch}, total de lotes esperados: {total_batches}")
     
     for batch_idx, (images, labels) in enumerate(data_loader):
         logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
-        images, labels = images.to(device), labels.to(device)
+        images, labels = images.to(device, non_blocking=True), labels.to(device)
         
         optimizer.zero_grad()
-        with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu', dtype = torch.float16):
+        with autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
             outputs = model(images)
-            loss = criterion(outputs, labels.unsqueeze(1).float())  # Convertir a float para la pérdida
+            loss = criterion(outputs, labels.unsqueeze(1).float())
         
         if scaler:
             scaler.scale(loss).backward()
@@ -534,47 +520,71 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
         logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
         
         preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
-        batch_size = labels.size(0)
-        all_preds[idx:idx + batch_size] = preds
-        all_labels[idx:idx + batch_size] = labels.cpu().numpy().astype(int).flatten()
-        idx += batch_size
-        torch.cuda.empty_cache()
-
+        all_preds.extend(preds)
+        all_labels.extend(labels.cpu().numpy().astype(int).flatten())
+        
+        if batch_idx % 100 == 0 and batch_idx > 0:
+            metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+            logger.info(f"Métricas intermedias (hasta lote {batch_idx}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
+            all_preds = []  # Liberar memoria
+            all_labels = []
+        
+        if device.type == 'cuda':
+            torch.cuda.empty_cache()  # Liberar memoria solo si es necesario
+        
+        logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
+        start_time = time.time()  # Reiniciar temporizador
+    
+    torch.cuda.empty_cache()  # Limpieza final
     avg_loss = running_loss / total_batches
-    metrics_dict = calculate_metrics(all_labels[:idx], all_preds[:idx], metrics)
+    metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
     metrics_dict['loss'] = avg_loss
     
     logger.info(f"Época {epoch} completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
+    logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
     return metrics_dict
 
 def validate_epoch(model, data_loader, criterion, device, metrics):
     model.eval()
     running_loss = 0.0
     total_batches = len(data_loader)
-    all_preds = np.zeros(len(data_loader.dataset), dtype=np.float32)
-    all_labels = np.zeros(len(data_loader.dataset), dtype=np.int32)
-    idx = 0
+    all_preds = []
+    all_labels = []
+    
+    start_time = time.time()
+    logger.info(f"Iniciando validación, total de lotes esperados: {total_batches}")
     
     with torch.no_grad():
         for batch_idx, (images, labels) in enumerate(data_loader):
-            images, labels = images.to(device), labels.to(device)
-            with torch.amp.autocast('cuda' if device.type == 'cuda' else 'cpu', dtype = torch.float16):
+            images, labels = images.to(device, non_blocking=True), labels.to(device)
+            with autocast(device_type='cuda' if device.type == 'cuda' else 'cpu', dtype=torch.float16):
                 outputs = model(images)
                 loss = criterion(outputs, labels.unsqueeze(1).float())
             
             running_loss += loss.item()
             preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
-            batch_size = labels.size(0)
-            all_preds[idx:idx + batch_size] = preds
-            all_labels[idx:idx + batch_size] = labels.cpu().numpy().astype(int).flatten()
-            idx += batch_size
+            all_preds.extend(preds)
+            all_labels.extend(labels.cpu().numpy().astype(int).flatten())
+            
+            if batch_idx % 50 == 0 and batch_idx > 0:
+                metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
+                logger.info(f"Métricas intermedias (lote {batch_idx}/{total_batches}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
+                all_preds = []  # Liberar memoria
+                all_labels = []
+            
+            if device.type == 'cuda':
+                torch.cuda.empty_cache()  # Liberar memoria solo si es necesario
+            
+            logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
+            start_time = time.time()  # Reiniciar temporizador
     
-    torch.cuda.empty_cache()
+    torch.cuda.empty_cache()  # Limpieza final
     avg_loss = running_loss / total_batches
-    metrics_dict = calculate_metrics(all_labels[:idx], all_preds[:idx], metrics)
+    metrics_dict = calculate_metrics(all_labels, all_labels, metrics)  # Corrección: usar all_labels, all_preds
     metrics_dict['loss'] = avg_loss
     
     logger.info(f"Validación completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
+    logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
     return metrics_dict
 
 def save_model_checkpoint(model: nn.Module, path: str, val_auc: float, epoch: int):
