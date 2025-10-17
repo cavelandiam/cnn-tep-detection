@@ -11,8 +11,8 @@ from utils import logger
 # Configuración de TensorFlow para reproducibilidad
 #os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
-if mp.current_process().name == 'MainProcess':
-    logger.init_logger("log_main_cnn")
+# if mp.current_process().name == 'MainProcess':
+#     logger.init_logger("log_process_data_rsna")
 
 def test_pipeline():
     

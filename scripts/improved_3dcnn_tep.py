@@ -15,9 +15,9 @@ from torch.utils.checkpoint import checkpoint
 from torch.utils.data import Dataset, DataLoader
 from torch.cuda.amp import GradScaler, autocast
 from monai.transforms import Compose, RandFlipD, RandRotateD, RandAdjustContrastD, RandGaussianNoiseD
-from torchmetrics.classification import BinaryAUROC, BinaryPrecision, BinaryRecall, BinaryAccuracy, BinaryF1Score
+from torchmetrics.classification import BinaryAUROC, BinaryPrecision, BinaryRecall, BinaryAccuracy, BinaryF1Score, BinarySpecificity, MatthewsCorrCoef, PrecisionRecallCurve
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, f1_score
+from sklearn.metrics import confusion_matrix, f1_score, auc
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.ndimage import zoom
@@ -428,7 +428,7 @@ def plot_training_curves(history: Dict[str, List[float]]):
         ax.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig("logs/training_curves.png", dpi=300, bbox_inches='tight')
-    plt.show()
+    #plt.show()
 
 def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loader: DataLoader, device: torch.device):
     model.eval()
@@ -454,32 +454,37 @@ def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loade
     plt.xlabel('Predicción')
     plt.ylabel('Real')
     plt.savefig("logs/confusion_matrix.png", dpi=300)
-    plt.show()
+    #plt.show()
     f1_val = f1_score(true_binary, pred_binary)
     logger.info(f"F1-Score validación: {f1_val:.4f}")
     return f1_val
 
 def create_metrics(device: torch.device):
     return {
-        'auc': BinaryAUROC().to(device),
+        'accuracy': BinaryAccuracy().to(device),        
         'precision': BinaryPrecision().to(device),
-        'recall': BinaryRecall().to(device),
-        'accuracy': BinaryAccuracy().to(device),
-        'f1': BinaryF1Score().to(device)
+        'recall': BinaryRecall().to(device),        
+        'f1': BinaryF1Score().to(device),
+        'auc': BinaryAUROC().to(device),
+        'specificity': BinarySpecificity().to(device),
+        'mcc': MatthewsCorrCoef(task='binary').to(device)
     }
 
 def calculate_metrics(labels, preds, metrics):    
     labels = [int(label) for label in labels]
     labels = torch.tensor(labels, dtype=torch.long).to(metrics['accuracy'].device)
     preds = torch.tensor(preds, dtype=torch.float).to(metrics['accuracy'].device)
-        
-    return {
-        'accuracy': metrics['accuracy'](preds, labels).item(),
-        'precision': metrics['precision'](preds, labels).item(),
-        'recall': metrics['recall'](preds, labels).item(),
-        'f1': metrics['f1'](preds, labels).item(),
-        'auc': metrics['auc'](preds, labels).item()
+
+    metric_dict = {
+        key: metrics[key](preds, labels).item() for key in ['accuracy', 'precision', 'recall', 'f1', 'auc', 'specificity', 'mcc']
     }
+
+    # Calcular PR-AUC
+    precision, recall, _ = PrecisionRecallCurve(task='binary')(preds, labels)
+    pr_auc = auc(recall.cpu().numpy(), precision.cpu().numpy())
+    metric_dict['pr_auc'] = pr_auc
+        
+    return metric_dict
 
 def log_gpu_memory():
     """Monitorea y registra uso de memoria GPU"""
@@ -514,7 +519,7 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
     log_gpu_memory()
     
     for batch_idx, (images, labels) in enumerate(data_loader):
-        logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
+        #logger.info(f"Procesando lote {batch_idx}: imágenes {images.shape}, etiquetas {labels.tolist()}")
         images, labels = images.to(device, non_blocking=True), labels.to(device)
         
         # Usar set_to_none=True para liberar memoria
@@ -536,7 +541,7 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
             optimizer.step()
         
         running_loss += loss.item()
-        logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
+        #logger.info(f"Epoch {epoch}, Batch {batch_idx}/{total_batches}, Loss: {loss.item():.4f}")
         
         # Calcular predicciones y liberar memoria
         preds = torch.sigmoid(outputs).detach().cpu().numpy().flatten()
@@ -551,16 +556,16 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
         
-        if batch_idx % 50 == 0 and batch_idx > 0:
-            # Calcular métricas intermedias con subset de datos
-            subset_size = min(100, len(all_preds))
-            subset_preds = all_preds[-subset_size:]
-            subset_labels = all_labels[-subset_size:]
-            metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
-            logger.info(f"Métricas intermedias (lote {batch_idx}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
-            log_gpu_memory()
+        # if batch_idx % 50 == 0 and batch_idx > 0:
+        #     # Calcular métricas intermedias con subset de datos
+        #     subset_size = min(100, len(all_preds))
+        #     subset_preds = all_preds[-subset_size:]
+        #     subset_labels = all_labels[-subset_size:]
+        #     metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
+        #     logger.info(f"Métricas intermedias (lote {batch_idx}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
+        #     log_gpu_memory()
         
-        logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
+        #logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
         start_time = time.time()
     
     # Limpieza final
@@ -571,9 +576,9 @@ def train_epoch(model, data_loader, optimizer, criterion, class_weights, device,
     metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
     metrics_dict['loss'] = avg_loss
     
-    logger.info(f"Época {epoch} completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
-    logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
-    log_gpu_memory()
+    logger.info(f"Época {epoch} Completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
+    logger.info(f"Métricas Finales Entrenamiento: ACC: {metrics_dict['accuracy']:.4f}, PRECISION: {metrics_dict['precision']:.4f}, RECALL: {metrics_dict['recall']:.4f}, F1: {metrics_dict['f1']:.4f}, AUC: {metrics_dict['auc']:.4f}, SPEC: {metrics_dict['specificity']:.4f}, MCC: {metrics_dict['mcc']:.4f}, PR-AUC: {metrics_dict['pr_auc']:.4f}")
+    #log_gpu_memory()
     
     return metrics_dict
 
@@ -608,14 +613,14 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
             if device.type == 'cuda':
                 torch.cuda.empty_cache()
             
-            if batch_idx % 50 == 0 and batch_idx > 0:
-                subset_size = min(100, len(all_preds))
-                subset_preds = all_preds[-subset_size:]
-                subset_labels = all_labels[-subset_size:]
-                metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
-                logger.info(f"Métricas intermedias (lote {batch_idx}/{total_batches}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
+            # if batch_idx % 50 == 0 and batch_idx > 0:
+            #     subset_size = min(100, len(all_preds))
+            #     subset_preds = all_preds[-subset_size:]
+            #     subset_labels = all_labels[-subset_size:]
+            #     metrics_dict = calculate_metrics(subset_labels, subset_preds, metrics)
+            #     logger.info(f"Métricas intermedias (lote {batch_idx}/{total_batches}): Loss: {running_loss / (batch_idx + 1):.4f}, AUC: {metrics_dict['auc']:.4f}")
             
-            logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
+            #logger.info(f"Tiempo para lote {batch_idx}: {time.time() - start_time:.2f} segundos")
             start_time = time.time()
     
     # Limpieza final
@@ -626,9 +631,9 @@ def validate_epoch(model, data_loader, criterion, device, metrics):
     metrics_dict = calculate_metrics(all_labels, all_preds, metrics)
     metrics_dict['loss'] = avg_loss
     
-    logger.info(f"Validación completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")
-    logger.info(f"Métricas finales: AUC: {metrics_dict['auc']:.4f}, F1: {metrics_dict['f1']:.4f}")
-    log_gpu_memory()
+    logger.info(f"Validación Completada: {total_batches} lotes procesados, pérdida promedio: {avg_loss:.4f}")    
+    logger.info(f"Métricas Finales Validación: ACC: {metrics_dict['accuracy']:.4f}, PRECISION: {metrics_dict['precision']:.4f}, RECALL: {metrics_dict['recall']:.4f}, F1: {metrics_dict['f1']:.4f}, AUC: {metrics_dict['auc']:.4f}, SPEC: {metrics_dict['specificity']:.4f}, MCC: {metrics_dict['mcc']:.4f}, PR-AUC: {metrics_dict['pr_auc']:.4f}")
+    #log_gpu_memory()
     
     return metrics_dict
 
@@ -682,6 +687,30 @@ def clear_gpu_memory():
         torch.cuda.synchronize()
         torch.cuda.reset_peak_memory_stats()
     logger.info("✅ Memoria GPU limpiada")
+
+
+# =============================================================================
+# INITIATE TRAINING
+# =============================================================================
+
+def update_history_and_log(epoch: int, train_metrics: dict, val_metrics: dict, history: dict):
+    metrics_keys = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1', 'specificity', 'mcc', 'pr_auc']
+    for key in metrics_keys:
+        history[key].append(train_metrics.get(key, 0.0))  # Default a 0 si no existe
+        history[f'val_{key}'].append(val_metrics.get(key, 0.0))
+    
+    logger.info(f"RESULTADOS ÉPOCA {epoch}:")
+    logger.info(f"  Train = ACC: {train_metrics.get('accuracy', 0):.3f}, PRECISION: {train_metrics.get('precision', 0):.4f}, "
+                f"RECALL: {train_metrics.get('recall', 0):.4f}, F1: {train_metrics.get('f1', 0):.3f}, "
+                f"AUC: {train_metrics.get('auc', 0):.4f}, PR-AUC: {train_metrics.get('pr_auc', 0):.4f}, "
+                f"SPEC: {train_metrics.get('specificity', 0):.4f}, MCC: {train_metrics.get('mcc', 0):.4f}, "
+                f"Loss: {train_metrics.get('loss', 0):.4f}")
+    logger.info(f"  Valid = ACC: {val_metrics.get('accuracy', 0):.3f}, PRECISION: {val_metrics.get('precision', 0):.4f}, "
+                f"RECALL: {val_metrics.get('recall', 0):.4f}, F1: {val_metrics.get('f1', 0):.3f}, "
+                f"AUC: {val_metrics.get('auc', 0):.4f}, PR-AUC: {val_metrics.get('pr_auc', 0):.4f}, "
+                f"SPEC: {val_metrics.get('specificity', 0):.4f}, MCC: {val_metrics.get('mcc', 0):.4f}, "
+                f"Loss: {val_metrics.get('loss', 0):.4f}")
+
 
 # =============================================================================
 # INITIATE TRAINING
@@ -766,9 +795,7 @@ def pretrain_model():
     train_df = pl.from_pandas(train_df_pd)
     val_df = pl.from_pandas(val_df_pd)
     
-    logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")
-    logger.info(f"Estudios en train_df: {train_df['StudyInstanceUID'].to_list()}")
-    logger.info(f"Estudios en val_df: {val_df['StudyInstanceUID'].to_list()}")
+    logger.info(f"✅ División: {len(train_df)} entrenamiento, {len(val_df)} validación")    
 
     # Verificar archivos .npy en train_df y val_df
     logger.info("Verificando archivos .npy en train_df...")
@@ -884,36 +911,27 @@ def pretrain_model():
     
     history = {
         'loss': [], 'accuracy': [], 'precision': [], 'recall': [], 'auc': [], 'f1': [],
-        'val_loss': [], 'val_accuracy': [], 'val_precision': [], 'val_recall': [], 'val_auc': [], 'val_f1': []
+        'specificity': [], 'mcc': [], 'pr_auc': [],
+        'val_loss': [], 'val_accuracy': [], 'val_precision': [], 'val_recall': [], 'val_auc': [], 'val_f1': [],
+        'val_specificity': [], 'val_mcc': [], 'val_pr_auc': []
     }
     
     best_val_auc = 0.0
     patience = 5
     no_improve_count = 0
     
-    logger.info(f"🎯 Iniciando entrenamiento por {config.EPOCHS} épocas...")
+    logger.info(f"🎯 Iniciando entrenamiento para {config.EPOCHS} épocas...")
     log_gpu_memory()
 
     for epoch in range(config.EPOCHS):
         logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
-        
-        train_metrics = train_epoch(
-            model, train_loader, optimizer, criterion, 
-            class_weights, device, metrics, epoch+1, scaler
-        )
-        
+
+        train_metrics = train_epoch(model, train_loader, optimizer, criterion, class_weights, device, metrics, epoch+1, scaler)
+
         val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
         
-        for key in ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']:
-            history[key].append(train_metrics[key])
-            history[f'val_{key}'].append(val_metrics[key])
-        
-        logger.info(f"RESULTADOS ÉPOCA {epoch+1}:")
-        logger.info(f"  Train - Loss: {train_metrics['loss']:.4f}, AUC: {train_metrics['auc']:.4f}, "
-                   f"Acc: {train_metrics['accuracy']:.3f}, F1: {train_metrics['f1']:.3f}")
-        logger.info(f"  Valid - Loss: {val_metrics['loss']:.4f}, AUC: {val_metrics['auc']:.4f}, "
-                   f"Acc: {val_metrics['accuracy']:.3f}, F1: {val_metrics['f1']:.3f}")
-        
+        update_history_and_log(epoch + 1, train_metrics, val_metrics, history)
+
         current_val_auc = val_metrics['auc']
         if current_val_auc > best_val_auc:
             best_val_auc = current_val_auc
