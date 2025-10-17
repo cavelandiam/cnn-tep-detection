@@ -40,7 +40,7 @@ torch.backends.cudnn.benchmark = True
 
 # --- CONFIGURACIÓN DE LOGGING Y DISPOSITIVO ---
 if mp.current_process().name == 'MainProcess':
-    logger.init_logger("log_process_data_rsna")
+    logger.init_logger("log_process_data_rsna", metrics_file="metrics_log.json")
 
 try:
     mp.set_start_method('spawn', force=True)
@@ -930,6 +930,8 @@ def pretrain_model():
 
         val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
         
+        logger.log_metrics(epoch + 1, train_metrics, val_metrics)
+
         update_history_and_log(epoch + 1, train_metrics, val_metrics, history)
 
         current_val_auc = val_metrics['auc']

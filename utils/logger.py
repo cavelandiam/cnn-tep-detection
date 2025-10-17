@@ -2,12 +2,14 @@ import logging
 import sys
 from pathlib import Path
 import multiprocessing as mp
+import json
 
 # --- CONFIGURACIÓN GLOBAL DEL LOGGER ---
 _logger = None
 _log_file = None
+_metrics_file = None
 
-def init_logger(name: str, log_dir: str = "logs"):
+def init_logger(name: str, log_dir: str = "logs", metrics_file: str = "metrics_log.json"):
     """
     Inicializa el logger con un nombre y archivo de log específicos.
     Solo se inicializa en el proceso principal.
@@ -15,8 +17,10 @@ def init_logger(name: str, log_dir: str = "logs"):
     Args:
         name (str): Nombre del logger y base del archivo de log (ej: "train_rsna")
         log_dir (str): Directorio donde se guardarán los logs (por defecto: "logs")
+        metrics_file (str): Nombre del archivo JSON para métricas (por defecto: "metrics_log.json")
     """
-    global _logger, _log_file
+
+    global _logger, _log_file, _metrics_file
 
     # Solo inicializar en el proceso principal
     if mp.current_process().name != 'MainProcess':
@@ -27,6 +31,7 @@ def init_logger(name: str, log_dir: str = "logs"):
 
     # Definir ruta del archivo de log
     _log_file = f"{log_dir}/{name}.log"
+    _metrics_file = f"{log_dir}/{metrics_file}"
 
     # Si ya existe un logger anterior, limpiarlo
     if _logger is not None:
@@ -69,6 +74,7 @@ def init_logger(name: str, log_dir: str = "logs"):
 
     # Mensaje de inicio
     info(f"✅ Logger inicializado: {_log_file}")
+    info(f"✅ Registro de métricas inicializado: {_metrics_file}")
 
 def _get_logger():
     """Devuelve el logger actual. Crea uno dummy si no se inicializó."""
@@ -131,3 +137,44 @@ def model_summary(model):
     sys.stdout = old_stdout
     summary_str = buffer.getvalue()
     info("\n" + "="*60 + "\n" + "MODEL SUMMARY:\n" + summary_str + "="*60)
+
+# --- NUEVA FUNCIÓN PARA MÉTRICAS JSON ---
+def log_metrics(epoch: int, train_metrics: dict, val_metrics: dict):
+    """
+    Escribe las métricas de entrenamiento y validación en un archivo JSON.
+    """
+    global _metrics_file
+
+    # Cargar datos existentes si el archivo existe
+    metrics_data = []
+    if Path(_metrics_file).exists():
+        try:
+            with open(_metrics_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+                if content:
+                    metrics_data = json.loads(content)
+        except json.JSONDecodeError as e:
+            warning(f"Error decodificando { _metrics_file}: {str(e)}. Iniciando nuevo array.")
+            metrics_data = []
+
+    # Formatear métricas con 4 decimales
+    train_formatted = {k: f"{v:.4f}" for k, v in train_metrics.items()}
+    val_formatted = {k: f"{v:.4f}" for k, v in val_metrics.items()}
+
+    # Crear nuevo objeto de época
+    epoch_data = {
+        "EPOCH": epoch,
+        "TRAIN": train_formatted,
+        "VALIDATION": val_formatted
+    }
+
+    # Añadir al array
+    metrics_data.append(epoch_data)
+
+    # Escribir el array completo al archivo
+    try:
+        with open(_metrics_file, 'w', encoding='utf-8') as f:
+            json.dump(metrics_data, f, ensure_ascii=False, indent=2)
+        info(f"📊 Métricas de época {epoch} guardadas en {_metrics_file}")
+    except Exception as e:
+        error(f"Error al guardar métricas en {_metrics_file}: {str(e)}")
