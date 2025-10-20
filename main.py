@@ -5,7 +5,7 @@ import pydicom
 import torch
 import multiprocessing as mp
 
-from scripts import improved_3dcnn_tep  # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
+from scripts import s1_improved_3dcnn_tep # load_images_hucsr, validate_load_images_hucsr, calculate_target_depth, pretrain_rsna, process_rsna
 from utils import logger
 
 # Configuración de TensorFlow para reproducibilidad
@@ -19,8 +19,8 @@ def test_pipeline():
     logger.info("INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION")
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
-    
-    history, best_auc = improved_3dcnn_tep.pretrain_model()
+
+    history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
     #logger.info(f"🎉 Preentrenamiento completado! Mejor AUC: {best_auc:.4f}")
 
     #print("Calcular target depth HUCSR...")

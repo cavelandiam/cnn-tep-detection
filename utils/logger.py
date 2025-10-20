@@ -9,7 +9,7 @@ _logger = None
 _log_file = None
 _metrics_file = None
 
-def init_logger(name: str, log_dir: str = "logs", metrics_file: str = "metrics_log.json"):
+def init_logger(name: str, log_dir: str = "logs", metrics_file: str = "log_metrics_rsna.json"):
     """
     Inicializa el logger con un nombre y archivo de log específicos.
     Solo se inicializa en el proceso principal.
