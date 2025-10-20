@@ -13,7 +13,6 @@ from collections import defaultdict
 import numpy as np
 import polars as pl
 import pydicom
-import h5py
 import matplotlib.pyplot as plt
 from scipy.ndimage import zoom
 from skimage.transform import resize
@@ -31,13 +30,13 @@ class HUCSRConfig:
     """Configuración específica para HUCSR"""
     
     # Directorios
-    POSITIVOS_DIR = config.HUCSR_DATASET_TEP_TRUE_DIR
-    NEGATIVOS_DIR = config.HUCSR_DATASET_TEP_FALSE_DIR    
-    
+    POSITIVOS_DIR = Path(config.HUCSR_DATASET_TEP_TRUE_DIR)
+    NEGATIVOS_DIR = Path(config.HUCSR_DATASET_TEP_FALSE_DIR)
+
     # Output
-    OUTPUT_DIR = config.HUCSR_PREPROCESSED_DATA_DIR
-    METADATA_CSV = config.HUCSR_CSV_PREPROCESSED_DATA_DIR
-    VISUALIZATIONS_DIR = config.HUCSR_VISUALIZATIONS_DIR
+    OUTPUT_DIR = Path(config.HUCSR_PREPROCESSED_DATA_DIR)
+    METADATA_CSV = Path(config.HUCSR_CSV_PREPROCESSED_DATA_DIR)
+    VISUALIZATIONS_DIR = Path(config.HUCSR_VISUALIZATIONS_DIR)
     
     # Parámetros de imagen
     IMAGE_SIZE = config.IMAGE_SIZE  # (256, 256)
@@ -573,7 +572,7 @@ class HUCSRPreprocessor:
 
 def load_images_hucsr():
     """Función principal"""
-    logger.init_logger("load_images_hucsr", metrics_file="hucsr_preprocess_metrics.json")
+    logger.init_logger("log_process_data_hucsr", metrics_file="log_metrics_hucsr.json")
     
     logger.info("="*80)
     logger.info("🚀 PREPROCESAMIENTO HUCSR - TODAS LAS SERIES")
