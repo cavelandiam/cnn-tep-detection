@@ -26,6 +26,7 @@ HUCSR_FINETUNED_MODEL = os.path.join(MODEL_DIR, "hucsr_finetuned.pth")
 # 📂 **Rutas de Gráficas**
 HUCSR_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "hucsr")
 HUCSR_GRAPHS_METRICS_DIR = os.path.join(HUCSR_GRAPHS_DIR, "metrics")
+HUCSR_GRAPHS_CONFUSION_MATRIX_DIR = os.path.join(HUCSR_GRAPHS_DIR, "hucsr_confusion_matrix.png")
 HUCSR_GRAPHS_MODEL_NAME = "resnet3d_finetuned"
 RSNA_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "rsna")
 RSNA_GRAPHS_METRICS_DIR = os.path.join(RSNA_GRAPHS_DIR, "metrics")

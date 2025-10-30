@@ -15,4 +15,5 @@ torchmetrics
 torchsummary
 torchviz
 psutil
+hiddenlayer
 tqdm

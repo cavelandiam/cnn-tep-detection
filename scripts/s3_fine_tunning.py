@@ -114,10 +114,15 @@ def finetune_model():
     plot_training_curves(history, config.HUCSR_GRAPHS_METRICS_DIR)
     logger.info(f"Gráficas de métricas guardadas: {config.HUCSR_GRAPHS_METRICS_DIR}")
 
-    f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
+    f1 = calculate_confusion_matrix(val_df, model, val_loader, device, config.HUCSR_GRAPHS_CONFUSION_MATRIX_DIR)
     logger.info(f"F1 Final: {f1:.4f}, AUC: {best_val_auc:.4f}")
 
-    visualization.plot_model_architecture(model, config.HUCSR_GRAPHS_MODEL_DIR)
-    logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_MODEL_DIR}")
+    visualization.plot_model_architecture(
+        model=model,
+        save_dir=config.HUCSR_GRAPHS_METRICS_DIR,
+        model_name= config.HUCSR_GRAPHS_MODEL_NAME,
+        input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
+    )
+    logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_METRICS_DIR}")
 
     return history, best_val_auc

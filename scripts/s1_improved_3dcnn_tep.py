@@ -28,8 +28,6 @@ import torch.multiprocessing as mp  # Importar torch.multiprocessing
 from utils import logger, config, visualization
 import multiprocessing as mp
 
-from utils.visualization import plot_model_architecture
-
 # --- CONFIGURACIÓN PARA REPRODUCIBILIDAD ---
 SEED = 42
 random.seed(SEED)
@@ -454,7 +452,7 @@ def plot_training_curves(history: Dict[str, List[float]], output_dir: str = "gra
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
 
-def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loader: DataLoader, device: torch.device):
+def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loader: DataLoader, device: torch.device, route: str = "graphs") -> float:
     model.eval()
     predictions, labels = [], []
     with torch.no_grad():
@@ -477,7 +475,7 @@ def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loade
     plt.title('Confusion Matrix')
     plt.xlabel('Predicted')
     plt.ylabel('Real')
-    plt.savefig(config.RSNA_GRAPHS_CONFUSION_MATRIX_DIR, dpi=300)
+    plt.savefig(route, dpi=300)
     #plt.show()
     f1_val = f1_score(true_binary, pred_binary)
     logger.info(f"F1-Score validación: {f1_val:.4f}")
@@ -990,14 +988,14 @@ def pretrain_model():
     # === NUEVO: Arquitectura ===
     visualization.plot_model_architecture(
         model=model,
-        save_path=config.RSNA_GRAPHS_DIR,
+        save_dir=config.RSNA_GRAPHS_DIR,
         model_name= config.RSNA_GRAPHS_MODEL_NAME,
         input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)  # (C, D, H, W, 1)
     )
     
     logger.info("📊 Generando visualizaciones...")
     plot_training_curves(history, config.RSNA_GRAPHS_METRICS_DIR)
-    final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
+    final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device, config.RSNA_GRAPHS_CONFUSION_MATRIX_DIR)
     
     final_train_auc = history['auc'][-1]
     final_val_auc = history['val_auc'][-1]
