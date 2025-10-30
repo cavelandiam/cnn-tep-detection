@@ -1,8 +1,9 @@
 import sys
+import torch
+import torch.onnx
 from io import StringIO
 from pathlib import Path
 from datetime import datetime
-import torch
 from utils import logger
 
 def plot_model_architecture(
@@ -119,22 +120,26 @@ def generate_model_summary(model, input_size, device, model_name, total_params, 
 def generate_model_graph(model, input_size, device, png_path, svg_path):
     """Genera el grafo visual del modelo (PNG y SVG)"""
     
+    # Asegurar que torch esté importado globalmente
+    import torch
+    import torch.onnx
+    
     # Método 1: Intentar con torchview (más moderno y compatible)
     try:
         from torchview import draw_graph
         
+        logger.info("Intentando generar grafo con torchview...")
+        
         # Entrada con batch dimension
         x = torch.randn(1, *input_size).to(device)
         
-        logger.info("Generando grafo con torchview...")
-        
-        # Generar grafo
+        # Generar grafo con manejo de errores robusto
         model_graph = draw_graph(
             model, 
             input_data=x,
             expand_nested=True,
             depth=10,
-            device=device
+            device=str(device)  # Pasar como string para evitar problemas
         )
         
         # Guardar visualizaciones (sin extensión porque render() la agrega)
@@ -147,74 +152,120 @@ def generate_model_graph(model, input_size, device, png_path, svg_path):
         logger.info(f"✅ Grafo 3D generado con torchview: {png_path.name} y {svg_path.name}")
         return True
         
-    except ImportError:
-        logger.info("💡 torchview no disponible, intentando método alternativo...")
+    except ImportError as e:
+        logger.info(f"💡 torchview no disponible: {e}")
     except Exception as e:
         logger.warning(f"⚠️ torchview falló: {e}")
         import traceback
         logger.debug(traceback.format_exc())
     
-    # Método 2: Exportar a ONNX y generar PNG simple
+    # Método 2: Exportar a ONNX y usar netron
     try:
-        import torch.onnx
-        import subprocess
+        logger.info("Intentando exportar modelo a ONNX...")
         
-        logger.info("Generando visualización con ONNX...")
+        # Verificar que onnx esté instalado
+        try:
+            import onnx
+        except ImportError:
+            logger.warning("⚠️ ONNX no instalado. Ejecuta: pip install onnx")
+            raise
         
         # Exportar modelo a ONNX
         x = torch.randn(1, *input_size).to(device)
         onnx_path = png_path.parent / "model.onnx"
         
+        # Mover modelo a CPU para exportación (más estable)
+        model_cpu = model.cpu()
+        x_cpu = x.cpu()
+        
         torch.onnx.export(
-            model,
-            x,
+            model_cpu,
+            x_cpu,
             str(onnx_path),
             input_names=['input'],
             output_names=['output'],
             dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}},
-            opset_version=11
+            opset_version=11,
+            do_constant_folding=True
         )
         
+        # Volver modelo a dispositivo original
+        model.to(device)
+        
         logger.info(f"✅ Modelo exportado a ONNX: {onnx_path}")
-        logger.info(f"💡 Visualiza el modelo con: netron {onnx_path}")
-        logger.info(f"   O visita: https://netron.app y carga {onnx_path}")
+        logger.info(f"💡 Visualiza con: netron {onnx_path}")
+        logger.info(f"   O en el navegador: https://netron.app")
         
         # Crear imagen placeholder informativa
         try:
             from PIL import Image, ImageDraw, ImageFont
             
-            img = Image.new('RGB', (800, 400), color='white')
+            img = Image.new('RGB', (1000, 600), color='#f8f9fa')
             draw = ImageDraw.Draw(img)
             
-            text = f"Modelo exportado a:\n{onnx_path.name}\n\n"
-            text += "Visualízalo con:\n"
-            text += "1. netron model.onnx\n"
-            text += "2. https://netron.app"
+            # Dibujar borde
+            draw.rectangle([(20, 20), (980, 580)], outline='#667eea', width=3)
+            
+            # Título
+            title = "Modelo 3D-CNN exportado a ONNX"
+            
+            # Texto principal
+            text_lines = [
+                "",
+                f"Archivo: {onnx_path.name}",
+                "",
+                "Para visualizar el modelo:",
+                "",
+                "Opción 1 - Netron (local):",
+                "  $ pip install netron",
+                f"  $ netron {onnx_path.name}",
+                "",
+                "Opción 2 - Netron (web):",
+                "  1. Visita: https://netron.app",
+                f"  2. Carga el archivo: {onnx_path}",
+                "",
+                "El archivo ONNX contiene la arquitectura completa",
+                "con todas las capas y conexiones del modelo 3D.",
+            ]
             
             # Intentar usar fuente, si falla usar default
             try:
-                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+                font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
+                font_text = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
             except:
-                font = ImageFont.load_default()
+                font_title = ImageFont.load_default()
+                font_text = ImageFont.load_default()
             
-            draw.text((50, 50), text, fill='black', font=font)
+            # Dibujar título
+            draw.text((80, 60), title, fill='#667eea', font=font_title)
+            
+            # Dibujar texto
+            y_offset = 130
+            for line in text_lines:
+                draw.text((80, y_offset), line, fill='#333333', font=font_text)
+                y_offset += 28
+            
             img.save(str(png_path))
             
-            logger.info(f"✅ Imagen placeholder guardada: {png_path.name}")
+            logger.info(f"✅ Imagen informativa guardada: {png_path.name}")
+            logger.info(f"💡 El grafo real está en: {onnx_path.name}")
+            
         except Exception as e:
             logger.warning(f"No se pudo crear imagen placeholder: {e}")
         
-        return False  # No se generó grafo visual real
+        return True  # ONNX exportado exitosamente
         
     except Exception as e:
         logger.warning(f"⚠️ Export ONNX falló: {e}")
+        import traceback
+        logger.debug(traceback.format_exc())
     
     # Mensaje final de ayuda
     logger.info("💡 Para generar grafos visuales automáticamente:")
-    logger.info("   1. pip install torchview")
+    logger.info("   1. pip install torchview onnx pillow")
     logger.info("   2. pip install graphviz")
     logger.info("   3. sudo apt-get install graphviz")
-    logger.info("   Luego ejecuta de nuevo.")
+    logger.info("   4. Ejecuta de nuevo el script")
     
     return False
 

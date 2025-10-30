@@ -10,3 +10,219 @@
 2025-10-29 22:52:38,234 - INFO - Device capability: (12, 0)
 2025-10-29 22:52:38,236 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
 2025-10-29 22:52:38,236 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-10-29 22:57:36,576 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-10-29 22:57:36,576 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-10-29 22:57:36,576 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-10-29 22:57:36,649 - INFO - Usando dispositivo: cuda:0
+2025-10-29 22:57:36,649 - INFO - ¿CUDA disponible?: True
+2025-10-29 22:57:36,675 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-10-29 22:57:36,675 - INFO - Memoria GPU disponible: 17.09 GB
+2025-10-29 22:57:36,675 - INFO - PyTorch version: 2.8.0+cu128
+2025-10-29 22:57:36,676 - INFO - CUDA version: 12.8
+2025-10-29 22:57:36,676 - INFO - Device capability: (12, 0)
+2025-10-29 22:57:36,678 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-10-29 22:57:36,678 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-10-29 22:57:36,678 - INFO - === INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) - OPTIMIZADO PARA MEMORIA ===
+2025-10-29 22:57:36,678 - INFO - ✅ Arquitectura GPU sm_12.0 compatible con PyTorch 2.8.0+cu128
+2025-10-29 22:57:36,913 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 22:57:36,913 - INFO - 1. Preprocesando datos DICOM...
+2025-10-29 22:57:37,096 - INFO - Total de estudios en CSV: 7279
+2025-10-29 22:58:16,986 - INFO - ✅ Metadatos cargados: 7279 estudios válidos
+2025-10-29 22:58:17,003 - INFO - preprocessed_metadata.csv ya existe, cargando...
+2025-10-29 22:58:17,293 - INFO - 2. Dividiendo datos...
+2025-10-29 22:58:17,332 - INFO - ✅ División: 5823 entrenamiento, 1456 validación
+2025-10-29 22:58:17,333 - INFO - Verificando archivos .npy en train_df...
+2025-10-29 22:58:17,333 - INFO - Verificando archivos .npy en val_df...
+2025-10-29 22:58:17,333 - INFO - 3. Calculando pesos de clase...
+2025-10-29 22:58:17,334 - INFO -    Clases train: 1894 positivos (32.5%), 3929 negativos (67.5%)
+2025-10-29 22:58:17,340 - INFO - ✅ Pesos: clase 0=0.74, clase 1=1.54
+2025-10-29 22:58:17,340 - INFO - 4. Creando datasets...
+2025-10-29 22:58:17,342 - INFO - Tamaño de train_dataset: 5823
+2025-10-29 22:58:17,342 - INFO - Tamaño de val_dataset: 1456
+2025-10-29 22:58:17,342 - INFO - Creando DataLoaders optimizados...
+2025-10-29 22:58:17,342 - INFO - Esperado número de lotes: train=728, val=182
+2025-10-29 22:58:17,343 - INFO - Probando carga de un lote de train_loader...
+2025-10-29 22:58:32,782 - INFO - Lote cargado: volúmenes torch.Size([8, 1, 64, 128, 128]), etiquetas torch.Size([8])
+2025-10-29 22:58:32,783 - INFO - Probando carga de un lote de val_loader...
+2025-10-29 22:58:47,420 - INFO - Lote cargado: volúmenes torch.Size([8, 1, 64, 128, 128]), etiquetas torch.Size([8])
+2025-10-29 22:58:47,601 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 22:58:47,601 - INFO - 5. Creando modelo ResNet3D optimizado...
+2025-10-29 22:58:47,602 - INFO - Creando ResNet3D optimizado: input_channels=1, num_classes=1
+2025-10-29 22:58:47,634 - INFO - Modelo creado en dispositivo: cuda:0
+2025-10-29 22:58:47,692 - INFO - Probando modelo con entrada: torch.Size([1, 1, 64, 128, 128]), dispositivo: cuda:0
+2025-10-29 22:58:48,251 - INFO - Salida del modelo: torch.Size([1, 1]), dispositivo: cuda:0
+2025-10-29 22:58:48,252 - INFO - Modelo en dispositivo: cuda:0
+2025-10-29 22:58:48,252 - INFO - Probando modelo con lote de ejemplo...
+2025-10-29 22:58:48,256 - INFO - Lote de prueba: torch.Size([1, 1, 64, 128, 128]), etiquetas [1.0]
+2025-10-29 22:58:48,256 - INFO - Creando ResNet3D optimizado: input_channels=1, num_classes=1
+2025-10-29 22:58:48,260 - INFO - Modelo creado en dispositivo: cuda:0
+2025-10-29 22:58:48,264 - INFO - Probando modelo con entrada: torch.Size([1, 1, 64, 128, 128]), dispositivo: cuda:0
+2025-10-29 22:58:48,267 - INFO - Salida del modelo: torch.Size([1, 1]), dispositivo: cuda:0
+2025-10-29 22:58:48,289 - INFO - Salida del modelo: torch.Size([1, 1])
+2025-10-29 22:58:48,289 - INFO - Después de squeeze: torch.Size([1])
+2025-10-29 22:58:48,289 - INFO - ✅ Modelo funciona correctamente
+2025-10-29 22:58:48,533 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 22:58:48,533 - INFO - 6. Configurando entrenamiento...
+2025-10-29 22:58:48,539 - INFO - ✅ Optimizador: Adam(lr=0.0002), Mixed precision: True
+2025-10-29 22:58:48,539 - INFO - 🎯 Iniciando entrenamiento para 2 épocas...
+2025-10-29 22:58:48,540 - INFO - GPU Memory - Allocated: 0.03GB, Reserved: 0.04GB, Max: 0.03GB
+2025-10-29 22:58:48,540 - INFO - 
+--- ÉPOCA 1/2 ---
+2025-10-29 22:58:48,540 - INFO - Iniciando época 1, total de lotes esperados: 728
+2025-10-29 22:58:48,541 - INFO - GPU Memory - Allocated: 0.03GB, Reserved: 0.04GB, Max: 0.03GB
+2025-10-29 22:59:29,671 - INFO - Época 1 Completada: 728 lotes procesados, pérdida promedio: 1.6295
+2025-10-29 22:59:29,671 - INFO - Métricas Finales Entrenamiento: ACC: 0.5446, PRECISION: 0.3263, RECALL: 0.3759, F1: 0.3494, AUC: 0.5064, SPEC: 0.6259, MCC: 0.0017, PR-AUC: 0.3314
+2025-10-29 22:59:29,672 - INFO - Iniciando validación, total de lotes esperados: 182
+2025-10-29 22:59:29,673 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 4.78GB
+2025-10-29 22:59:32,569 - INFO - Validación Completada: 182 lotes procesados, pérdida promedio: 0.8300
+2025-10-29 22:59:32,569 - INFO - Métricas Finales Validación: ACC: 0.6745, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.0000, AUC: 0.5191, SPEC: 1.0000, MCC: 0.0195, PR-AUC: 0.3339
+2025-10-29 22:59:32,575 - INFO - 📊 Métricas de época 1 guardadas en logs/log_metrics_rsna.json
+2025-10-29 22:59:32,575 - INFO - RESULTADOS ÉPOCA 1:
+2025-10-29 22:59:32,575 - INFO -   Train = ACC: 0.545, PRECISION: 0.3263, RECALL: 0.3759, F1: 0.349, AUC: 0.5064, PR-AUC: 0.3314, SPEC: 0.6259, MCC: 0.0017, Loss: 1.6295
+2025-10-29 22:59:32,575 - INFO -   Valid = ACC: 0.674, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.000, AUC: 0.5191, PR-AUC: 0.3339, SPEC: 1.0000, MCC: 0.0195, Loss: 0.8300
+2025-10-29 22:59:32,587 - INFO - Checkpoint guardado: /home/cavm/cnn-tep-detection/models/rsna_best_model_auc.pth (AUC: 0.5191, Epoch: 1)
+2025-10-29 22:59:32,587 - INFO - 🌟 NUEVO MEJOR MODELO: AUC = 0.5191
+2025-10-29 22:59:32,774 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 22:59:32,774 - INFO - 
+--- ÉPOCA 2/2 ---
+2025-10-29 22:59:32,775 - INFO - Iniciando época 2, total de lotes esperados: 728
+2025-10-29 22:59:32,775 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 0.07GB
+2025-10-29 23:00:11,939 - INFO - Época 2 Completada: 728 lotes procesados, pérdida promedio: 0.8680
+2025-10-29 23:00:11,939 - INFO - Métricas Finales Entrenamiento: ACC: 0.5899, PRECISION: 0.3253, RECALL: 0.2429, F1: 0.2781, AUC: 0.4992, SPEC: 0.7572, MCC: 0.0001, PR-AUC: 0.3253
+2025-10-29 23:00:11,940 - INFO - Iniciando validación, total de lotes esperados: 182
+2025-10-29 23:00:11,941 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 0.93GB
+2025-10-29 23:00:14,657 - INFO - Validación Completada: 182 lotes procesados, pérdida promedio: 0.8047
+2025-10-29 23:00:14,657 - INFO - Métricas Finales Validación: ACC: 0.6745, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.0000, AUC: 0.4543, SPEC: 1.0000, MCC: 0.0195, PR-AUC: 0.2903
+2025-10-29 23:00:14,661 - INFO - 📊 Métricas de época 2 guardadas en logs/log_metrics_rsna.json
+2025-10-29 23:00:14,662 - INFO - RESULTADOS ÉPOCA 2:
+2025-10-29 23:00:14,662 - INFO -   Train = ACC: 0.590, PRECISION: 0.3253, RECALL: 0.2429, F1: 0.278, AUC: 0.4992, PR-AUC: 0.3253, SPEC: 0.7572, MCC: 0.0001, Loss: 0.8680
+2025-10-29 23:00:14,662 - INFO -   Valid = ACC: 0.674, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.000, AUC: 0.4543, PR-AUC: 0.2903, SPEC: 1.0000, MCC: 0.0195, Loss: 0.8047
+2025-10-29 23:00:14,795 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:00:14,795 - INFO - 
+=== ENTRENAMIENTO COMPLETADO ===
+2025-10-29 23:00:14,796 - INFO - Mejor AUC validación: 0.5191
+2025-10-29 23:00:14,803 - INFO - 💾 Modelo final guardado: /home/cavm/cnn-tep-detection/models/rsna_pretrained.pth
+2025-10-29 23:00:14,824 - INFO - ✅ Resumen generado con torchinfo
+2025-10-29 23:00:14,824 - INFO - ✅ Resumen guardado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/summary.txt
+2025-10-29 23:00:14,844 - WARNING - ⚠️ torchview falló: local variable 'torch' referenced before assignment
+2025-10-29 23:00:14,845 - INFO - Generando visualización con ONNX...
+2025-10-29 23:00:14,924 - WARNING - ⚠️ Export ONNX falló: Module onnx is not installed!
+2025-10-29 23:00:14,925 - INFO - 💡 Para generar grafos visuales automáticamente:
+2025-10-29 23:00:14,925 - INFO -    1. pip install torchview
+2025-10-29 23:00:14,925 - INFO -    2. pip install graphviz
+2025-10-29 23:00:14,925 - INFO -    3. sudo apt-get install graphviz
+2025-10-29 23:00:14,925 - INFO -    Luego ejecuta de nuevo.
+2025-10-29 23:00:14,925 - INFO - 📄 Reporte HTML generado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/report.html
+2025-10-29 23:00:14,925 - INFO - 📊 Generando visualizaciones...
+2025-10-29 23:00:14,926 - INFO - Guardando gráficas de métricas en: /home/cavm/cnn-tep-detection/graphs/rsna/metrics
+2025-10-29 23:00:20,184 - INFO - F1-Score validación: 0.0000
+2025-10-29 23:00:20,184 - INFO - 📈 RESULTADOS FINALES: Train AUC: 0.4992, Valid AUC: 0.4543, Valid F1: 0.0000
+2025-10-29 23:00:24,044 - INFO - ✅ Preentrenamiento completado exitosamente
+2025-10-29 23:00:24,068 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-10-29 23:00:24,068 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-10-29 23:04:56,551 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-10-29 23:04:56,551 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-10-29 23:04:56,551 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-10-29 23:04:56,628 - INFO - Usando dispositivo: cuda:0
+2025-10-29 23:04:56,629 - INFO - ¿CUDA disponible?: True
+2025-10-29 23:04:56,654 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-10-29 23:04:56,655 - INFO - Memoria GPU disponible: 17.09 GB
+2025-10-29 23:04:56,655 - INFO - PyTorch version: 2.8.0+cu128
+2025-10-29 23:04:56,655 - INFO - CUDA version: 12.8
+2025-10-29 23:04:56,655 - INFO - Device capability: (12, 0)
+2025-10-29 23:04:56,657 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-10-29 23:04:56,657 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-10-29 23:04:56,657 - INFO - === INICIANDO PREENTRENAMIENTO 3D-CNN (PyTorch) - OPTIMIZADO PARA MEMORIA ===
+2025-10-29 23:04:56,658 - INFO - ✅ Arquitectura GPU sm_12.0 compatible con PyTorch 2.8.0+cu128
+2025-10-29 23:04:56,903 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:04:56,903 - INFO - 1. Preprocesando datos DICOM...
+2025-10-29 23:04:57,075 - INFO - Total de estudios en CSV: 7279
+2025-10-29 23:05:36,734 - INFO - ✅ Metadatos cargados: 7279 estudios válidos
+2025-10-29 23:05:36,750 - INFO - preprocessed_metadata.csv ya existe, cargando...
+2025-10-29 23:05:37,035 - INFO - 2. Dividiendo datos...
+2025-10-29 23:05:37,072 - INFO - ✅ División: 5823 entrenamiento, 1456 validación
+2025-10-29 23:05:37,073 - INFO - Verificando archivos .npy en train_df...
+2025-10-29 23:05:37,073 - INFO - Verificando archivos .npy en val_df...
+2025-10-29 23:05:37,073 - INFO - 3. Calculando pesos de clase...
+2025-10-29 23:05:37,075 - INFO -    Clases train: 1894 positivos (32.5%), 3929 negativos (67.5%)
+2025-10-29 23:05:37,079 - INFO - ✅ Pesos: clase 0=0.74, clase 1=1.54
+2025-10-29 23:05:37,079 - INFO - 4. Creando datasets...
+2025-10-29 23:05:37,081 - INFO - Tamaño de train_dataset: 5823
+2025-10-29 23:05:37,081 - INFO - Tamaño de val_dataset: 1456
+2025-10-29 23:05:37,081 - INFO - Creando DataLoaders optimizados...
+2025-10-29 23:05:37,081 - INFO - Esperado número de lotes: train=728, val=182
+2025-10-29 23:05:37,081 - INFO - Probando carga de un lote de train_loader...
+2025-10-29 23:05:52,539 - INFO - Lote cargado: volúmenes torch.Size([8, 1, 64, 128, 128]), etiquetas torch.Size([8])
+2025-10-29 23:05:52,539 - INFO - Probando carga de un lote de val_loader...
+2025-10-29 23:06:07,518 - INFO - Lote cargado: volúmenes torch.Size([8, 1, 64, 128, 128]), etiquetas torch.Size([8])
+2025-10-29 23:06:07,712 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:06:07,712 - INFO - 5. Creando modelo ResNet3D optimizado...
+2025-10-29 23:06:07,712 - INFO - Creando ResNet3D optimizado: input_channels=1, num_classes=1
+2025-10-29 23:06:07,738 - INFO - Modelo creado en dispositivo: cuda:0
+2025-10-29 23:06:07,799 - INFO - Probando modelo con entrada: torch.Size([1, 1, 64, 128, 128]), dispositivo: cuda:0
+2025-10-29 23:06:08,460 - INFO - Salida del modelo: torch.Size([1, 1]), dispositivo: cuda:0
+2025-10-29 23:06:08,461 - INFO - Modelo en dispositivo: cuda:0
+2025-10-29 23:06:08,461 - INFO - Probando modelo con lote de ejemplo...
+2025-10-29 23:06:08,469 - INFO - Lote de prueba: torch.Size([1, 1, 64, 128, 128]), etiquetas [1.0]
+2025-10-29 23:06:08,469 - INFO - Creando ResNet3D optimizado: input_channels=1, num_classes=1
+2025-10-29 23:06:08,475 - INFO - Modelo creado en dispositivo: cuda:0
+2025-10-29 23:06:08,480 - INFO - Probando modelo con entrada: torch.Size([1, 1, 64, 128, 128]), dispositivo: cuda:0
+2025-10-29 23:06:08,483 - INFO - Salida del modelo: torch.Size([1, 1]), dispositivo: cuda:0
+2025-10-29 23:06:08,523 - INFO - Salida del modelo: torch.Size([1, 1])
+2025-10-29 23:06:08,523 - INFO - Después de squeeze: torch.Size([1])
+2025-10-29 23:06:08,523 - INFO - ✅ Modelo funciona correctamente
+2025-10-29 23:06:08,753 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:06:08,753 - INFO - 6. Configurando entrenamiento...
+2025-10-29 23:06:08,761 - INFO - ✅ Optimizador: Adam(lr=0.0002), Mixed precision: True
+2025-10-29 23:06:08,761 - INFO - 🎯 Iniciando entrenamiento para 2 épocas...
+2025-10-29 23:06:08,762 - INFO - GPU Memory - Allocated: 0.03GB, Reserved: 0.04GB, Max: 0.03GB
+2025-10-29 23:06:08,762 - INFO - 
+--- ÉPOCA 1/2 ---
+2025-10-29 23:06:08,763 - INFO - Iniciando época 1, total de lotes esperados: 728
+2025-10-29 23:06:08,763 - INFO - GPU Memory - Allocated: 0.03GB, Reserved: 0.04GB, Max: 0.03GB
+2025-10-29 23:06:48,269 - INFO - Época 1 Completada: 728 lotes procesados, pérdida promedio: 1.6188
+2025-10-29 23:06:48,269 - INFO - Métricas Finales Entrenamiento: ACC: 0.5396, PRECISION: 0.3157, RECALL: 0.3559, F1: 0.3346, AUC: 0.5010, SPEC: 0.6281, MCC: -0.0155, PR-AUC: 0.3306
+2025-10-29 23:06:48,270 - INFO - Iniciando validación, total de lotes esperados: 182
+2025-10-29 23:06:48,271 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 4.78GB
+2025-10-29 23:06:51,526 - INFO - Validación Completada: 182 lotes procesados, pérdida promedio: 0.8378
+2025-10-29 23:06:51,527 - INFO - Métricas Finales Validación: ACC: 0.6745, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.0000, AUC: 0.4743, SPEC: 1.0000, MCC: 0.0195, PR-AUC: 0.3082
+2025-10-29 23:06:51,532 - INFO - 📊 Métricas de época 1 guardadas en logs/log_metrics_rsna.json
+2025-10-29 23:06:51,532 - INFO - RESULTADOS ÉPOCA 1:
+2025-10-29 23:06:51,532 - INFO -   Train = ACC: 0.540, PRECISION: 0.3157, RECALL: 0.3559, F1: 0.335, AUC: 0.5010, PR-AUC: 0.3306, SPEC: 0.6281, MCC: -0.0155, Loss: 1.6188
+2025-10-29 23:06:51,532 - INFO -   Valid = ACC: 0.674, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.000, AUC: 0.4743, PR-AUC: 0.3082, SPEC: 1.0000, MCC: 0.0195, Loss: 0.8378
+2025-10-29 23:06:51,544 - INFO - Checkpoint guardado: /home/cavm/cnn-tep-detection/models/rsna_best_model_auc.pth (AUC: 0.4743, Epoch: 1)
+2025-10-29 23:06:51,544 - INFO - 🌟 NUEVO MEJOR MODELO: AUC = 0.4743
+2025-10-29 23:06:51,673 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:06:51,673 - INFO - 
+--- ÉPOCA 2/2 ---
+2025-10-29 23:06:51,673 - INFO - Iniciando época 2, total de lotes esperados: 728
+2025-10-29 23:06:51,674 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 0.07GB
+2025-10-29 23:07:28,852 - INFO - Época 2 Completada: 728 lotes procesados, pérdida promedio: 0.8618
+2025-10-29 23:07:28,852 - INFO - Métricas Finales Entrenamiento: ACC: 0.5906, PRECISION: 0.3265, RECALL: 0.2434, F1: 0.2789, AUC: 0.5031, SPEC: 0.7580, MCC: 0.0015, PR-AUC: 0.3304
+2025-10-29 23:07:28,853 - INFO - Iniciando validación, total de lotes esperados: 182
+2025-10-29 23:07:28,854 - INFO - GPU Memory - Allocated: 0.07GB, Reserved: 0.07GB, Max: 0.93GB
+2025-10-29 23:07:32,042 - INFO - Validación Completada: 182 lotes procesados, pérdida promedio: 0.8021
+2025-10-29 23:07:32,042 - INFO - Métricas Finales Validación: ACC: 0.6745, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.0000, AUC: 0.4980, SPEC: 1.0000, MCC: 0.0195, PR-AUC: 0.3205
+2025-10-29 23:07:32,048 - INFO - 📊 Métricas de época 2 guardadas en logs/log_metrics_rsna.json
+2025-10-29 23:07:32,048 - INFO - RESULTADOS ÉPOCA 2:
+2025-10-29 23:07:32,048 - INFO -   Train = ACC: 0.591, PRECISION: 0.3265, RECALL: 0.2434, F1: 0.279, AUC: 0.5031, PR-AUC: 0.3304, SPEC: 0.7580, MCC: 0.0015, Loss: 0.8618
+2025-10-29 23:07:32,048 - INFO -   Valid = ACC: 0.674, PRECISION: 0.0000, RECALL: 0.0000, F1: 0.000, AUC: 0.4980, PR-AUC: 0.3205, SPEC: 1.0000, MCC: 0.0195, Loss: 0.8021
+2025-10-29 23:07:32,056 - INFO - Checkpoint guardado: /home/cavm/cnn-tep-detection/models/rsna_best_model_auc.pth (AUC: 0.4980, Epoch: 2)
+2025-10-29 23:07:32,056 - INFO - 🌟 NUEVO MEJOR MODELO: AUC = 0.4980
+2025-10-29 23:07:32,188 - INFO - ✅ Memoria GPU limpiada
+2025-10-29 23:07:32,189 - INFO - 
+=== ENTRENAMIENTO COMPLETADO ===
+2025-10-29 23:07:32,189 - INFO - Mejor AUC validación: 0.4980
+2025-10-29 23:07:32,195 - INFO - 💾 Modelo final guardado: /home/cavm/cnn-tep-detection/models/rsna_pretrained.pth
+2025-10-29 23:07:32,217 - INFO - ✅ Resumen generado con torchinfo
+2025-10-29 23:07:32,218 - INFO - ✅ Resumen guardado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/summary.txt
+2025-10-29 23:07:32,239 - INFO - Intentando generar grafo con torchview...
+2025-10-29 23:07:32,383 - INFO - ✅ Grafo 3D generado con torchview: graph.png y graph.svg
+2025-10-29 23:07:32,383 - INFO - 📄 Reporte HTML generado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/report.html
+2025-10-29 23:07:32,384 - INFO - 📊 Generando visualizaciones...
+2025-10-29 23:07:32,384 - INFO - Guardando gráficas de métricas en: /home/cavm/cnn-tep-detection/graphs/rsna/metrics
+2025-10-29 23:07:37,702 - INFO - F1-Score validación: 0.0000
+2025-10-29 23:07:37,703 - INFO - 📈 RESULTADOS FINALES: Train AUC: 0.5031, Valid AUC: 0.4980, Valid F1: 0.0000
+2025-10-29 23:07:41,481 - INFO - ✅ Preentrenamiento completado exitosamente
+2025-10-29 23:07:41,500 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-10-29 23:07:41,500 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
