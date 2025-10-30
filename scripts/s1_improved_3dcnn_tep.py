@@ -299,11 +299,7 @@ class ResidualBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
         
-        shortcut_out = self.shortcut(x)        
-        
-        if out.shape != shortcut_out.shape:
-            logger.error(f"Forma de main path {out.shape} != shortcut {shortcut_out.shape}")
-            raise ValueError("Desajuste de formas en ResidualBlock")
+        shortcut_out = self.shortcut(x)                
         
         out += shortcut_out
         out = self.relu_final(out)        
@@ -990,7 +986,7 @@ def pretrain_model():
         model=model,
         save_dir=config.RSNA_GRAPHS_DIR,
         model_name= config.RSNA_GRAPHS_MODEL_NAME,
-        input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)  # (C, D, H, W, 1)
+        input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE)  # (C, D, H, W, 1)
     )
     
     logger.info("📊 Generando visualizaciones...")

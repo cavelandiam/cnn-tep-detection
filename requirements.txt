@@ -13,8 +13,10 @@ pyarrow
 monai
 torchmetrics
 torchsummary
+torchinfo
 torchviz
 psutil
 hiddenlayer
 ipython
 tqdm
+torchview

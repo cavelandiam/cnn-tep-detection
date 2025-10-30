@@ -28,6 +28,7 @@ Luego de la instalación, se busca la aplicación instalada con el nombre de "Ub
 ```bash
  sudo apt update && sudo apt upgrade -y
  sudo apt update && sudo apt upgrade -y python3-pip python3-venv
+ sudo apt-get install graphviz
 ```
 
 Después de realizar la configuración necesaria, se descarga el repositorio y se accede a la carpeta "venv", si no existe, entonces crearla.

@@ -121,7 +121,7 @@ def finetune_model():
         model=model,
         save_dir=config.HUCSR_GRAPHS_METRICS_DIR,
         model_name= config.HUCSR_GRAPHS_MODEL_NAME,
-        input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE, 1)
+        input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE)
     )
     logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_METRICS_DIR}")
 

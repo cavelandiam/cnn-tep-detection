@@ -1,0 +1,12 @@
+2025-10-29 22:52:38,120 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-10-29 22:52:38,121 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-10-29 22:52:38,121 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-10-29 22:52:38,206 - INFO - Usando dispositivo: cuda:0
+2025-10-29 22:52:38,207 - INFO - ¿CUDA disponible?: True
+2025-10-29 22:52:38,233 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-10-29 22:52:38,233 - INFO - Memoria GPU disponible: 17.09 GB
+2025-10-29 22:52:38,233 - INFO - PyTorch version: 2.8.0+cu128
+2025-10-29 22:52:38,234 - INFO - CUDA version: 12.8
+2025-10-29 22:52:38,234 - INFO - Device capability: (12, 0)
+2025-10-29 22:52:38,236 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-10-29 22:52:38,236 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
