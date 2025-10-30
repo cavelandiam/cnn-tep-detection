@@ -16,4 +16,5 @@ torchsummary
 torchviz
 psutil
 hiddenlayer
+ipython
 tqdm
