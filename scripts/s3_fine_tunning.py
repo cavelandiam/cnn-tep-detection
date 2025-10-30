@@ -12,8 +12,8 @@ from sklearn.metrics import confusion_matrix, f1_score
 import polars as pl
 from sklearn.model_selection import train_test_split
 
-from utils import logger, config
-from s3_improved_3dcnn_tep import (
+from utils import logger, config, visualization
+from scripts.s1_improved_3dcnn_tep import (
     RSNADataset, ResNet3D, build_resnet3d_model, initialize_model_weights,
     create_optimizer, create_criterion, create_metrics,
     train_epoch, validate_epoch, save_model_checkpoint,
@@ -60,7 +60,7 @@ def finetune_model():
 
     # Modelo preentrenado
     model = build_resnet3d_model().to(device)
-    pretrained_path = "models/pretrained_rsna_final.pth"
+    pretrained_path = config.RSNA_PRETRAINED_MODEL
     model.load_state_dict(torch.load(pretrained_path, map_location=device))
     logger.info(f"Modelo RSNA cargado desde {pretrained_path}")
 
@@ -78,7 +78,10 @@ def finetune_model():
     metrics = create_metrics(device)
 
     # Entrenamiento
-    history = {k: [] for k in ['loss', 'accuracy', 'auc', 'f1', 'val_loss', 'val_accuracy', 'val_auc', 'val_f1']}
+
+    history = {k: [] for k in ['loss','accuracy','precision','recall','auc','f1','specificity',
+                               'mcc','pr_auc','val_loss','val_accuracy','val_precision','val_recall',
+                               'val_auc','val_f1','val_specificity','val_mcc','val_pr_auc']}
     best_val_auc = 0.0
     patience, no_improve = 5, 0
 
@@ -96,7 +99,7 @@ def finetune_model():
 
         if val_metrics['auc'] > best_val_auc:
             best_val_auc = val_metrics['auc']
-            save_model_checkpoint(model, "models/finetuned_hucsr_best.pth", best_val_auc, epoch+1)
+            save_model_checkpoint(model, config.HUCSR_FINETUNED_MODEL, best_val_auc, epoch+1)
             no_improve = 0
         else:
             no_improve += 1
@@ -104,16 +107,17 @@ def finetune_model():
                 logger.info("Early stopping")
                 break
 
-    # Guardar final
-    torch.save(model.state_dict(), "models/finetuned_hucsr_final.pth")
-    plot_training_curves(history)
-    plt.savefig("visualizations/training_curves_finetune.png", dpi=300, bbox_inches='tight')
+    # Guardar final    
+    torch.save(model.state_dict(), config.HUCSR_FINETUNED_MODEL)
+    logger.info(f"Modelo final guardado: {config.HUCSR_FINETUNED_MODEL}")
 
-    # Matriz de confusión
+    plot_training_curves(history, config.HUCSR_GRAPHS_METRICS_DIR)
+    logger.info(f"Gráficas de métricas guardadas: {config.HUCSR_GRAPHS_METRICS_DIR}")
+
     f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
     logger.info(f"F1 Final: {f1:.4f}, AUC: {best_val_auc:.4f}")
 
-    # Graficar modelo
-    plot_model_architecture(model, "visualizations/model_finetuned_hucsr.png")
+    visualization.plot_model_architecture(model, config.HUCSR_GRAPHS_MODEL_DIR)
+    logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_MODEL_DIR}")
 
     return history, best_val_auc

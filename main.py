@@ -5,9 +5,7 @@ import pydicom
 import torch
 import multiprocessing as mp
 
-#rom scripts import s3_fine_tunning
-#from scripts import s2_load_images_hucsr
-from scripts import s1_improved_3dcnn_tep
+from scripts import s1_improved_3dcnn_tep, s2_load_images_hucsr, s3_fine_tunning
 from utils import logger
 
 # Configuración de TensorFlow para reproducibilidad
@@ -31,7 +29,7 @@ def test_pipeline():
     #s2_load_images_hucsr.load_images_hucsr()
 
 
-    logger.info("PROCESANDO DATOS DE ENTRENAMIENTO HUCSR")
+    logger.info("PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL")
 
     #s3_fine_tunning.finetune_model()
 

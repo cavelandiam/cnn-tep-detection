@@ -36,7 +36,7 @@ class HUCSRConfig:
     # Output
     OUTPUT_DIR = Path(config.HUCSR_PREPROCESSED_DATA_DIR)
     METADATA_CSV = Path(config.HUCSR_CSV_PREPROCESSED_DATA_DIR)
-    VISUALIZATIONS_DIR = Path(config.HUCSR_VISUALIZATIONS_DIR)
+    #VISUALIZATIONS_DIR = Path(config.HUCSR_VISUALIZATIONS_DIR)
     
     # Parámetros de imagen
     IMAGE_SIZE = config.IMAGE_SIZE  # (256, 256)
@@ -468,7 +468,7 @@ class HUCSRPreprocessor:
     def __init__(self):
         self.config = HUCSRConfig()
         self.config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        self.config.VISUALIZATIONS_DIR.mkdir(parents=True, exist_ok=True)
+        #self.config.VISUALIZATIONS_DIR.mkdir(parents=True, exist_ok=True)
         
     def discover_all_patients(self) -> List[PatientData]:
         """Descubre todos los pacientes en HUCSR"""

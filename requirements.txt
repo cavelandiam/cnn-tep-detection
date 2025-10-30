@@ -12,5 +12,7 @@ seaborn
 pyarrow
 monai
 torchmetrics
+torchsummary
+torchviz
 psutil
 tqdm

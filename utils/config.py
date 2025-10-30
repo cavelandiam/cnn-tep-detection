@@ -12,18 +12,25 @@ HUCSR_DATASET_TEP_TRUE_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-
 HUCSR_DATASET_TEP_FALSE_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/hucsr/negative")
 HUCSR_CSV_PREPROCESSED_DATA_DIR = os.path.join(DATA_DIR, "hucsr", "preprocessed_metadata.csv")
 HUCSR_PREPROCESSED_DATA_DIR = os.path.join(DATA_DIR, "hucsr", "preprocessed_data")
-HUCSR_VISUALIZATIONS_DIR = os.path.join(DATA_DIR, "hucsr", "visualizations")
-HUCSR_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "hucsr")
 
 RSNA_DATASET_TRAIN_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/rsna/train")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train.csv")
 RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_metadata.csv")
 RSNA_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_data")
-RSNA_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "rsna")
 
 # 📂 **Rutas de Modelos**
-RSNA_BEST_MODEL_AUC = os.path.join(MODEL_DIR, "best_model_auc.pth")
-RSNA_PRETRAINED_MODEL = os.path.join(MODEL_DIR, "pretrained_rsna_final.pth")
+RSNA_BEST_MODEL_AUC = os.path.join(MODEL_DIR, "rsna_best_model_auc.pth")
+RSNA_PRETRAINED_MODEL = os.path.join(MODEL_DIR, "rsna_pretrained.pth")
+HUCSR_FINETUNED_MODEL = os.path.join(MODEL_DIR, "hucsr_finetuned.pth")
+
+# 📂 **Rutas de Gráficas**
+HUCSR_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "hucsr")
+HUCSR_GRAPHS_METRICS_DIR = os.path.join(HUCSR_GRAPHS_DIR, "metrics")
+HUCSR_GRAPHS_MODEL_NAME = "resnet3d_finetuned"
+RSNA_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "rsna")
+RSNA_GRAPHS_METRICS_DIR = os.path.join(RSNA_GRAPHS_DIR, "metrics")
+RSNA_GRAPHS_MODEL_NAME = "resnet3d_pretrained"
+RSNA_GRAPHS_CONFUSION_MATRIX_DIR = os.path.join(RSNA_GRAPHS_DIR, "rsna_confusion_matrix.png")
 
 # 📌 **Parámetros de Preprocesamiento**
 IMAGE_SIZE = (128, 128) #(224, 224)
