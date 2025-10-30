@@ -23,3 +23,5 @@ torchview
 onnx
 pillow
 netron
+argparse
+opencv-python

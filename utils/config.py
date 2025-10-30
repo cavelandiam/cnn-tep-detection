@@ -6,6 +6,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 GRAPHS_DIR = os.path.join(BASE_DIR, "graphs")
+INFERENCES_DIR = os.path.join(BASE_DIR, "inferences")
 
 # 📂 **Rutas de Datos**
 HUCSR_DATASET_TEP_TRUE_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/hucsr/positive")
@@ -32,6 +33,10 @@ RSNA_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "rsna")
 RSNA_GRAPHS_METRICS_DIR = os.path.join(RSNA_GRAPHS_DIR, "metrics")
 RSNA_GRAPHS_MODEL_NAME = "resnet3d_pretrained"
 RSNA_GRAPHS_CONFUSION_MATRIX_DIR = os.path.join(RSNA_GRAPHS_METRICS_DIR, "rsna_confusion_matrix.png")
+
+# 📂 **Rutas de Inferencias**
+INFERENCE_NEW_PATIENTS_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients")
+INFERENCE_RESULTS_DIR = os.path.join(INFERENCES_DIR, "results")
 
 # 📌 **Parámetros de Preprocesamiento**
 IMAGE_SIZE = (128, 128) #(224, 224)
