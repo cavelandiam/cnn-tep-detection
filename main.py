@@ -5,7 +5,9 @@ import pydicom
 import torch
 import multiprocessing as mp
 
-from scripts import  s2_load_images_hucsr #s1_improved_3dcnn_tep
+#rom scripts import s3_fine_tunning
+#from scripts import s2_load_images_hucsr
+from scripts import s1_improved_3dcnn_tep
 from utils import logger
 
 # Configuración de TensorFlow para reproducibilidad
@@ -20,13 +22,18 @@ def test_pipeline():
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
 
-    # history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
+    history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
 
     # logger.info(f"🎉 PREENTRENAMIENTO RSNA COMPLETADO! MEJOR AUC: {best_auc:.4f}")
 
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO HUCSR")
 
-    s2_load_images_hucsr.load_images_hucsr()
+    #s2_load_images_hucsr.load_images_hucsr()
+
+
+    logger.info("PROCESANDO DATOS DE ENTRENAMIENTO HUCSR")
+
+    #s3_fine_tunning.finetune_model()
 
     #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()

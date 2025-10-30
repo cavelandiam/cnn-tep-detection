@@ -414,21 +414,43 @@ def create_val_transforms() -> Compose:
 # METRICS AND VISUALIZATIONS
 # =============================================================================
 
-def plot_training_curves(history: Dict[str, List[float]]):
-    metrics = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1']
-    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-    for i, metric in enumerate(metrics):
-        ax = axes[i//3, i%3]
-        ax.plot(history[metric], label=f'Train {metric}', color='royalblue', linewidth=2)
-        ax.plot(history[f'val_{metric}'], label=f'Val {metric}', color='orangered', linestyle='--', linewidth=2)
-        ax.set_title(f'{metric.capitalize()}')
-        ax.set_xlabel('Epoch')
-        ax.set_ylabel(metric.capitalize())
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig("models/rsna_training_curves.png", dpi=300, bbox_inches='tight')
-    #plt.show()
+def plot_training_curves(history: Dict[str, List[float]], output_dir: str = "graphs"):
+    metrics_keys = ['loss', 'accuracy', 'precision', 'recall', 'auc', 'f1', 'specificity', 'mcc', 'pr_auc']
+
+    out_path = Path(output_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    logger.info(f"Guardando gráficas de métricas en: {out_path.resolve()}")
+
+    for metric in metrics_keys:
+        train_key = metric
+        val_key = f'val_{metric}'
+        
+        if train_key not in history or val_key not in history:
+            logger.warning(f"Métrica {metric} no encontrada en history. Saltando...")
+            continue
+        
+        train_vals = history[train_key]
+        val_vals = history[val_key]
+        
+        if not train_vals or not val_vals:
+            continue
+        
+        plt.figure(figsize=(10, 6))
+        plt.plot(train_vals, label=f'Train {metric}', color='royalblue', linewidth=2.5)
+        plt.plot(val_vals, label=f'Val {metric}', color='orangered', linestyle='--', linewidth=2.5)
+        
+        plt.title(f'{metric.upper()} vs Epoch', fontsize=16, fontweight='bold')
+        plt.xlabel('Epoch', fontsize=12)
+        plt.ylabel(metric.capitalize(), fontsize=12)
+        plt.legend(fontsize=12)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        
+        # Guardar con nombre de la métrica
+        save_path = out_path / f"{metric}.png"
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.close()
 
 def calculate_confusion_matrix(val_df: pl.DataFrame, model: nn.Module, val_loader: DataLoader, device: torch.device):
     model.eval()
@@ -964,7 +986,7 @@ def pretrain_model():
     logger.info(f"💾 Modelo final guardado: {final_model_path}")
     
     logger.info("📊 Generando visualizaciones...")
-    plot_training_curves(history)
+    plot_training_curves(history, config.RSNA_GRAPHS_DIR)
     final_f1 = calculate_confusion_matrix(val_df, model, val_loader, device)
     
     final_train_auc = history['auc'][-1]

@@ -5,6 +5,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
+GRAPHS_DIR = os.path.join(BASE_DIR, "graphs")
 
 # 📂 **Rutas de Datos**
 HUCSR_DATASET_TEP_TRUE_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/hucsr/positive")
@@ -12,11 +13,13 @@ HUCSR_DATASET_TEP_FALSE_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep
 HUCSR_CSV_PREPROCESSED_DATA_DIR = os.path.join(DATA_DIR, "hucsr", "preprocessed_metadata.csv")
 HUCSR_PREPROCESSED_DATA_DIR = os.path.join(DATA_DIR, "hucsr", "preprocessed_data")
 HUCSR_VISUALIZATIONS_DIR = os.path.join(DATA_DIR, "hucsr", "visualizations")
+HUCSR_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "hucsr")
 
 RSNA_DATASET_TRAIN_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/data/rsna/train")
 RSNA_CSV_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "train.csv")
 RSNA_CSV_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_metadata.csv")
 RSNA_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_data")
+RSNA_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "rsna")
 
 # 📂 **Rutas de Modelos**
 RSNA_BEST_MODEL_AUC = os.path.join(MODEL_DIR, "best_model_auc.pth")
