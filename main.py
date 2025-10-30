@@ -20,7 +20,7 @@ def test_pipeline():
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
 
-    history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
+    #history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
 
     # logger.info(f"🎉 PREENTRENAMIENTO RSNA COMPLETADO! MEJOR AUC: {best_auc:.4f}")
 
@@ -31,7 +31,7 @@ def test_pipeline():
 
     logger.info("PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL")
 
-    #s3_fine_tunning.finetune_model()
+    s3_fine_tunning.finetune_model()
 
     #print("Calcular target depth HUCSR...")
     #calculate_target_depth.calculate()

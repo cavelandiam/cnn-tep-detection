@@ -74,7 +74,7 @@ def finetune_model():
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4)
     class_weights = torch.tensor([1.0, 3.0], device=device)  # Ajustar si imbalance
     criterion = nn.BCEWithLogitsLoss(pos_weight=class_weights[1])
-    scaler = GradScaler() if device.type == 'cuda' else None
+    scaler = torch.amp.GradScaler('cuda') if device.type == 'cuda' else None
     metrics = create_metrics(device)
 
     # Entrenamiento
@@ -85,8 +85,8 @@ def finetune_model():
     best_val_auc = 0.0
     patience, no_improve = 5, 0
 
-    for epoch in range(20):
-        logger.info(f"\n--- ÉPOCA {epoch+1}/20 ---")
+    for epoch in range(config.EPOCHS):
+        logger.info(f"\n--- ÉPOCA {epoch+1}/{config.EPOCHS} ---")
         train_metrics = train_epoch(model, train_loader, optimizer, criterion, None, device, metrics, epoch+1, scaler)
         val_metrics = validate_epoch(model, val_loader, criterion, device, metrics)
 
@@ -119,10 +119,10 @@ def finetune_model():
 
     visualization.plot_model_architecture(
         model=model,
-        save_dir=config.HUCSR_GRAPHS_METRICS_DIR,
+        save_dir=config.HUCSR_GRAPHS_DIR,
         model_name= config.HUCSR_GRAPHS_MODEL_NAME,
         input_size=(1, config.TARGET_DEPTH, *config.IMAGE_SIZE)
     )
-    logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_METRICS_DIR}")
+    logger.info(f"Arquitectura del modelo guardada en {config.HUCSR_GRAPHS_DIR}")
 
     return history, best_val_auc
