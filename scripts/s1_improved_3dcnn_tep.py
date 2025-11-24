@@ -934,9 +934,9 @@ def pretrain_model():
         'val_specificity': [], 'val_mcc': [], 'val_pr_auc': []
     }
     
-    best_val_auc = 0.0
-    patience = 5
-    no_improve_count = 0
+    best_val_auc = 0.0    
+    no_improve_lr = 0
+    no_improve_es = 0
     
     logger.info(f"🎯 Iniciando entrenamiento para {config.EPOCHS} épocas...")
     log_gpu_memory()
@@ -956,18 +956,20 @@ def pretrain_model():
         if current_val_auc > best_val_auc:
             best_val_auc = current_val_auc
             save_model_checkpoint(model, config.RSNA_BEST_MODEL_AUC, best_val_auc, epoch+1)
-            no_improve_count = 0
+            no_improve_lr = 0  # Resetea ambos contadores
+            no_improve_es = 0
             logger.info(f"🌟 NUEVO MEJOR MODELO: AUC = {best_val_auc:.4f}")
         else:
-            no_improve_count += 1
+            no_improve_lr += 1
+            no_improve_es += 1
         
-        if no_improve_count >= patience:
+        if no_improve_lr >= config.PATIENCE_LEARNING_RATE:
             for g in optimizer.param_groups:
                 g['lr'] *= 0.5
                 logger.info(f"📉 LR reducido a {g['lr']:.6f}")
-            no_improve_count = 0
+            no_improve_lr = 0
         
-        if no_improve_count >= 10:
+        if no_improve_es >= config.PATIENCE_EARLY_STOPPING:
             logger.info(f"🛑 Early stopping en época {epoch+1}")
             break
 
