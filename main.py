@@ -5,7 +5,7 @@ import pydicom
 import torch
 import multiprocessing as mp
 
-from scripts import s1_improved_3dcnn_tep, s2_load_images_hucsr, s3_fine_tunning, s4_inference_tep
+from scripts import s1_improved_3dcnn_tep_copy1, s2_load_images_hucsr, s3_fine_tunning, s4_inference_tep
 from utils import logger, config
 
 def test_pipeline():
@@ -13,7 +13,7 @@ def test_pipeline():
     logger.info("INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION")
     logger.info("PROCESANDO DATOS DE ENTRENAMIENTO RSNA")
 
-    history, best_auc = s1_improved_3dcnn_tep.pretrain_model()
+    history, best_auc = s1_improved_3dcnn_tep_copy1.pretrain_model()
 
     # logger.info(f"🎉 PREENTRENAMIENTO RSNA COMPLETADO! MEJOR AUC: {best_auc:.4f}")
 
