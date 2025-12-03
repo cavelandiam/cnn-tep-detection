@@ -1,12 +1,12 @@
 {
   "patient_id": "TTEP86872473",
   "series_id": "TTEP86872473_0.834417",
-  "timestamp": "2025-12-03 11:28:41",
-  "prediction": "NEGATIVO",
+  "timestamp": "2025-12-03 18:19:55",
+  "prediction": "POSITIVO",
   "true_label": "POSITIVO",
-  "correct": false,
-  "probability": 0.2086181640625,
-  "logit": -1.3330078125,
+  "correct": true,
+  "probability": 0.76318359375,
+  "logit": 1.1708984375,
   "threshold": 0.5,
   "volume_stats": {
     "mean": 0.6025742888450623,

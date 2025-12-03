@@ -36,21 +36,20 @@ RSNA_GRAPHS_CONFUSION_MATRIX_DIR = os.path.join(RSNA_GRAPHS_METRICS_DIR, "rsna_c
 
 # 📂 **Rutas de Inferencias**
 INFERENCE_NEW_PATIENTS_DIR = os.path.join("/mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients")
-INFERENCE_RESULTS_DIR = os.path.join(INFERENCES_DIR, "results")
 
 # 📌 **Parámetros de Preprocesamiento**
-IMAGE_SIZE = (192, 192) #(224, 224)
-TARGET_DEPTH = 94 #128 #512
+IMAGE_SIZE = (192, 192)
+TARGET_DEPTH = 94
 
 # 📌 **Hiperparámetros del Modelo**
 BATCH_SIZE = 2
 LEARNING_RATE = 1e-4
+WEIGHT_DECAY = 1e-3
 NUM_WORKERS = PREFETCH_FACTOR = 4
+EPOCHS = 20
+PATIENCE_EARLY_STOPPING = 10
 GRADIENT_ACCUMULATION_STEPS = 8
 NUM_PROCESSES = 25
-EPOCHS = 20
-PATIENCE_LEARNING_RATE = 10
-PATIENCE_EARLY_STOPPING = PATIENCE_LEARNING_RATE * 3
 
 
 # 📌 **Constantes**

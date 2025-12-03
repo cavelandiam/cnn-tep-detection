@@ -1,8 +1,0 @@
-{
-  "patient_id": "TTEP86872473",
-  "tep_prediction": "NEGATIVO",
-  "tep_probability": 0.0,
-  "threshold": 0.5,
-  "total_slices_processed": 3246,
-  "model_auc": 0.6779
-}

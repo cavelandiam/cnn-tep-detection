@@ -73,8 +73,8 @@ def init_logger(name: str, log_dir: str = "logs", metrics_file: str = "log_metri
     warnings.filterwarnings('ignore', category=UserWarning, message='.*Invalid value for VR UI.*')
 
     # Mensaje de inicio
-    info(f"✅ Logger inicializado: {_log_file}")
-    info(f"✅ Registro de métricas inicializado: {_metrics_file}")
+    info(f"Logger inicializado: {_log_file}")
+    info(f"Registro de métricas inicializado: {_metrics_file}")
 
 def _get_logger():
     """Devuelve el logger actual. Crea uno dummy si no se inicializó."""
