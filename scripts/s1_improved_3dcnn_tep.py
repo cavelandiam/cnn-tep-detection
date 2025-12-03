@@ -87,7 +87,7 @@ def process_dicom_image(ds: pydicom.FileDataset) -> Optional[np.ndarray]:
         except (ValueError, TypeError):
             pass
     
-    window_center, window_width = -600, 1600 if ds.Modality == 'CT' else (40, 400)
+    window_center, window_width = 200, 700  # Windowing para contraste vascular (TEP)
     img_min = window_center - window_width // 2
     img_max = window_center + window_width // 2
     img = np.clip(img, img_min, img_max)
@@ -798,6 +798,32 @@ def pretrain_model():
     )
     if len(missing_npy) > 0:
         logger.warning(f"⚠️ {len(missing_npy)} estudios sin archivos .npy preprocesados")
+
+
+    # === BALANCEO 1:1 DE CLASES (POSITIVOS = NEGATIVOS) ===
+    logger.info("1.1. Aplicando balanceo 1:1 de clases (undersampling de negativos)...")
+    # Separar positivos y negativos
+    positive_df = studies_df.filter(pl.col("label") == 1)
+    negative_df = studies_df.filter(pl.col("label") == 0)
+
+    num_positives = len(positive_df)
+    num_negatives = len(negative_df)
+
+    logger.info(f"Antes del balanceo → Positivos: {num_positives}, Negativos: {num_negatives}")
+
+    # Undersampling de negativos: tomar solo tantos como positivos
+    negative_df_balanced = negative_df.sample(n=num_positives, seed=SEED, shuffle=True)
+
+    # Unir de nuevo
+    studies_df_balanced = pl.concat([positive_df, negative_df_balanced]).sort("StudyInstanceUID")
+
+    logger.info(f"Después del balanceo → Total estudios: {len(studies_df_balanced)} "
+                f"(Positivos: {len(positive_df)}, Negativos: {num_positives}) → Ratio 1:1")
+
+    # Reemplazar studies_df por la versión balanceada
+    studies_df = studies_df_balanced
+
+    logger.info("Balanceo 1:1 completado. Continuando con división train/val...")
 
 
 

@@ -43,8 +43,8 @@ class HUCSRConfig:
     TARGET_DEPTH = config.TARGET_DEPTH  # 64
     
     # Ventana Hounsfield para angiotacs (ajustado para TEP)
-    WINDOW_CENTER = -600
-    WINDOW_WIDTH = 1600
+    WINDOW_CENTER = 200
+    WINDOW_WIDTH = 700
     
     # Procesamiento paralelo
     MAX_WORKERS = 4

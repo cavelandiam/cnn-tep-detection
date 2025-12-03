@@ -1,0 +1,8 @@
+{
+  "patient_id": "111111111",
+  "tep_prediction": "NEGATIVO",
+  "tep_probability": 0.0,
+  "threshold": 0.5,
+  "total_slices_processed": 1468,
+  "model_auc": 0.6779
+}

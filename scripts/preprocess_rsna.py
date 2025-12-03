@@ -35,18 +35,20 @@ from utils import logger, config
 # =============================================================================
 
 def adaptive_windowing(img: np.ndarray, ds: pydicom.FileDataset) -> np.ndarray:
-    """Ventana Hounsfield adaptativa optimizada para angiotacs pulmonares"""
-    window_center = -600
-    window_width = 1600
+    """Ventana Hounsfield CORRECTA para PE detection"""
     
-    # Ajustar según características del scanner
+    # VALORES CORRECTOS
+    window_center = 200
+    window_width = 700
+    
+    # Ajustes según scanner (mantener)
     if hasattr(ds, 'KVP'):
         try:
             kvp = float(ds.KVP)
             if kvp < 100:
-                window_width = 1800
+                window_width = 800
             elif kvp > 140:
-                window_width = 1400
+                window_width = 600
         except (ValueError, TypeError):
             pass
     

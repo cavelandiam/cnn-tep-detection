@@ -1,0 +1,29 @@
+{
+  "patient_id": "TTEP86872473",
+  "timestamp": "2025-12-02 21:15:01",
+  "prediction": "NEGATIVO",
+  "probability": 0.0,
+  "logit": -19.28125,
+  "threshold": 0.5,
+  "preprocessing": {
+    "window_center": 200,
+    "window_width": 700,
+    "volume_mean": 0.1501004695892334,
+    "volume_std": 0.20705723762512207,
+    "train_mean": 0.6026,
+    "train_std": 0.2959,
+    "diff_mean": 0.45249950885772705,
+    "status": "incorrect"
+  },
+  "model": {
+    "architecture": "r3d_18",
+    "fold": 3,
+    "auc": 0.6779
+  },
+  "comparison": {
+    "previous_logit": -23.95,
+    "previous_prob": 0.0,
+    "previous_pred": "NEGATIVO",
+    "improved": false
+  }
+}

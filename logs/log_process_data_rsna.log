@@ -1,0 +1,2181 @@
+2025-12-01 23:49:07,956 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:49:07,956 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:49:07,956 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:49:08,061 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:49:08,062 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:49:08,089 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:49:08,090 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:49:08,090 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:49:08,090 - INFO - CUDA version: 12.8
+2025-12-01 23:49:08,090 - INFO - Device capability: (12, 0)
+2025-12-01 23:49:08,093 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:49:08,093 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:49:08,093 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:49:08,093 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:49:08,094 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:49:08,094 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:49:08,094 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:49:08,094 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:49:08,094 - INFO - CUDA version: 12.8
+2025-12-01 23:49:08,094 - INFO - Device capability: (12, 0)
+2025-12-01 23:49:34,572 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:49:34,572 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:49:34,572 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:49:34,648 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:49:34,648 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:49:34,674 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:49:34,674 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:49:34,674 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:49:34,674 - INFO - CUDA version: 12.8
+2025-12-01 23:49:34,674 - INFO - Device capability: (12, 0)
+2025-12-01 23:49:34,677 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:49:34,677 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:49:34,677 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:49:34,678 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:49:34,678 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:49:34,678 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:49:34,678 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:49:34,678 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:49:34,678 - INFO - CUDA version: 12.8
+2025-12-01 23:49:34,678 - INFO - Device capability: (12, 0)
+2025-12-01 23:49:34,679 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-01 23:49:34,679 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-01 23:49:34,679 - INFO - === INICIANDO ENTRENAMIENTO RSNA-PE 3D-CNN (VÁLIDO) ===
+2025-12-01 23:49:34,679 - INFO - ✅ Arquitectura GPU sm_12.0 compatible con PyTorch 2.8.0+cu128
+2025-12-01 23:49:35,133 - INFO - ✅ Memoria GPU limpiada
+2025-12-01 23:49:35,133 - INFO - 1. Preprocesando datos DICOM...
+2025-12-01 23:49:35,171 - INFO - Estudios cargados: 7279
+2025-12-01 23:49:35,171 - INFO - 1.1. Aplicando balanceo 1:1 de clases (undersampling de negativos)...
+2025-12-01 23:49:35,189 - INFO - Antes del balanceo → Positivos: 2368, Negativos: 4911
+2025-12-01 23:49:35,194 - INFO - Balanceado → Total: 7279 (Pos: 2368, Neg: 2368) → Ratio 1:1
+2025-12-01 23:49:35,194 - INFO - 2. Dividiendo datos...
+2025-12-01 23:49:35,218 - INFO - Train: 3788, Val: 948
+2025-12-01 23:49:35,218 - INFO - 3. Calculando pesos de clase...
+2025-12-01 23:49:35,221 - INFO - Clases balanceadas → pos_weight = 1.0
+2025-12-01 23:49:35,221 - INFO - 4. Creando datasets...
+2025-12-01 23:49:35,223 - INFO - Tamaño de train_dataset: 3788
+2025-12-01 23:49:35,224 - INFO - Tamaño de val_dataset: 948
+2025-12-01 23:49:35,224 - INFO - Esperado número de lotes: train=1894, val=474
+2025-12-01 23:49:35,355 - INFO - ✅ Memoria GPU limpiada
+2025-12-01 23:49:35,355 - INFO - 5. Creando modelo ResNet3D optimizado...
+2025-12-01 23:49:35,356 - INFO - Creando Video ResNet-34 3D (oficial torchvision) preentrenado en Kinetics-400...
+2025-12-01 23:49:35,725 - INFO - Modelo 3D cargado → Total params: 33,147,969 | Trainable: 33,147,969
+2025-12-01 23:49:35,731 - INFO - Gradient accumulation: 8 pasos → batch efectivo = 16
+2025-12-01 23:50:25,730 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:50:25,730 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:50:25,730 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:50:25,811 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:50:25,811 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:50:25,837 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:50:25,837 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:50:25,837 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:50:25,837 - INFO - CUDA version: 12.8
+2025-12-01 23:50:25,838 - INFO - Device capability: (12, 0)
+2025-12-01 23:50:25,840 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:50:25,840 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:50:25,840 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:50:25,840 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:50:25,840 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:50:25,840 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:50:25,840 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:50:25,840 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:50:25,840 - INFO - CUDA version: 12.8
+2025-12-01 23:50:25,840 - INFO - Device capability: (12, 0)
+2025-12-01 23:50:25,841 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-01 23:50:25,841 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-01 23:50:25,841 - INFO - === INICIANDO ENTRENAMIENTO RSNA-PE 3D-CNN (VÁLIDO) ===
+2025-12-01 23:50:25,841 - INFO - ✅ Arquitectura GPU sm_12.0 compatible con PyTorch 2.8.0+cu128
+2025-12-01 23:50:26,091 - INFO - ✅ Memoria GPU limpiada
+2025-12-01 23:50:26,092 - INFO - 1. Preprocesando datos DICOM...
+2025-12-01 23:50:26,114 - INFO - Estudios cargados: 7279
+2025-12-01 23:50:26,114 - INFO - 1.1. Aplicando balanceo 1:1 de clases (undersampling de negativos)...
+2025-12-01 23:50:26,126 - INFO - Antes del balanceo → Positivos: 2368, Negativos: 4911
+2025-12-01 23:50:26,129 - INFO - Balanceado → Total: 7279 (Pos: 2368, Neg: 2368) → Ratio 1:1
+2025-12-01 23:50:26,129 - INFO - 2. Dividiendo datos...
+2025-12-01 23:50:26,141 - INFO - Train: 3788, Val: 948
+2025-12-01 23:50:26,141 - INFO - 3. Calculando pesos de clase...
+2025-12-01 23:50:26,146 - INFO - Clases balanceadas → pos_weight = 1.0
+2025-12-01 23:50:26,146 - INFO - 4. Creando datasets...
+2025-12-01 23:50:26,148 - INFO - Tamaño de train_dataset: 3788
+2025-12-01 23:50:26,148 - INFO - Tamaño de val_dataset: 948
+2025-12-01 23:50:26,148 - INFO - Esperado número de lotes: train=1894, val=474
+2025-12-01 23:50:26,277 - INFO - ✅ Memoria GPU limpiada
+2025-12-01 23:50:26,277 - INFO - 5. Creando modelo ResNet3D optimizado...
+2025-12-01 23:50:26,277 - INFO - Creando Video ResNet-34 3D (oficial torchvision) preentrenado en Kinetics-400...
+2025-12-01 23:50:26,604 - INFO - Modelo 3D cargado → Total params: 33,147,969 | Trainable: 33,147,969
+2025-12-01 23:50:26,607 - INFO - Gradient accumulation: 8 pasos → batch efectivo = 16
+2025-12-01 23:50:28,229 - INFO - ✅ Resumen generado con torchinfo
+2025-12-01 23:50:28,229 - INFO - ✅ Resumen guardado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/summary.txt
+2025-12-01 23:50:28,254 - INFO - Intentando generar grafo con torchview...
+2025-12-01 23:50:28,593 - INFO - ✅ Grafo 3D generado con torchview: graph.png y graph.svg
+2025-12-01 23:50:28,594 - INFO - 📄 Reporte HTML generado: /home/cavm/cnn-tep-detection/graphs/rsna/resnet3d_pretrained/report.html
+2025-12-01 23:50:28,594 - INFO - 6. Configurando entrenamiento...
+2025-12-01 23:50:28,594 - INFO - 🎯 Iniciando entrenamiento para 20 épocas...
+2025-12-01 23:50:28,594 - INFO - GPU Memory - Allocated: 0.17GB, Reserved: 1.54GB, Max: 9.85GB
+2025-12-01 23:50:28,594 - INFO - 
+--- ÉPOCA 1/20 ---
+2025-12-01 23:53:45,375 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:53:45,375 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:53:45,375 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:53:45,461 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:53:45,461 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:53:45,489 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:53:45,489 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:53:45,490 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:53:45,490 - INFO - CUDA version: 12.8
+2025-12-01 23:53:45,490 - INFO - Device capability: (12, 0)
+2025-12-01 23:53:45,492 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:53:45,492 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:53:45,492 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:53:45,493 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:53:45,493 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:53:45,493 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:53:45,493 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:53:45,493 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:53:45,493 - INFO - CUDA version: 12.8
+2025-12-01 23:53:45,493 - INFO - Device capability: (12, 0)
+2025-12-01 23:53:45,493 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-01 23:53:45,494 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-01 23:53:45,494 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-01 23:53:45,494 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-01 23:57:31,412 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:57:31,412 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:57:31,412 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:57:31,495 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:57:31,496 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:57:31,524 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:57:31,524 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:57:31,525 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:57:31,525 - INFO - CUDA version: 12.8
+2025-12-01 23:57:31,525 - INFO - Device capability: (12, 0)
+2025-12-01 23:58:11,925 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:58:11,925 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:58:11,925 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:58:12,000 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:58:12,000 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:58:12,026 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:58:12,026 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:58:12,026 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:58:12,026 - INFO - CUDA version: 12.8
+2025-12-01 23:58:12,026 - INFO - Device capability: (12, 0)
+2025-12-01 23:58:12,030 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-01 23:58:12,031 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-01 23:58:12,031 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-01 23:58:12,031 - INFO - Usando dispositivo: cuda:0
+2025-12-01 23:58:12,031 - INFO - ¿CUDA disponible?: True
+2025-12-01 23:58:12,031 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-01 23:58:12,031 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-01 23:58:12,031 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-01 23:58:12,031 - INFO - CUDA version: 12.8
+2025-12-01 23:58:12,031 - INFO - Device capability: (12, 0)
+2025-12-01 23:58:12,031 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-01 23:58:12,031 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-01 23:58:12,031 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-01 23:58:12,032 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:02:17,577 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:02:17,577 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:02:17,578 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:02:17,661 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:02:17,661 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:02:17,691 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:02:17,691 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:02:17,691 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:02:17,691 - INFO - CUDA version: 12.8
+2025-12-02 00:02:17,691 - INFO - Device capability: (12, 0)
+2025-12-02 00:02:17,696 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:02:17,696 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:02:17,696 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:02:17,696 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:02:17,696 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:02:17,696 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:02:17,696 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:02:17,696 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:02:17,696 - INFO - CUDA version: 12.8
+2025-12-02 00:02:17,696 - INFO - Device capability: (12, 0)
+2025-12-02 00:02:17,697 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:02:17,697 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:02:17,697 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:02:17,697 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:05:49,194 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:05:49,195 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:05:49,195 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:05:49,278 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:05:49,278 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:05:49,306 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:05:49,306 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:05:49,306 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:05:49,306 - INFO - CUDA version: 12.8
+2025-12-02 00:05:49,306 - INFO - Device capability: (12, 0)
+2025-12-02 00:05:49,312 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:05:49,312 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:05:49,313 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:05:49,313 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:05:49,313 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:05:49,313 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:05:49,313 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:05:49,313 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:05:49,313 - INFO - CUDA version: 12.8
+2025-12-02 00:05:49,313 - INFO - Device capability: (12, 0)
+2025-12-02 00:05:49,313 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:05:49,313 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:05:49,314 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:05:49,314 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:07:12,049 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:07:12,049 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:07:12,049 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:07:12,131 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:07:12,131 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:07:12,159 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:07:12,159 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:07:12,159 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:07:12,159 - INFO - CUDA version: 12.8
+2025-12-02 00:07:12,159 - INFO - Device capability: (12, 0)
+2025-12-02 00:07:12,165 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:07:12,166 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:07:12,166 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:07:12,166 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:07:12,166 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:07:12,166 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:07:12,166 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:07:12,166 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:07:12,166 - INFO - CUDA version: 12.8
+2025-12-02 00:07:12,166 - INFO - Device capability: (12, 0)
+2025-12-02 00:07:12,166 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:07:12,167 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:07:12,167 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:07:12,167 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:14:31,242 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:14:31,243 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:14:31,243 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:14:31,320 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:14:31,320 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:14:31,345 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:14:31,345 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:14:31,345 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:14:31,346 - INFO - CUDA version: 12.8
+2025-12-02 00:14:31,346 - INFO - Device capability: (12, 0)
+2025-12-02 00:14:31,350 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:14:31,350 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:14:31,350 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:14:31,350 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:14:31,350 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:14:31,350 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:14:31,350 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:14:31,350 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:14:31,350 - INFO - CUDA version: 12.8
+2025-12-02 00:14:31,350 - INFO - Device capability: (12, 0)
+2025-12-02 00:14:31,351 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:14:31,351 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:14:31,351 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:14:31,351 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:14:49,740 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:14:49,740 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:14:49,740 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:14:49,817 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:14:49,817 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:14:49,844 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:14:49,844 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:14:49,844 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:14:49,845 - INFO - CUDA version: 12.8
+2025-12-02 00:14:49,845 - INFO - Device capability: (12, 0)
+2025-12-02 00:14:49,848 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:14:49,848 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:14:49,848 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:14:49,848 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:14:49,848 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:14:49,848 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:14:49,848 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:14:49,848 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:14:49,849 - INFO - CUDA version: 12.8
+2025-12-02 00:14:49,849 - INFO - Device capability: (12, 0)
+2025-12-02 00:14:49,849 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:14:49,849 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:14:49,849 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:14:49,849 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:15:23,493 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:15:23,493 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:15:23,493 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:15:23,569 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:15:23,569 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:15:23,594 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:15:23,595 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:15:23,595 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:15:23,595 - INFO - CUDA version: 12.8
+2025-12-02 00:15:23,595 - INFO - Device capability: (12, 0)
+2025-12-02 00:15:23,598 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:15:23,598 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:15:23,598 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:15:23,598 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:15:23,598 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:15:23,599 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:15:23,599 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:15:23,599 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:15:23,599 - INFO - CUDA version: 12.8
+2025-12-02 00:15:23,599 - INFO - Device capability: (12, 0)
+2025-12-02 00:15:23,599 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:15:23,599 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:15:23,599 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:15:23,599 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:24:10,251 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:24:10,251 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:24:10,252 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:24:10,345 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:24:10,345 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:24:10,373 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:24:10,373 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:24:10,373 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:24:10,373 - INFO - CUDA version: 12.8
+2025-12-02 00:24:10,373 - INFO - Device capability: (12, 0)
+2025-12-02 00:24:10,377 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:24:10,377 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:24:10,377 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:24:10,377 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:24:10,377 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:24:10,377 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:24:10,378 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:24:10,378 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:24:10,378 - INFO - CUDA version: 12.8
+2025-12-02 00:24:10,378 - INFO - Device capability: (12, 0)
+2025-12-02 00:24:10,378 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:24:10,378 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:24:10,378 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:24:10,378 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:25:11,409 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:25:11,409 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:25:11,409 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:25:11,499 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:25:11,499 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:25:11,527 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:25:11,528 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:25:11,528 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:25:11,528 - INFO - CUDA version: 12.8
+2025-12-02 00:25:11,528 - INFO - Device capability: (12, 0)
+2025-12-02 00:25:11,531 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:25:11,531 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:25:11,531 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:25:11,531 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:25:11,531 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:25:11,531 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:25:11,532 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:25:11,532 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:25:11,532 - INFO - CUDA version: 12.8
+2025-12-02 00:25:11,532 - INFO - Device capability: (12, 0)
+2025-12-02 00:25:11,532 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:25:11,532 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:25:11,532 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:25:11,532 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 00:25:49,869 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:25:49,869 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:25:49,869 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:25:49,955 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:25:49,955 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:25:49,981 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:25:49,981 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:25:49,982 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:25:49,982 - INFO - CUDA version: 12.8
+2025-12-02 00:25:49,982 - INFO - Device capability: (12, 0)
+2025-12-02 00:25:49,985 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 00:25:49,985 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 00:25:49,985 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 00:25:49,985 - INFO - Usando dispositivo: cuda:0
+2025-12-02 00:25:49,985 - INFO - ¿CUDA disponible?: True
+2025-12-02 00:25:49,985 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 00:25:49,985 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 00:25:49,986 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 00:25:49,986 - INFO - CUDA version: 12.8
+2025-12-02 00:25:49,986 - INFO - Device capability: (12, 0)
+2025-12-02 00:25:49,986 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 00:25:49,986 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 00:25:49,986 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 00:25:49,986 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 12:05:17,503 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 12:05:17,503 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 12:05:17,503 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 12:05:17,596 - INFO - Usando dispositivo: cuda:0
+2025-12-02 12:05:17,596 - INFO - ¿CUDA disponible?: True
+2025-12-02 12:05:17,630 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 12:05:17,630 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 12:05:17,630 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 12:05:17,630 - INFO - CUDA version: 12.8
+2025-12-02 12:05:17,630 - INFO - Device capability: (12, 0)
+2025-12-02 12:05:17,634 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 12:05:17,635 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 12:05:17,635 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 12:05:17,635 - INFO - Usando dispositivo: cuda:0
+2025-12-02 12:05:17,635 - INFO - ¿CUDA disponible?: True
+2025-12-02 12:05:17,635 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 12:05:17,635 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 12:05:17,635 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 12:05:17,635 - INFO - CUDA version: 12.8
+2025-12-02 12:05:17,635 - INFO - Device capability: (12, 0)
+2025-12-02 12:05:17,636 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 12:05:17,636 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 12:05:17,636 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 12:05:17,636 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 12:08:15,861 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 12:08:15,861 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 12:08:15,861 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 12:08:15,942 - INFO - Usando dispositivo: cuda:0
+2025-12-02 12:08:15,943 - INFO - ¿CUDA disponible?: True
+2025-12-02 12:08:15,964 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 12:08:15,964 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 12:08:15,964 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 12:08:15,965 - INFO - CUDA version: 12.8
+2025-12-02 12:08:15,965 - INFO - Device capability: (12, 0)
+2025-12-02 12:08:15,967 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 12:08:15,968 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 12:08:15,968 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 12:08:15,968 - INFO - Usando dispositivo: cuda:0
+2025-12-02 12:08:15,968 - INFO - ¿CUDA disponible?: True
+2025-12-02 12:08:15,968 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 12:08:15,968 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 12:08:15,968 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 12:08:15,968 - INFO - CUDA version: 12.8
+2025-12-02 12:08:15,968 - INFO - Device capability: (12, 0)
+2025-12-02 12:08:15,968 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 12:08:15,969 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 12:08:15,969 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 12:08:15,969 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 16:48:19,073 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:48:19,073 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:48:19,073 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:48:19,167 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:48:19,167 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:48:19,198 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:48:19,199 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:48:19,199 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:48:19,199 - INFO - CUDA version: 12.8
+2025-12-02 16:48:19,199 - INFO - Device capability: (12, 0)
+2025-12-02 16:48:19,203 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:48:19,203 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:48:19,203 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:48:19,203 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:48:19,203 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:48:19,203 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:48:19,203 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:48:19,203 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:48:19,203 - INFO - CUDA version: 12.8
+2025-12-02 16:48:19,203 - INFO - Device capability: (12, 0)
+2025-12-02 16:49:59,810 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:49:59,810 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:49:59,810 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:49:59,892 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:49:59,893 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:49:59,921 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:49:59,921 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:49:59,921 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:49:59,921 - INFO - CUDA version: 12.8
+2025-12-02 16:49:59,921 - INFO - Device capability: (12, 0)
+2025-12-02 16:49:59,925 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:49:59,925 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:49:59,925 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:49:59,926 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:49:59,926 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:49:59,926 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:49:59,926 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:49:59,926 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:49:59,926 - INFO - CUDA version: 12.8
+2025-12-02 16:49:59,926 - INFO - Device capability: (12, 0)
+2025-12-02 16:51:08,938 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:51:08,938 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:51:08,938 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:51:09,019 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:51:09,019 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:51:09,050 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:51:09,051 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:51:09,051 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:51:09,051 - INFO - CUDA version: 12.8
+2025-12-02 16:51:09,051 - INFO - Device capability: (12, 0)
+2025-12-02 16:51:09,056 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:51:09,056 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:51:09,056 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:51:09,056 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:51:09,056 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:51:09,057 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:51:09,057 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:51:09,057 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:51:09,057 - INFO - CUDA version: 12.8
+2025-12-02 16:51:09,057 - INFO - Device capability: (12, 0)
+2025-12-02 16:51:09,059 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:51:09,059 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 16:51:09,059 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 16:51:09,059 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 16:51:09,059 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 16:51:09,059 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 16:51:09,060 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 16:52:34,422 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:52:34,422 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:52:34,422 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:52:34,505 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:52:34,505 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:52:34,534 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:52:34,535 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:52:34,535 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:52:34,535 - INFO - CUDA version: 12.8
+2025-12-02 16:52:34,535 - INFO - Device capability: (12, 0)
+2025-12-02 16:52:34,539 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:52:34,539 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:52:34,539 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:52:34,539 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:52:34,540 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:52:34,540 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:52:34,540 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:52:34,540 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:52:34,540 - INFO - CUDA version: 12.8
+2025-12-02 16:52:34,540 - INFO - Device capability: (12, 0)
+2025-12-02 16:52:34,542 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:52:34,542 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 16:52:34,542 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 16:52:34,542 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 16:52:34,542 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 16:52:34,542 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 16:52:34,543 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 16:52:58,003 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:52:58,003 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:52:58,003 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:52:58,084 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:52:58,085 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:52:58,112 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:52:58,112 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:52:58,112 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:52:58,112 - INFO - CUDA version: 12.8
+2025-12-02 16:52:58,112 - INFO - Device capability: (12, 0)
+2025-12-02 16:52:58,114 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:52:58,114 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:52:58,114 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:52:58,114 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:52:58,114 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:52:58,115 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:52:58,115 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:52:58,115 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:52:58,115 - INFO - CUDA version: 12.8
+2025-12-02 16:52:58,115 - INFO - Device capability: (12, 0)
+2025-12-02 16:52:58,117 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:52:58,117 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 16:52:58,117 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 16:52:58,117 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 16:52:58,117 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 16:52:58,117 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 16:52:58,117 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 16:52:59,220 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 16:52:59,240 - ERROR - No se encontraron archivos DICOM en /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 16:52:59,240 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:52:59,240 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 16:55:26,718 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:55:26,718 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:55:26,719 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:55:26,804 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:55:26,805 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:55:26,834 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:55:26,835 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:55:26,835 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:55:26,835 - INFO - CUDA version: 12.8
+2025-12-02 16:55:26,835 - INFO - Device capability: (12, 0)
+2025-12-02 16:55:26,854 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 16:55:26,854 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 16:55:26,854 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 16:55:26,854 - INFO - Usando dispositivo: cuda:0
+2025-12-02 16:55:26,854 - INFO - ¿CUDA disponible?: True
+2025-12-02 16:55:26,854 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 16:55:26,855 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 16:55:26,855 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 16:55:26,855 - INFO - CUDA version: 12.8
+2025-12-02 16:55:26,855 - INFO - Device capability: (12, 0)
+2025-12-02 16:55:26,856 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:55:26,856 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 16:55:26,856 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 16:55:26,857 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 16:55:26,857 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 16:55:26,857 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 16:55:26,857 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 16:55:29,010 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 16:55:29,026 - ERROR - No se encontraron archivos DICOM en /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 16:55:29,026 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 16:55:29,026 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:08:31,017 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:08:31,018 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:08:31,018 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:08:31,104 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:08:31,104 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:08:31,135 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:08:31,135 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:08:31,135 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:08:31,135 - INFO - CUDA version: 12.8
+2025-12-02 17:08:31,135 - INFO - Device capability: (12, 0)
+2025-12-02 17:08:31,140 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:08:31,140 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:08:31,140 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:08:31,140 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:08:31,140 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:08:31,140 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:08:31,140 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:08:31,140 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:08:31,140 - INFO - CUDA version: 12.8
+2025-12-02 17:08:31,140 - INFO - Device capability: (12, 0)
+2025-12-02 17:08:31,141 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:08:31,141 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:08:31,141 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:08:31,141 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:08:31,141 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:08:31,147 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:08:31,147 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:38:18,469 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:38:18,469 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:38:18,469 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:38:18,551 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:38:18,552 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:38:18,580 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:38:18,580 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:38:18,580 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:38:18,580 - INFO - CUDA version: 12.8
+2025-12-02 17:38:18,580 - INFO - Device capability: (12, 0)
+2025-12-02 17:38:18,584 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:38:18,584 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:38:18,584 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:38:18,584 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:38:18,584 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:38:18,584 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:38:18,584 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:38:18,585 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:38:18,585 - INFO - CUDA version: 12.8
+2025-12-02 17:38:18,585 - INFO - Device capability: (12, 0)
+2025-12-02 17:38:18,587 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:38:18,587 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:38:18,587 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:38:18,587 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:38:18,587 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:38:18,596 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:38:18,596 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:43:55,471 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:43:55,471 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:43:55,471 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:43:55,558 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:43:55,559 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:43:55,586 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:43:55,586 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:43:55,586 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:43:55,586 - INFO - CUDA version: 12.8
+2025-12-02 17:43:55,586 - INFO - Device capability: (12, 0)
+2025-12-02 17:43:55,590 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:43:55,590 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:43:55,590 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:43:55,590 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:43:55,590 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:43:55,590 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:43:55,591 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:43:55,591 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:43:55,591 - INFO - CUDA version: 12.8
+2025-12-02 17:43:55,591 - INFO - Device capability: (12, 0)
+2025-12-02 17:43:55,593 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:43:55,593 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:43:55,593 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:43:55,593 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:43:55,593 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:43:55,602 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:43:55,602 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:44:11,814 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:44:11,814 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:44:11,814 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:44:11,899 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:44:11,899 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:44:11,925 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:44:11,925 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:44:11,925 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:44:11,925 - INFO - CUDA version: 12.8
+2025-12-02 17:44:11,925 - INFO - Device capability: (12, 0)
+2025-12-02 17:44:11,927 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:44:11,928 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:44:11,928 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:44:11,928 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:44:11,928 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:44:11,928 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:44:11,928 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:44:11,928 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:44:11,928 - INFO - CUDA version: 12.8
+2025-12-02 17:44:11,928 - INFO - Device capability: (12, 0)
+2025-12-02 17:44:11,929 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:44:11,929 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:44:11,929 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:44:11,929 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:44:11,929 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:44:11,929 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 17:44:11,929 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 17:44:12,743 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 17:44:35,467 - INFO - Paciente 111111111: 11 series, 1466 slices totales
+2025-12-02 17:47:21,385 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:47:21,385 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:47:21,385 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:47:21,469 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:47:21,469 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:47:21,497 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:47:21,498 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:47:21,498 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:47:21,498 - INFO - CUDA version: 12.8
+2025-12-02 17:47:21,498 - INFO - Device capability: (12, 0)
+2025-12-02 17:47:21,502 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:47:21,502 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:47:21,502 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:47:21,502 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:47:21,502 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:47:21,502 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:47:21,502 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:47:21,502 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:47:21,502 - INFO - CUDA version: 12.8
+2025-12-02 17:47:21,502 - INFO - Device capability: (12, 0)
+2025-12-02 17:47:21,504 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:47:21,504 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:47:21,505 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:47:21,505 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:47:21,505 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:47:21,505 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 17:47:21,505 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 17:47:22,710 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 17:47:43,985 - INFO - Paciente 111111111: 11 series, 1466 slices totales
+2025-12-02 17:50:38,545 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:50:38,545 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:50:38,545 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:50:38,630 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:50:38,631 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:50:38,659 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:50:38,659 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:50:38,659 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:50:38,659 - INFO - CUDA version: 12.8
+2025-12-02 17:50:38,659 - INFO - Device capability: (12, 0)
+2025-12-02 17:50:38,663 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:50:38,663 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:50:38,663 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:50:38,664 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:50:38,664 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:50:38,664 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:50:38,664 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:50:38,664 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:50:38,664 - INFO - CUDA version: 12.8
+2025-12-02 17:50:38,664 - INFO - Device capability: (12, 0)
+2025-12-02 17:50:38,666 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:50:38,666 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:50:38,666 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:50:38,666 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:50:38,666 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:50:38,666 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 17:50:38,666 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 17:50:39,451 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 17:50:55,714 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:50:55,714 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:50:55,715 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:50:55,798 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:50:55,798 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:50:55,824 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:50:55,825 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:50:55,825 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:50:55,825 - INFO - CUDA version: 12.8
+2025-12-02 17:50:55,825 - INFO - Device capability: (12, 0)
+2025-12-02 17:50:55,827 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:50:55,827 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:50:55,827 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:50:55,827 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:50:55,827 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:50:55,827 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:50:55,827 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:50:55,827 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:50:55,827 - INFO - CUDA version: 12.8
+2025-12-02 17:50:55,828 - INFO - Device capability: (12, 0)
+2025-12-02 17:50:55,829 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:50:55,829 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:50:55,829 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:50:55,829 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:50:55,829 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:50:55,829 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 17:50:55,830 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 17:50:56,510 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 17:50:56,511 - ERROR - No se encontraron archivos DICOM en /home/cavm/cnn-tep-detection/inferences/results/111111111
+2025-12-02 17:50:56,511 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:50:56,521 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:51:47,590 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:51:47,590 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:51:47,590 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:51:47,676 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:51:47,676 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:51:47,706 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:51:47,706 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:51:47,706 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:51:47,706 - INFO - CUDA version: 12.8
+2025-12-02 17:51:47,706 - INFO - Device capability: (12, 0)
+2025-12-02 17:51:47,710 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:51:47,710 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:51:47,710 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:51:47,710 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:51:47,710 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:51:47,711 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:51:47,711 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:51:47,711 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:51:47,711 - INFO - CUDA version: 12.8
+2025-12-02 17:51:47,711 - INFO - Device capability: (12, 0)
+2025-12-02 17:51:47,713 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:51:47,713 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:51:47,713 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:51:47,713 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:51:47,713 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:51:47,713 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 17:51:47,713 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 17:51:48,853 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 17:51:48,870 - ERROR - No se encontraron archivos DICOM en /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 17:51:48,870 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:51:48,870 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 17:57:47,135 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:57:47,136 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:57:47,136 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:57:47,218 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:57:47,218 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:57:47,247 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:57:47,247 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:57:47,247 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:57:47,247 - INFO - CUDA version: 12.8
+2025-12-02 17:57:47,247 - INFO - Device capability: (12, 0)
+2025-12-02 17:57:47,251 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 17:57:47,251 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 17:57:47,251 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 17:57:47,251 - INFO - Usando dispositivo: cuda:0
+2025-12-02 17:57:47,251 - INFO - ¿CUDA disponible?: True
+2025-12-02 17:57:47,251 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 17:57:47,251 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 17:57:47,251 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 17:57:47,251 - INFO - CUDA version: 12.8
+2025-12-02 17:57:47,252 - INFO - Device capability: (12, 0)
+2025-12-02 17:57:47,252 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:57:47,252 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 17:57:47,252 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 17:57:47,252 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 17:57:47,252 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 17:57:51,913 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 17:57:51,913 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 18:02:06,876 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:02:06,876 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:02:06,876 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:02:06,958 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:02:06,958 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:02:06,986 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:02:06,986 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:02:06,986 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:02:06,986 - INFO - CUDA version: 12.8
+2025-12-02 18:02:06,986 - INFO - Device capability: (12, 0)
+2025-12-02 18:02:06,990 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:02:06,990 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:02:06,990 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:02:06,990 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:02:06,990 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:02:06,990 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:02:06,990 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:02:06,990 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:02:06,990 - INFO - CUDA version: 12.8
+2025-12-02 18:02:06,990 - INFO - Device capability: (12, 0)
+2025-12-02 18:02:06,993 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:02:06,993 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:02:06,993 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:02:06,993 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:02:06,993 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:02:06,993 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:02:06,993 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:02:08,134 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:02:08,140 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:02:08,154 - ERROR - No se encontraron archivos DICOM en /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:02:08,154 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:02:08,154 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 18:04:31,914 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:04:31,914 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:04:31,914 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:04:31,997 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:04:31,997 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:04:32,025 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:04:32,025 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:04:32,026 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:04:32,026 - INFO - CUDA version: 12.8
+2025-12-02 18:04:32,026 - INFO - Device capability: (12, 0)
+2025-12-02 18:04:32,030 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:04:32,030 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:04:32,030 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:04:32,030 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:04:32,030 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:04:32,030 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:04:32,030 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:04:32,030 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:04:32,030 - INFO - CUDA version: 12.8
+2025-12-02 18:04:32,030 - INFO - Device capability: (12, 0)
+2025-12-02 18:04:32,033 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:04:32,033 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:04:32,033 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:04:32,033 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:04:32,033 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:04:32,033 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:04:32,033 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:04:33,319 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:04:33,322 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:04:37,908 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:05:04,700 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:05:36,980 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:05:36,980 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:05:36,980 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:05:37,066 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:05:37,066 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:05:37,096 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:05:37,096 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:05:37,096 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:05:37,096 - INFO - CUDA version: 12.8
+2025-12-02 18:05:37,096 - INFO - Device capability: (12, 0)
+2025-12-02 18:05:37,100 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:05:37,100 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:05:37,100 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:05:37,100 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:05:37,100 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:05:37,100 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:05:37,101 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:05:37,101 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:05:37,101 - INFO - CUDA version: 12.8
+2025-12-02 18:05:37,101 - INFO - Device capability: (12, 0)
+2025-12-02 18:05:37,103 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:05:37,103 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:05:37,104 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:05:37,104 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:05:37,104 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:05:37,104 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:05:37,104 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:05:38,248 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:05:38,251 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:05:42,865 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:06:09,528 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:11:21,184 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:11:21,184 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:11:21,184 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:11:21,277 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:11:21,277 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:11:21,306 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:11:21,307 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:11:21,307 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:11:21,307 - INFO - CUDA version: 12.8
+2025-12-02 18:11:21,307 - INFO - Device capability: (12, 0)
+2025-12-02 18:11:21,311 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:11:21,311 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:11:21,311 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:11:21,311 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:11:21,311 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:11:21,311 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:11:21,311 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:11:21,311 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:11:21,311 - INFO - CUDA version: 12.8
+2025-12-02 18:11:21,312 - INFO - Device capability: (12, 0)
+2025-12-02 18:11:21,314 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:11:21,314 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:11:21,314 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:11:21,314 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:11:21,314 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:11:21,314 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:11:21,314 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:11:22,569 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:11:22,573 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:11:27,109 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:11:55,275 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:11:56,338 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 18:11:56,601 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/111111111
+2025-12-02 18:11:56,602 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:11:56,602 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 18:13:21,713 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:13:21,713 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:13:21,713 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:13:21,797 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:13:21,798 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:13:21,827 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:13:21,827 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:13:21,827 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:13:21,827 - INFO - CUDA version: 12.8
+2025-12-02 18:13:21,828 - INFO - Device capability: (12, 0)
+2025-12-02 18:13:21,832 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:13:21,832 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:13:21,832 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:13:21,832 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:13:21,832 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:13:21,832 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:13:21,832 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:13:21,832 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:13:21,832 - INFO - CUDA version: 12.8
+2025-12-02 18:13:21,832 - INFO - Device capability: (12, 0)
+2025-12-02 18:13:21,834 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:13:21,834 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:13:21,835 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:13:21,835 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:13:21,835 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:13:21,835 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:13:21,835 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:13:23,030 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:13:23,033 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:13:27,346 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:13:54,749 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:15:42,240 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:15:42,241 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:15:42,241 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:15:42,323 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:15:42,323 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:15:42,352 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:15:42,353 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:15:42,353 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:15:42,353 - INFO - CUDA version: 12.8
+2025-12-02 18:15:42,353 - INFO - Device capability: (12, 0)
+2025-12-02 18:15:42,356 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:15:42,357 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:15:42,357 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:15:42,357 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:15:42,357 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:15:42,357 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:15:42,357 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:15:42,357 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:15:42,357 - INFO - CUDA version: 12.8
+2025-12-02 18:15:42,357 - INFO - Device capability: (12, 0)
+2025-12-02 18:15:42,360 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:15:42,360 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:15:42,360 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:15:42,360 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:15:42,360 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:15:42,360 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:15:42,360 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:15:43,617 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:15:43,621 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:15:48,024 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:16:16,733 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:16:17,911 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 18:16:18,169 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/111111111
+2025-12-02 18:16:18,170 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:16:18,170 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 18:18:22,617 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:18:22,617 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:18:22,618 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:18:22,690 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:18:22,691 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:18:22,713 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:18:22,713 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:18:22,713 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:18:22,713 - INFO - CUDA version: 12.8
+2025-12-02 18:18:22,713 - INFO - Device capability: (12, 0)
+2025-12-02 18:18:22,717 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:18:22,717 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:18:22,717 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:18:22,717 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:18:22,717 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:18:22,717 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:18:22,717 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:18:22,717 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:18:22,717 - INFO - CUDA version: 12.8
+2025-12-02 18:18:22,718 - INFO - Device capability: (12, 0)
+2025-12-02 18:18:22,719 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:18:22,719 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:18:22,720 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:18:22,720 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:18:22,720 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:18:22,720 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:18:22,720 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:18:23,535 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:18:23,538 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:18:27,944 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:18:55,870 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:22:03,416 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:22:03,416 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:22:03,416 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:22:03,501 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:22:03,501 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:22:03,532 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:22:03,532 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:22:03,532 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:22:03,532 - INFO - CUDA version: 12.8
+2025-12-02 18:22:03,532 - INFO - Device capability: (12, 0)
+2025-12-02 18:22:03,536 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:22:03,536 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:22:03,536 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:22:03,536 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:22:03,536 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:22:03,536 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:22:03,536 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:22:03,537 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:22:03,537 - INFO - CUDA version: 12.8
+2025-12-02 18:22:03,537 - INFO - Device capability: (12, 0)
+2025-12-02 18:22:03,539 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:22:03,539 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:22:03,539 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:22:03,539 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:22:03,539 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:22:03,539 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:22:03,540 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:22:04,776 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:22:04,779 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:22:09,266 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:22:36,938 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:24:05,958 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:24:05,958 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:24:05,958 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:24:06,042 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:24:06,043 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:24:06,070 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:24:06,070 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:24:06,070 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:24:06,071 - INFO - CUDA version: 12.8
+2025-12-02 18:24:06,071 - INFO - Device capability: (12, 0)
+2025-12-02 18:24:06,074 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:24:06,074 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:24:06,074 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:24:06,074 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:24:06,074 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:24:06,075 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:24:06,075 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:24:06,075 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:24:06,075 - INFO - CUDA version: 12.8
+2025-12-02 18:24:06,075 - INFO - Device capability: (12, 0)
+2025-12-02 18:24:06,077 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:24:06,077 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:24:06,077 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:24:06,077 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:24:06,077 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:24:06,077 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 18:24:06,077 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:24:07,215 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:24:07,219 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 18:24:11,669 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:24:40,095 - INFO - 1468 cortes procesados correctamente
+2025-12-02 18:24:41,201 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 18:24:41,463 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/111111111
+2025-12-02 18:24:41,464 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:24:41,464 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 18:26:29,498 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:26:29,498 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:26:29,498 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:26:29,582 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:26:29,583 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:26:29,610 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:26:29,610 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:26:29,610 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:26:29,611 - INFO - CUDA version: 12.8
+2025-12-02 18:26:29,611 - INFO - Device capability: (12, 0)
+2025-12-02 18:26:29,615 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 18:26:29,615 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 18:26:29,615 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 18:26:29,615 - INFO - Usando dispositivo: cuda:0
+2025-12-02 18:26:29,615 - INFO - ¿CUDA disponible?: True
+2025-12-02 18:26:29,615 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 18:26:29,615 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 18:26:29,615 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 18:26:29,615 - INFO - CUDA version: 12.8
+2025-12-02 18:26:29,615 - INFO - Device capability: (12, 0)
+2025-12-02 18:26:29,616 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:26:29,616 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 18:26:29,616 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 18:26:29,616 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 18:26:29,616 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 18:26:29,616 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 18:26:29,617 - INFO - CARGANDO MODELO FINAL (Fold 3 - AUC 0.6779)
+2025-12-02 18:26:30,953 - INFO - Modelo cargado correctamente → AUC: 0.6779
+2025-12-02 18:26:30,959 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 18:26:40,955 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 18:27:48,063 - INFO - 3246 cortes procesados correctamente
+2025-12-02 18:27:49,081 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 18:27:49,345 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 18:27:49,347 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 18:27:49,348 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:04:56,081 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:04:56,082 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:04:56,082 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:04:56,185 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:04:56,186 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:04:56,220 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:04:56,221 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:04:56,221 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:04:56,221 - INFO - CUDA version: 12.8
+2025-12-02 19:04:56,221 - INFO - Device capability: (12, 0)
+2025-12-02 19:04:56,225 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:04:56,225 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:04:56,225 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:04:56,226 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:04:56,226 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:04:56,226 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:04:56,226 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:04:56,226 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:04:56,226 - INFO - CUDA version: 12.8
+2025-12-02 19:04:56,226 - INFO - Device capability: (12, 0)
+2025-12-02 19:04:56,229 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:04:56,229 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:04:56,229 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:04:56,230 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:04:56,230 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:04:56,230 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:04:56,230 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:04:58,065 - INFO - Modelo cargado → AUC: 0.6778764128684998
+2025-12-02 19:04:58,069 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:05:08,858 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:06:19,668 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:06:20,830 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:06:21,136 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:06:21,138 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:06:21,139 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:14:22,032 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:14:22,032 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:14:22,032 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:14:22,123 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:14:22,123 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:14:22,154 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:14:22,154 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:14:22,154 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:14:22,154 - INFO - CUDA version: 12.8
+2025-12-02 19:14:22,154 - INFO - Device capability: (12, 0)
+2025-12-02 19:14:22,158 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:14:22,158 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:14:22,158 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:14:22,158 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:14:22,158 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:14:22,158 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:14:22,159 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:14:22,159 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:14:22,159 - INFO - CUDA version: 12.8
+2025-12-02 19:14:22,159 - INFO - Device capability: (12, 0)
+2025-12-02 19:14:22,161 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:14:22,162 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:14:22,162 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:14:22,162 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:14:22,162 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:14:22,162 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:14:22,162 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:14:23,103 - INFO - Modelo cargado → AUC: 0.6778764128684998
+2025-12-02 19:14:23,107 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:14:33,142 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:15:37,350 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:15:38,391 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:15:38,659 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:15:38,661 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:15:38,661 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:18:10,599 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:18:10,599 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:18:10,599 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:18:10,687 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:18:10,688 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:18:10,717 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:18:10,717 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:18:10,717 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:18:10,717 - INFO - CUDA version: 12.8
+2025-12-02 19:18:10,717 - INFO - Device capability: (12, 0)
+2025-12-02 19:18:10,721 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:18:10,721 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:18:10,721 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:18:10,721 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:18:10,722 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:18:10,722 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:18:10,722 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:18:10,722 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:18:10,722 - INFO - CUDA version: 12.8
+2025-12-02 19:18:10,722 - INFO - Device capability: (12, 0)
+2025-12-02 19:18:10,724 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:18:10,724 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:18:10,724 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:18:10,724 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:18:10,724 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:18:10,724 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:18:10,725 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:18:12,065 - INFO - Modelo cargado → AUC: 0.6778764128684998
+2025-12-02 19:18:12,068 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:18:22,026 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:19:25,442 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:19:26,536 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:19:26,842 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:19:26,842 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:19:26,847 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:19:26,847 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:19:26,849 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:19:26,850 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:21:09,100 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:21:09,101 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:21:09,101 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:21:09,189 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:21:09,189 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:21:09,218 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:21:09,219 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:21:09,219 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:21:09,219 - INFO - CUDA version: 12.8
+2025-12-02 19:21:09,219 - INFO - Device capability: (12, 0)
+2025-12-02 19:21:09,223 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:21:09,223 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:21:09,223 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:21:09,223 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:21:09,223 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:21:09,223 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:21:09,223 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:21:09,224 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:21:09,224 - INFO - CUDA version: 12.8
+2025-12-02 19:21:09,224 - INFO - Device capability: (12, 0)
+2025-12-02 19:21:09,226 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:21:09,227 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:21:09,227 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:21:09,227 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:21:09,227 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:21:09,227 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:21:09,227 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:21:10,470 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:21:10,474 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:21:20,356 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:22:27,558 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:25:19,015 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:25:19,015 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:25:19,015 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:25:19,101 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:25:19,101 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:25:19,129 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:25:19,129 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:25:19,129 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:25:19,129 - INFO - CUDA version: 12.8
+2025-12-02 19:25:19,129 - INFO - Device capability: (12, 0)
+2025-12-02 19:25:19,132 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:25:19,132 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:25:19,132 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:25:19,132 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:25:19,132 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:25:19,132 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:25:19,132 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:25:19,132 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:25:19,132 - INFO - CUDA version: 12.8
+2025-12-02 19:25:19,133 - INFO - Device capability: (12, 0)
+2025-12-02 19:25:19,134 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:25:19,134 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:25:19,134 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:25:19,134 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:25:19,134 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:25:19,134 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:25:19,134 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:25:20,332 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:25:20,336 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:25:30,518 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:26:39,503 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:26:40,423 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:26:40,709 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:26:40,709 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:26:40,713 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:26:40,713 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:26:40,716 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:26:40,716 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:28:37,215 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:28:37,215 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:28:37,225 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:28:37,315 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:28:37,316 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:28:37,343 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:28:37,344 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:28:37,344 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:28:37,344 - INFO - CUDA version: 12.8
+2025-12-02 19:28:37,344 - INFO - Device capability: (12, 0)
+2025-12-02 19:28:37,346 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:28:37,346 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:28:37,346 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:28:37,346 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:28:37,347 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:28:37,347 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:28:37,347 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:28:37,347 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:28:37,347 - INFO - CUDA version: 12.8
+2025-12-02 19:28:37,347 - INFO - Device capability: (12, 0)
+2025-12-02 19:28:37,349 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:28:37,349 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:28:37,349 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:28:37,349 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:28:37,349 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:28:37,349 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:28:37,349 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:28:38,503 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:28:38,507 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:28:48,840 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:29:57,821 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:29:57,830 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:29:57,868 - INFO - Volumen min: 0.000000
+2025-12-02 19:29:57,885 - INFO - Volumen max: 1.000000
+2025-12-02 19:29:57,899 - INFO - Volumen mean: 0.078182
+2025-12-02 19:29:57,900 - INFO - Volumen std: 0.156218
+2025-12-02 19:29:58,769 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:29:59,064 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:29:59,064 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:29:59,066 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:29:59,066 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:29:59,069 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:29:59,069 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:36:30,612 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:36:30,612 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:36:30,612 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:36:30,706 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:36:30,706 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:36:30,737 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:36:30,738 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:36:30,738 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:36:30,738 - INFO - CUDA version: 12.8
+2025-12-02 19:36:30,738 - INFO - Device capability: (12, 0)
+2025-12-02 19:36:30,742 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:36:30,742 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:36:30,742 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:36:30,743 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:36:30,743 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:36:30,743 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:36:30,743 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:36:30,743 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:36:30,743 - INFO - CUDA version: 12.8
+2025-12-02 19:36:30,743 - INFO - Device capability: (12, 0)
+2025-12-02 19:36:30,746 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:36:30,746 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:36:30,746 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:36:30,746 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:36:30,746 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:36:30,746 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:36:30,746 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:36:32,103 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:36:32,107 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:36:42,391 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:37:51,117 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:37:51,127 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:37:51,160 - INFO - Volumen min: 0.000000
+2025-12-02 19:37:51,179 - INFO - Volumen max: 1.000000
+2025-12-02 19:37:51,197 - INFO - Volumen mean: 0.078182
+2025-12-02 19:37:51,198 - INFO - Volumen std: 0.156218
+2025-12-02 19:40:00,563 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:40:00,563 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:40:00,563 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:40:00,652 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:40:00,652 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:40:00,682 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:40:00,682 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:40:00,682 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:40:00,683 - INFO - CUDA version: 12.8
+2025-12-02 19:40:00,683 - INFO - Device capability: (12, 0)
+2025-12-02 19:40:00,687 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:40:00,687 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:40:00,687 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:40:00,687 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:40:00,687 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:40:00,687 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:40:00,687 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:40:00,687 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:40:00,687 - INFO - CUDA version: 12.8
+2025-12-02 19:40:00,688 - INFO - Device capability: (12, 0)
+2025-12-02 19:40:00,690 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:40:00,690 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:40:00,690 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:40:00,690 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:40:00,690 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:40:00,691 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:40:00,691 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:40:02,003 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:40:02,006 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:40:12,518 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:41:21,955 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:41:21,964 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:41:21,999 - INFO - Volumen min: 0.000000
+2025-12-02 19:41:22,016 - INFO - Volumen max: 1.000000
+2025-12-02 19:41:22,034 - INFO - Volumen mean: 0.078182
+2025-12-02 19:41:22,035 - INFO - Volumen std: 0.156218
+2025-12-02 19:41:23,106 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:41:23,389 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:41:23,389 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:41:23,393 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:41:23,394 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:41:23,396 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:41:23,396 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:43:39,158 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:43:39,158 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:43:39,158 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:43:39,245 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:43:39,245 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:43:39,274 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:43:39,275 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:43:39,275 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:43:39,275 - INFO - CUDA version: 12.8
+2025-12-02 19:43:39,275 - INFO - Device capability: (12, 0)
+2025-12-02 19:43:39,279 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:43:39,279 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:43:39,279 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:43:39,279 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:43:39,279 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:43:39,279 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:43:39,280 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:43:39,280 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:43:39,280 - INFO - CUDA version: 12.8
+2025-12-02 19:43:39,280 - INFO - Device capability: (12, 0)
+2025-12-02 19:43:39,282 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:43:39,282 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:43:39,282 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:43:39,282 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:43:39,282 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:43:39,282 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:43:39,282 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:43:40,548 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:43:40,552 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:43:50,881 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:44:59,189 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:44:59,198 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:44:59,228 - INFO - Volumen min: 0.000000
+2025-12-02 19:44:59,247 - INFO - Volumen max: 1.000000
+2025-12-02 19:44:59,265 - INFO - Volumen mean: 0.078182
+2025-12-02 19:44:59,266 - INFO - Volumen std: 0.156218
+2025-12-02 19:45:00,314 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:45:00,614 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:45:00,614 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:45:00,618 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:45:00,619 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:45:00,622 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:45:00,622 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:49:11,170 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:49:11,170 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:49:11,170 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:49:11,263 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:49:11,263 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:49:11,303 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:49:11,303 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:49:11,303 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:49:11,304 - INFO - CUDA version: 12.8
+2025-12-02 19:49:11,304 - INFO - Device capability: (12, 0)
+2025-12-02 19:49:11,309 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:49:11,310 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:49:11,310 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:49:11,310 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:49:11,310 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:49:11,310 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:49:11,311 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:49:11,311 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:49:11,311 - INFO - CUDA version: 12.8
+2025-12-02 19:49:11,311 - INFO - Device capability: (12, 0)
+2025-12-02 19:49:11,314 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:49:11,314 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:49:11,314 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:49:11,314 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:49:11,314 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:49:11,314 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:49:11,314 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:49:12,159 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:49:12,163 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:49:22,535 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:50:31,871 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:50:31,879 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:50:31,912 - INFO - Volumen min: 0.000000
+2025-12-02 19:50:31,928 - INFO - Volumen max: 1.000000
+2025-12-02 19:50:31,945 - INFO - Volumen mean: 0.078182
+2025-12-02 19:50:31,945 - INFO - Volumen std: 0.156218
+2025-12-02 19:50:33,290 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:50:33,291 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:50:33,294 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:50:33,294 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:50:33,296 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:50:33,297 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:52:50,090 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:52:50,091 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:52:50,091 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:52:50,182 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:52:50,182 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:52:50,211 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:52:50,211 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:52:50,212 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:52:50,212 - INFO - CUDA version: 12.8
+2025-12-02 19:52:50,212 - INFO - Device capability: (12, 0)
+2025-12-02 19:52:50,216 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:52:50,216 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:52:50,216 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:52:50,216 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:52:50,216 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:52:50,216 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:52:50,216 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:52:50,217 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:52:50,217 - INFO - CUDA version: 12.8
+2025-12-02 19:52:50,217 - INFO - Device capability: (12, 0)
+2025-12-02 19:52:50,220 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:52:50,220 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:52:50,220 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:52:50,220 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:52:50,220 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:52:50,220 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:52:50,220 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:52:51,535 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:52:51,538 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:53:01,921 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:54:11,916 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:54:11,935 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:54:11,968 - INFO - Volumen min: 0.000000
+2025-12-02 19:54:11,985 - INFO - Volumen max: 1.000000
+2025-12-02 19:54:12,003 - INFO - Volumen mean: 0.078182
+2025-12-02 19:54:12,004 - INFO - Volumen std: 0.156218
+2025-12-02 19:54:13,053 - INFO - RESULTADO FINAL → TEP: NEGATIVO | Probabilidad: 0.0000
+2025-12-02 19:54:13,324 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 19:54:13,324 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 19:54:13,328 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 19:54:13,328 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 19:54:13,330 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:54:13,330 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 19:55:22,678 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:55:22,678 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:55:22,678 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:55:22,774 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:55:22,774 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:55:22,806 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:55:22,806 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:55:22,806 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:55:22,806 - INFO - CUDA version: 12.8
+2025-12-02 19:55:22,807 - INFO - Device capability: (12, 0)
+2025-12-02 19:55:22,811 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:55:22,811 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:55:22,811 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:55:22,811 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:55:22,811 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:55:22,811 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:55:22,811 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:55:22,811 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:55:22,811 - INFO - CUDA version: 12.8
+2025-12-02 19:55:22,812 - INFO - Device capability: (12, 0)
+2025-12-02 19:55:22,815 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:55:22,815 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:55:22,815 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:55:22,815 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:55:22,815 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:55:22,815 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:55:22,815 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:55:24,160 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:55:24,163 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:55:34,414 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 19:56:44,104 - INFO - 3246 cortes procesados correctamente
+2025-12-02 19:56:44,122 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 19:56:44,157 - INFO - Volumen min: 0.000000
+2025-12-02 19:56:44,175 - INFO - Volumen max: 1.000000
+2025-12-02 19:56:44,194 - INFO - Volumen mean: 0.078182
+2025-12-02 19:56:44,194 - INFO - Volumen std: 0.156218
+2025-12-02 19:59:13,415 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:59:13,416 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:59:13,416 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:59:13,505 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:59:13,505 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:59:13,539 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:59:13,540 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:59:13,540 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:59:13,540 - INFO - CUDA version: 12.8
+2025-12-02 19:59:13,540 - INFO - Device capability: (12, 0)
+2025-12-02 19:59:13,542 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 19:59:13,542 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 19:59:13,542 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 19:59:13,543 - INFO - Usando dispositivo: cuda:0
+2025-12-02 19:59:13,543 - INFO - ¿CUDA disponible?: True
+2025-12-02 19:59:13,543 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 19:59:13,543 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 19:59:13,543 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 19:59:13,543 - INFO - CUDA version: 12.8
+2025-12-02 19:59:13,543 - INFO - Device capability: (12, 0)
+2025-12-02 19:59:13,545 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 19:59:13,545 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 19:59:13,545 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 19:59:13,545 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 19:59:13,545 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 19:59:13,545 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 19:59:13,545 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 19:59:14,781 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 19:59:14,784 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 19:59:25,158 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:00:34,982 - INFO - 3246 cortes procesados correctamente
+2025-12-02 20:00:34,990 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:00:35,017 - INFO - Volumen min: 0.000000
+2025-12-02 20:00:35,032 - INFO - Volumen max: 1.000000
+2025-12-02 20:00:35,046 - INFO - Volumen mean: 0.078182
+2025-12-02 20:00:35,047 - INFO - Volumen std: 0.156218
+2025-12-02 20:00:35,916 - INFO - LOGIT CRUDO: -23.953125
+2025-12-02 20:00:35,916 - INFO - PROBABILIDAD (sigmoid): 0.000000
+2025-12-02 20:00:35,916 - INFO - RESULTADO FINAL → TEP: NEGATIVO
+2025-12-02 20:00:36,211 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 20:00:36,212 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 20:00:36,215 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 20:00:36,216 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 20:00:36,218 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:00:36,218 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 20:03:56,513 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:03:56,513 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:03:56,513 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:03:56,592 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:03:56,592 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:03:56,618 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:03:56,618 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:03:56,618 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:03:56,619 - INFO - CUDA version: 12.8
+2025-12-02 20:03:56,619 - INFO - Device capability: (12, 0)
+2025-12-02 20:03:56,621 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:03:56,621 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:03:56,621 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:03:56,621 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:03:56,621 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:03:56,621 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:03:56,621 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:03:56,621 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:03:56,621 - INFO - CUDA version: 12.8
+2025-12-02 20:03:56,621 - INFO - Device capability: (12, 0)
+2025-12-02 20:03:56,623 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:03:56,623 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:03:56,623 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:03:56,623 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:03:56,623 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:03:56,623 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 20:03:56,623 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 20:03:57,810 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 20:03:57,814 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 20:04:08,156 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:05:11,014 - INFO - 3246 cortes procesados correctamente
+2025-12-02 20:05:11,023 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:05:11,037 - INFO - Volumen min: 0.000000
+2025-12-02 20:05:11,049 - INFO - Volumen max: 1.000000
+2025-12-02 20:05:11,049 - INFO - Volumen mean: 0.078182
+2025-12-02 20:05:11,050 - INFO - Volumen std: 0.156218
+2025-12-02 20:05:11,914 - INFO - LOGIT CRUDO: -23.953125
+2025-12-02 20:05:11,914 - INFO - PROBABILIDAD (sigmoid): 0.000000
+2025-12-02 20:05:11,914 - INFO - RESULTADO FINAL → TEP: NEGATIVO
+2025-12-02 20:05:12,155 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 20:05:12,155 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 20:05:12,156 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 20:05:12,157 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 20:05:12,159 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:05:12,159 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 20:06:39,886 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:06:39,886 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:06:39,886 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:06:39,957 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:06:39,957 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:06:39,977 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:06:39,977 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:06:39,977 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:06:39,977 - INFO - CUDA version: 12.8
+2025-12-02 20:06:39,977 - INFO - Device capability: (12, 0)
+2025-12-02 20:06:39,980 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:06:39,980 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:06:39,980 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:06:39,980 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:06:39,980 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:06:39,980 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:06:39,980 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:06:39,980 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:06:39,980 - INFO - CUDA version: 12.8
+2025-12-02 20:06:39,980 - INFO - Device capability: (12, 0)
+2025-12-02 20:06:39,981 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:06:39,982 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:06:39,982 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:06:39,982 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:06:39,982 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:06:39,982 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 20:06:39,982 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 20:06:41,058 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 20:06:41,061 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 20:06:51,079 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:07:51,020 - INFO - 3246 cortes procesados correctamente
+2025-12-02 20:07:51,031 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:07:51,043 - INFO - Volumen min: 0.000000
+2025-12-02 20:07:51,057 - INFO - Volumen max: 1.000000
+2025-12-02 20:07:51,058 - INFO - Volumen mean: 0.078182
+2025-12-02 20:07:51,058 - INFO - Volumen std: 0.156218
+2025-12-02 20:09:53,124 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:09:53,124 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:09:53,124 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:09:53,224 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:09:53,224 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:09:53,252 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:09:53,252 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:09:53,252 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:09:53,252 - INFO - CUDA version: 12.8
+2025-12-02 20:09:53,252 - INFO - Device capability: (12, 0)
+2025-12-02 20:09:53,255 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:09:53,255 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:09:53,255 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:09:53,255 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:09:53,255 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:09:53,255 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:09:53,255 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:09:53,255 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:09:53,255 - INFO - CUDA version: 12.8
+2025-12-02 20:09:53,255 - INFO - Device capability: (12, 0)
+2025-12-02 20:09:53,257 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:09:53,257 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:09:53,257 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:09:53,257 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:09:53,257 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:09:53,257 - INFO - INFERENCIA EN PACIENTE: 999999999
+2025-12-02 20:09:53,257 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 20:09:54,393 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 20:09:54,396 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/999999999/ST0
+2025-12-02 20:10:04,533 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:11:05,853 - INFO - 3246 cortes procesados correctamente
+2025-12-02 20:11:05,863 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:11:05,874 - INFO - Volumen min: 0.000000
+2025-12-02 20:11:05,886 - INFO - Volumen max: 1.000000
+2025-12-02 20:11:05,887 - INFO - Volumen mean: 0.078182
+2025-12-02 20:11:05,887 - INFO - Volumen std: 0.156218
+2025-12-02 20:11:06,667 - INFO - LOGIT CRUDO: -23.953125
+2025-12-02 20:11:06,667 - INFO - PROBABILIDAD (sigmoid): 0.000000
+2025-12-02 20:11:06,667 - INFO - RESULTADO FINAL → TEP: NEGATIVO
+2025-12-02 20:11:06,897 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/999999999
+2025-12-02 20:11:06,897 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 20:11:06,899 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 20:11:06,899 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 20:11:06,901 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:11:06,901 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 20:13:41,880 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:13:41,880 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:13:41,880 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:13:41,962 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:13:41,962 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:13:41,988 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:13:41,988 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:13:41,988 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:13:41,988 - INFO - CUDA version: 12.8
+2025-12-02 20:13:41,988 - INFO - Device capability: (12, 0)
+2025-12-02 20:13:41,990 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:13:41,990 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:13:41,990 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:13:41,990 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:13:41,990 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:13:41,991 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:13:41,991 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:13:41,991 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:13:41,991 - INFO - CUDA version: 12.8
+2025-12-02 20:13:41,991 - INFO - Device capability: (12, 0)
+2025-12-02 20:13:41,991 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:13:41,991 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:13:41,991 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:13:41,992 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:13:41,992 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:13:41,992 - INFO - INFERENCIA EN PACIENTE: 111111111
+2025-12-02 20:13:41,992 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 20:13:43,271 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 20:13:43,275 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/111111111/ST0
+2025-12-02 20:13:47,797 - INFO - 1472 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:14:16,214 - INFO - 1468 cortes procesados correctamente
+2025-12-02 20:14:16,225 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:14:16,239 - INFO - Volumen min: 0.000000
+2025-12-02 20:14:16,256 - INFO - Volumen max: 1.000000
+2025-12-02 20:14:16,257 - INFO - Volumen mean: 0.078069
+2025-12-02 20:14:16,257 - INFO - Volumen std: 0.152133
+2025-12-02 20:14:17,046 - INFO - LOGIT CRUDO: -28.453125
+2025-12-02 20:14:17,046 - INFO - PROBABILIDAD (sigmoid): 0.000000
+2025-12-02 20:14:17,046 - INFO - RESULTADO FINAL → TEP: NEGATIVO
+2025-12-02 20:14:17,281 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/111111111
+2025-12-02 20:14:17,281 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 20:14:17,283 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 20:14:17,283 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 20:14:17,284 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:14:17,284 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 20:34:52,621 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:34:52,621 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:34:52,621 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:34:52,704 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:34:52,704 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:34:52,734 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:34:52,734 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:34:52,734 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:34:52,734 - INFO - CUDA version: 12.8
+2025-12-02 20:34:52,734 - INFO - Device capability: (12, 0)
+2025-12-02 20:34:52,738 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:34:52,738 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:34:52,738 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:34:52,738 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:34:52,738 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:34:52,738 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:34:52,738 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:34:52,738 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:34:52,738 - INFO - CUDA version: 12.8
+2025-12-02 20:34:52,739 - INFO - Device capability: (12, 0)
+2025-12-02 20:34:52,739 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:34:52,739 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:34:52,739 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:34:52,739 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:34:52,739 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:34:52,739 - INFO - INFERENCIA EN PACIENTE: TTEP86872473
+2025-12-02 20:34:52,740 - INFO - CARGANDO MODELO FINAL - Fold 3 - AUC 0.6779
+2025-12-02 20:34:53,937 - INFO - Modelo cargado → AUC: 0.6779
+2025-12-02 20:34:53,940 - INFO - Carpeta ST0 encontrada: /mnt/c/Users/velan/Documents/cnn-tep-detection/inferences/patients/TTEP86872473/ST0
+2025-12-02 20:35:04,287 - INFO - 3250 archivos encontrados en ST0 y subcarpetas
+2025-12-02 20:36:05,432 - INFO - 3246 cortes procesados correctamente
+2025-12-02 20:36:05,453 - INFO - Volumen shape: torch.Size([1, 94, 192, 192])
+2025-12-02 20:36:05,468 - INFO - Volumen min: 0.000000
+2025-12-02 20:36:05,483 - INFO - Volumen max: 1.000000
+2025-12-02 20:36:05,484 - INFO - Volumen mean: 0.078182
+2025-12-02 20:36:05,484 - INFO - Volumen std: 0.156218
+2025-12-02 20:36:06,521 - INFO - LOGIT CRUDO: -23.953125
+2025-12-02 20:36:06,521 - INFO - PROBABILIDAD (sigmoid): 0.000000
+2025-12-02 20:36:06,521 - INFO - RESULTADO FINAL → TEP: NEGATIVO
+2025-12-02 20:36:06,779 - INFO - INFERENCIA COMPLETADA → Resultados en: /home/cavm/cnn-tep-detection/inferences/results/TTEP86872473
+2025-12-02 20:36:06,779 - INFO - === DIAGNÓSTICO DE PESOS ===
+2025-12-02 20:36:06,783 - INFO - fc.1.weight: mean_abs = 0.022427
+2025-12-02 20:36:06,783 - INFO - fc.1.bias: mean_abs = 0.018398
+2025-12-02 20:36:06,785 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:36:06,785 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 20:47:29,646 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:47:29,646 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:47:29,646 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:47:29,726 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:47:29,727 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:47:29,756 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:47:29,756 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:47:29,756 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:47:29,756 - INFO - CUDA version: 12.8
+2025-12-02 20:47:29,756 - INFO - Device capability: (12, 0)
+2025-12-02 20:47:29,764 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 20:47:29,764 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 20:47:29,764 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 20:47:29,764 - INFO - Usando dispositivo: cuda:0
+2025-12-02 20:47:29,764 - INFO - ¿CUDA disponible?: True
+2025-12-02 20:47:29,764 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 20:47:29,764 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 20:47:29,765 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 20:47:29,765 - INFO - CUDA version: 12.8
+2025-12-02 20:47:29,765 - INFO - Device capability: (12, 0)
+2025-12-02 20:47:29,766 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:47:29,766 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 20:47:29,767 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 20:47:29,767 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 20:47:29,767 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 20:48:28,876 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 20:48:28,877 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 21:01:52,693 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:01:52,693 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:01:52,693 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:01:52,783 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:01:52,783 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:01:52,813 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:01:52,813 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:01:52,814 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:01:52,814 - INFO - CUDA version: 12.8
+2025-12-02 21:01:52,814 - INFO - Device capability: (12, 0)
+2025-12-02 21:01:52,817 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:01:52,817 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:01:52,817 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:01:52,817 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:01:52,817 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:01:52,818 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:01:52,818 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:01:52,818 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:01:52,818 - INFO - CUDA version: 12.8
+2025-12-02 21:01:52,818 - INFO - Device capability: (12, 0)
+2025-12-02 21:01:52,822 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:01:52,822 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 21:01:52,822 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 21:01:52,822 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 21:01:52,822 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 21:03:17,247 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:03:17,274 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 21:09:28,965 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:09:28,965 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:09:28,965 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:09:29,052 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:09:29,052 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:09:29,082 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:09:29,082 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:09:29,082 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:09:29,082 - INFO - CUDA version: 12.8
+2025-12-02 21:09:29,082 - INFO - Device capability: (12, 0)
+2025-12-02 21:09:29,086 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:09:29,086 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:09:29,086 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:09:29,086 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:09:29,086 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:09:29,087 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:09:29,087 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:09:29,087 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:09:29,087 - INFO - CUDA version: 12.8
+2025-12-02 21:09:29,087 - INFO - Device capability: (12, 0)
+2025-12-02 21:09:29,091 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:09:29,091 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 21:09:29,091 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 21:09:29,091 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 21:09:29,091 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 21:10:19,897 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:10:19,897 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-02 21:14:30,283 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:14:30,283 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:14:30,283 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:14:30,361 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:14:30,361 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:14:30,387 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:14:30,388 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:14:30,388 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:14:30,388 - INFO - CUDA version: 12.8
+2025-12-02 21:14:30,388 - INFO - Device capability: (12, 0)
+2025-12-02 21:14:30,391 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-02 21:14:30,391 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-02 21:14:30,392 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-02 21:14:30,392 - INFO - Usando dispositivo: cuda:0
+2025-12-02 21:14:30,392 - INFO - ¿CUDA disponible?: True
+2025-12-02 21:14:30,392 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-02 21:14:30,392 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-02 21:14:30,392 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-02 21:14:30,392 - INFO - CUDA version: 12.8
+2025-12-02 21:14:30,392 - INFO - Device capability: (12, 0)
+2025-12-02 21:14:30,397 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:14:30,397 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-02 21:14:30,397 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-02 21:14:30,397 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-02 21:14:30,397 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-02 21:15:01,975 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-02 21:15:01,975 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
+2025-12-03 10:58:49,932 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 10:58:49,932 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 10:58:49,932 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 10:58:50,027 - INFO - Usando dispositivo: cuda:0
+2025-12-03 10:58:50,027 - INFO - ¿CUDA disponible?: True
+2025-12-03 10:58:50,058 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 10:58:50,058 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 10:58:50,058 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 10:58:50,058 - INFO - CUDA version: 12.8
+2025-12-03 10:58:50,059 - INFO - Device capability: (12, 0)
+2025-12-03 10:58:50,062 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 10:58:50,062 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 10:58:50,062 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 10:58:50,062 - INFO - Usando dispositivo: cuda:0
+2025-12-03 10:58:50,062 - INFO - ¿CUDA disponible?: True
+2025-12-03 10:58:50,062 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 10:58:50,062 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 10:58:50,062 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 10:58:50,063 - INFO - CUDA version: 12.8
+2025-12-03 10:58:50,063 - INFO - Device capability: (12, 0)
+2025-12-03 11:01:39,384 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:01:39,384 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:01:39,384 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:01:39,455 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:01:39,455 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:01:39,480 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:01:39,480 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:01:39,480 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:01:39,480 - INFO - CUDA version: 12.8
+2025-12-03 11:01:39,480 - INFO - Device capability: (12, 0)
+2025-12-03 11:01:39,484 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:01:39,484 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:01:39,484 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:01:39,485 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:01:39,485 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:01:39,485 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:01:39,485 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:01:39,485 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:01:39,485 - INFO - CUDA version: 12.8
+2025-12-03 11:01:39,485 - INFO - Device capability: (12, 0)
+2025-12-03 11:01:39,488 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:01:39,488 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:01:39,488 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:01:39,488 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:01:39,488 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:03:36,276 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:03:36,276 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:03:36,276 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:03:36,354 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:03:36,354 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:03:36,384 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:03:36,384 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:03:36,384 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:03:36,384 - INFO - CUDA version: 12.8
+2025-12-03 11:03:36,384 - INFO - Device capability: (12, 0)
+2025-12-03 11:03:36,388 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:03:36,388 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:03:36,388 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:03:36,388 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:03:36,388 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:03:36,388 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:03:36,388 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:03:36,389 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:03:36,389 - INFO - CUDA version: 12.8
+2025-12-03 11:03:36,389 - INFO - Device capability: (12, 0)
+2025-12-03 11:03:36,392 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:03:36,392 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:03:36,392 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:03:36,392 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:03:36,392 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:03:52,534 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:03:52,534 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:03:52,534 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:03:52,612 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:03:52,613 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:03:52,640 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:03:52,640 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:03:52,640 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:03:52,640 - INFO - CUDA version: 12.8
+2025-12-03 11:03:52,640 - INFO - Device capability: (12, 0)
+2025-12-03 11:03:52,642 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:03:52,642 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:03:52,642 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:03:52,642 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:03:52,642 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:03:52,643 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:03:52,643 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:03:52,643 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:03:52,643 - INFO - CUDA version: 12.8
+2025-12-03 11:03:52,643 - INFO - Device capability: (12, 0)
+2025-12-03 11:03:52,645 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:03:52,645 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:03:52,645 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:03:52,645 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:03:52,645 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:15:19,501 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:15:19,501 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:15:19,502 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:15:19,584 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:15:19,584 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:15:19,614 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:15:19,614 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:15:19,614 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:15:19,614 - INFO - CUDA version: 12.8
+2025-12-03 11:15:19,615 - INFO - Device capability: (12, 0)
+2025-12-03 11:15:19,619 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:15:19,619 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:15:19,619 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:15:19,619 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:15:19,619 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:15:19,619 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:15:19,619 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:15:19,619 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:15:19,620 - INFO - CUDA version: 12.8
+2025-12-03 11:15:19,620 - INFO - Device capability: (12, 0)
+2025-12-03 11:15:19,621 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:15:19,621 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:15:19,621 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:15:19,621 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:15:19,621 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:21:57,650 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:21:57,651 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:21:57,651 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:21:57,734 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:21:57,734 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:21:57,761 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:21:57,762 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:21:57,762 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:21:57,762 - INFO - CUDA version: 12.8
+2025-12-03 11:21:57,762 - INFO - Device capability: (12, 0)
+2025-12-03 11:21:57,766 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:21:57,767 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:21:57,767 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:21:57,767 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:21:57,767 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:21:57,767 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:21:57,767 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:21:57,767 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:21:57,767 - INFO - CUDA version: 12.8
+2025-12-03 11:21:57,767 - INFO - Device capability: (12, 0)
+2025-12-03 11:21:57,771 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:21:57,771 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:21:57,771 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:21:57,772 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:21:57,772 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:28:39,043 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:28:39,043 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:28:39,043 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:28:39,123 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:28:39,123 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:28:39,151 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:28:39,151 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:28:39,151 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:28:39,151 - INFO - CUDA version: 12.8
+2025-12-03 11:28:39,151 - INFO - Device capability: (12, 0)
+2025-12-03 11:28:39,155 - INFO - ✅ Logger inicializado: logs/log_process_data_rsna.log
+2025-12-03 11:28:39,155 - INFO - ✅ Registro de métricas inicializado: logs/log_metrics_rsna.json
+2025-12-03 11:28:39,155 - INFO - ✅ Método de inicio de multiprocessing configurado a 'spawn'
+2025-12-03 11:28:39,155 - INFO - Usando dispositivo: cuda:0
+2025-12-03 11:28:39,155 - INFO - ¿CUDA disponible?: True
+2025-12-03 11:28:39,155 - INFO - GPU: NVIDIA GeForce RTX 5070 Ti, Memoria total: 17.09 GB
+2025-12-03 11:28:39,155 - INFO - Memoria GPU disponible: 17.09 GB
+2025-12-03 11:28:39,156 - INFO - PyTorch version: 2.8.0+cu128
+2025-12-03 11:28:39,156 - INFO - CUDA version: 12.8
+2025-12-03 11:28:39,156 - INFO - Device capability: (12, 0)
+2025-12-03 11:28:39,158 - INFO - INICIANDO PRUEBA DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:28:39,158 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO RSNA
+2025-12-03 11:28:39,158 - INFO - PROCESANDO DATOS DE ENTRENAMIENTO HUCSR
+2025-12-03 11:28:39,158 - INFO - PROCESANDO FINE-TUNNING DE HUCSR HACIA RSNA MODEL
+2025-12-03 11:28:39,158 - INFO - GENERANDO INFERENCIA DE TEP EN PACIENTES HUCSR
+2025-12-03 11:28:41,765 - INFO - FINALIZA EJECUIÓN DEL PIPELINE: CNN-TEP DETECTION
+2025-12-03 11:28:41,766 - INFO - ✅ 🚀 PRUEBA DEL PIPELINE COMPLETA.
