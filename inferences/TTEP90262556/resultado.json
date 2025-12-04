@@ -1,0 +1,21 @@
+{
+  "patient_id": "TTEP90262556",
+  "series_id": "TTEP90262556_4.290243",
+  "timestamp": "2025-12-03 19:12:16",
+  "prediction": "POSITIVO",
+  "true_label": "POSITIVO",
+  "correct": true,
+  "probability": 0.708984375,
+  "logit": 0.8916015625,
+  "threshold": 0.5,
+  "volume_stats": {
+    "mean": 0.40604493021965027,
+    "std": 0.33983364701271057,
+    "expected_mean": 0.4559301733970642,
+    "expected_std": 0.3551770746707916
+  },
+  "model": {
+    "architecture": "r3d_18",
+    "auc": 0.7025519609451294
+  }
+}

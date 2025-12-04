@@ -20,7 +20,7 @@ from utils import config
 # CONFIGURACIÓN
 # =============================================================================
 
-TARGET_DEPTH = 94
+DATASET_STATS = None
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # =============================================================================
@@ -29,7 +29,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def load_model():
     """Carga el modelo"""
-    print("Cargando modelo (Fold 3 - AUC 0.6779)...")
+    print("Cargando modelo")
     
     from torchvision.models.video import R3D_18_Weights
     model = torch.hub.load('pytorch/vision', 'r3d_18', weights=R3D_18_Weights.KINETICS400_V1)
@@ -49,7 +49,7 @@ def load_model():
         nn.Linear(model.fc.in_features, 1)
     ).to(device)
     
-    checkpoint_path = "/home/cavm/cnn-tep-detection/models/hucsr_finetuned.pth_fold3.pth"
+    checkpoint_path = config.CHECKPOINT_PATH
     checkpoint = torch.load(checkpoint_path, map_location=device)
     
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -59,9 +59,81 @@ def load_model():
         if isinstance(module, torch.nn.Dropout):
             module.p = 0.0
     
-    print(f"✓ Modelo cargado (AUC: {checkpoint.get('val_auc', 0.6779):.4f})")
+    print(f"✓ Modelo cargado (AUC: {checkpoint.get('val_auc', 'NO EXISTE'):.4f})")
     
-    return model
+    return model, checkpoint
+
+def calculate_dataset_statistics(csv_path, sample_size=50):
+    """
+    Calcula las estadísticas promedio del dataset de entrenamiento
+    
+    Args:
+        csv_path: Ruta al CSV con metadata
+        sample_size: Número de samples a analizar (None = todos)
+    
+    Returns:
+        dict con mean, std, y otras estadísticas
+    """    
+    
+    print(f"Calculando estadísticas del dataset...")
+    
+    df = pl.read_csv(csv_path)
+    
+    # Tomar muestra aleatoria o todos los registros
+    if sample_size and len(df) > sample_size:
+        import random
+        indices = random.sample(range(len(df)), sample_size)
+        sample_df = df[indices]
+    else:
+        sample_df = df
+    
+    means = []
+    stds = []
+    mins = []
+    maxs = []
+    
+    print(f"  Analizando {len(sample_df)} samples...")
+    
+    for i, row in enumerate(sample_df.iter_rows(named=True)):
+        if i % 10 == 0:
+            print(f"    Procesado {i}/{len(sample_df)}...")
+        
+        try:
+            npy_path = row['preprocessed_path']
+            data = np.load(npy_path)
+            
+            means.append(data.mean())
+            stds.append(data.std())
+            mins.append(data.min())
+            maxs.append(data.max())
+        except Exception as e:
+            print(f"    Error con {npy_path}: {e}")
+            continue
+    
+    stats = {
+        'mean': np.mean(means),
+        'mean_std': np.std(means),
+        'std': np.mean(stds),
+        'std_std': np.std(stds),
+        'min': np.mean(mins),
+        'max': np.mean(maxs),
+        'n_samples': len(means)
+    }
+    
+    print(f"\n✓ Estadísticas calculadas de {stats['n_samples']} samples:")
+    print(f"  Mean: {stats['mean']:.4f} ± {stats['mean_std']:.4f}")
+    print(f"  Std:  {stats['std']:.4f} ± {stats['std_std']:.4f}")
+    
+    return stats
+
+def get_dataset_statistics(csv_path, force_recalculate=False):
+    """Obtiene estadísticas del dataset (cachea en memoria)"""
+    global DATASET_STATS
+    
+    if DATASET_STATS is None or force_recalculate:
+        DATASET_STATS = calculate_dataset_statistics(csv_path, sample_size=50)
+    
+    return DATASET_STATS
 
 
 # =============================================================================
@@ -81,7 +153,7 @@ def run_inference(patient_id):
     print(f"\n[1] BUSCANDO ARCHIVO .NPY DEL PACIENTE")
     print("-" * 80)
     
-    csv_path = "/home/cavm/cnn-tep-detection/data/hucsr/preprocessed_metadata.csv"
+    csv_path = config.HUCSR_CSV_PREPROCESSED_DATA_DIR
     df = pl.read_csv(csv_path)
     
     patient_rows = df.filter(pl.col('patient_name') == patient_id)
@@ -116,10 +188,11 @@ def run_inference(patient_id):
     print(f"  Std:   {volume.std():.6f}")
     print(f"  Range: [{volume.min():.6f}, {volume.max():.6f}]")
     
-    # Verificar que las estadísticas sean correctas
-    expected_mean = 0.6026
-    expected_std = 0.2959
-    
+    # Obtener estadísticas esperadas dinámicamente
+    stats = get_dataset_statistics(csv_path)
+    expected_mean = stats['mean']
+    expected_std = stats['std']
+        
     mean_diff = abs(volume.mean() - expected_mean)
     std_diff = abs(volume.std() - expected_std)
     
@@ -148,7 +221,7 @@ def run_inference(patient_id):
     print(f"\n[4] EJECUTANDO PREDICCIÓN")
     print("-" * 80)
     
-    model = load_model()
+    model, checkpoint = load_model()
     
     with torch.no_grad():
         with torch.amp.autocast(device_type='cuda', enabled=True):
@@ -199,29 +272,17 @@ def run_inference(patient_id):
     print(f"INTERPRETACIÓN")
     print(f"{'='*80}")
     print(f"""
-AUC del modelo: 0.6779 (bajo para uso clínico)
-
-Interpretación del resultado:
-- Logit {logit_value:.2f}: {'Indica tendencia negativa' if logit_value < 0 else 'Indica tendencia positiva'}
-- Prob {prob:.3f}: {'Baja confianza en positivo' if prob < 0.3 else 'Confianza moderada en positivo' if prob < 0.7 else 'Alta confianza en positivo'}
-
-El modelo tiene AUC 0.6779, lo que significa que:
-- Está apenas mejor que el azar (AUC 0.5)
-- No es confiable para uso clínico real
-- Necesita más datos o mejor arquitectura para mejorar
-
-Recomendaciones:
-1. ✓ El preprocesamiento es correcto (confirmado)
-2. ✓ La inferencia funciona correctamente
-3. ❌ El modelo necesita mejora (más datos, data augmentation, etc.)
-""")
+        Interpretación del resultado:
+        - Logit {logit_value:.2f}: {'Indica tendencia negativa' if logit_value < 0 else 'Indica tendencia positiva'}
+        - Prob {prob:.3f}: {'Baja confianza en positivo' if prob < 0.3 else 'Confianza moderada en positivo' if prob < 0.7 else 'Alta confianza en positivo'}
+        """)
     
     # Guardar resultados
     output_dir = Path(config.INFERENCES_DIR) / patient_id
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Visualización
-    mid_slice = volume[TARGET_DEPTH//2, :, :, 0]
+    mid_slice = volume[config.TARGET_DEPTH//2, :, :, 0]
     
     plt.figure(figsize=(10, 8))
     plt.imshow(mid_slice, cmap='gray')
@@ -230,7 +291,7 @@ Recomendaciones:
     plt.title(f"PACIENTE {patient_id}\n{check} Predicción: {pred}, Real: {'POSITIVO' if label == 1 else 'NEGATIVO'}\nProbabilidad: {prob:.4f}", 
               fontsize=16, color=color, fontweight='bold')
     plt.axis('off')
-    plt.savefig(output_dir / "resultado_from_npy.png", dpi=300, bbox_inches='tight')
+    plt.savefig(output_dir / "resultado.png", dpi=300, bbox_inches='tight')
     plt.close()
     
     # JSON
@@ -247,13 +308,12 @@ Recomendaciones:
         "volume_stats": {
             "mean": float(volume.mean()),
             "std": float(volume.std()),
-            "expected_mean": expected_mean,
-            "expected_std": expected_std
+            "expected_mean": float(expected_mean),
+            "expected_std": float(expected_std)
         },
         "model": {
-            "architecture": "r3d_18",
-            "fold": 3,
-            "auc": 0.6779
+            "architecture": "r3d_18",            
+            "auc": checkpoint.get('val_auc', 'NO EXISTE')
         }
     }
     

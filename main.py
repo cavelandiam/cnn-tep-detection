@@ -32,9 +32,9 @@ def test_pipeline_v2():
     #step2.train_hucsr()
 
     logger.info(f"STEP 3: INFERENCE\n{lineSeparator}")
-    patient_dir = os.path.join(config.INFERENCE_NEW_PATIENTS_DIR, "TTEP86872473")   
-
-    step3.run_inference("TTEP86872473")
+    
+    #step3.run_inference("TTEP90262556") #Positivo
+    step3.run_inference("FTEP86974623") #Negativo
 
     logger.info(f"END PIPELINE: CNN-TEP DETECTION\n{lineSeparator}")
 

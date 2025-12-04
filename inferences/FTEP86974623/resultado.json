@@ -1,0 +1,21 @@
+{
+  "patient_id": "FTEP86974623",
+  "series_id": "FTEP86974623_6.156705",
+  "timestamp": "2025-12-03 19:33:45",
+  "prediction": "NEGATIVO",
+  "true_label": "NEGATIVO",
+  "correct": true,
+  "probability": 0.4033203125,
+  "logit": -0.391845703125,
+  "threshold": 0.5,
+  "volume_stats": {
+    "mean": 0.4313381314277649,
+    "std": 0.35012108087539673,
+    "expected_mean": 0.4488716125488281,
+    "expected_std": 0.36816346645355225
+  },
+  "model": {
+    "architecture": "r3d_18",
+    "auc": 0.7025519609451294
+  }
+}

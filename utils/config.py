@@ -23,6 +23,7 @@ RSNA_PREPROCESSED_DATA_TRAIN_DIR = os.path.join(DATA_DIR, "rsna", "preprocessed_
 RSNA_BEST_MODEL_AUC = os.path.join(MODEL_DIR, "rsna_best_model_auc.pth")
 RSNA_PRETRAINED_MODEL = os.path.join(MODEL_DIR, "rsna_pretrained.pth")
 HUCSR_FINETUNED_MODEL = os.path.join(MODEL_DIR, "hucsr_finetuned.pth")
+CHECKPOINT_PATH = os.path.join(MODEL_DIR, "hucsr_finetuned.pth_fold4.pth")
 
 # 📂 **Rutas de Gráficas**
 HUCSR_GRAPHS_DIR = os.path.join(GRAPHS_DIR, "hucsr")
