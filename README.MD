@@ -94,36 +94,58 @@ Para instalar todos los paquetes se debe estar en el ambiente virtual y se ejecu
 
 ## Estructura del Proyecto
 
-```bash
-CNN-TEP-DETECTION/
-│── data/                               # 📂 Carpeta de datos (imágenes DICOM)
-│ ├── patients_tep_false/                   # 📂 Pacientes con TEP HUCSR (imágenes DICOM)
-│ ├── patients_tep_true/                    # 📂 Pacientes sin TEP HUCSR (imágenes DICOM)
-│ ├── rsna_dataset/                         # 📂 Dataset RSNA Pulmonary Embolism
-│── logs/                               # 📂 Guardar los logs de ejecución
-│ ├── training.log                          # 📄 Logs de entrenamiento
-│── models/                             # 📂 Guardar modelos entrenados
-│ ├── efficientnet_radimagenet.keras        # 📂 Pesos de EfficientNet en RadImageNet
-│ ├── rsna_pretrained_model.keras           # 📂 Modelo preentrenado en RSNA
-│ ├── trained_model.keras                   # 📂 Modelo final entrenado
-│── notebooks/                          # 📂 Jupyter Notebooks para pruebas
-│ ├── exploratory_analysis.ipynb            # 📓 Análisis exploratorio inicial
-│ ├── training_experiment.ipynb             # 📓 Experimentos de entrenamiento
-│── scripts/                            # 📂 Código modular del proyecto
-│ ├── dataset_loader.py                     # 📝 Carga y etiquetado del dataset del HUCSR
-│ ├── evaluate.py                           # 📝 Evaluación del modelo
-│ ├── model.py                              # 📝 Definición de EfficientNet + 3D-CNN
-│ ├── predict.py                            # 📝 Predicción sobre nuevas imágenes
-│ ├── preprocess_rsna.py                    # 📝 Preprocesamiento de imágenes DICOM RSNA
-│ ├── train.py                              # 📝 Entrenamiento del modelo
-│── utils/                              # 📂 Funciones auxiliares
-│ ├── config.py                             # 📝 Parámetros globales del proyecto
-│ ├── visualization.py                      # 📝 Funciones para visualizar imágenes y Grad-CAM
-│── venv/                               # 📂 Ambiente virtual
-│ ├── env-cnn-tep-detection/                # 📂 Ambiente virtual para CNN
-│── .gitignore                          # 📄 Ignora las carpetas marcadas
-│── main.py                             # 📄 Archivo temporal para probar cada uno de los archivos de la carpeta scripts
-│── Makefile                            # 📄 Comandos automatizados
-│── README.md                           # 📄 Descripción del proyecto
-│── requirements.txt                    # 📄 Dependencias del proyecto
+```
+├── 📁 graphs
+│   ├── 📁 hucsr
+│   │   └── 📁 metrics
+│   │       ├── 📁 fold_1
+│   │       │   └── 🖼️ fold_1_all_metrics.png
+│   │       ├── 📁 fold_2
+│   │       │   └── 🖼️ fold_2_all_metrics.png
+│   │       ├── 📁 fold_3
+│   │       │   └── 🖼️ fold_3_all_metrics.png
+│   │       ├── 📁 fold_4
+│   │       │   └── 🖼️ fold_4_all_metrics.png
+│   │       └── 📁 fold_5
+│   │           └── 🖼️ fold_5_all_metrics.png
+│   └── 📁 rsna
+│       └── 📁 resnet3d_pretrained
+│           ├── 🖼️ graph.png
+│           ├── 🖼️ graph.svg
+│           ├── 🌐 report.html
+│           └── 📄 summary.txt
+├── 📁 inferences
+│   ├── 📁 FTEP86974623
+│   │   ├── ⚙️ resultado.json
+│   │   └── 🖼️ resultado.png
+│   ├── 📁 TTEP86872473
+│   │   ├── ⚙️ resultado.json
+│   │   └── 🖼️ resultado_from_npy.png
+│   └── 📁 TTEP90262556
+│       ├── ⚙️ resultado.json
+│       └── 🖼️ resultado_from_npy.png
+├── 📁 scripts
+│   ├── 📁 steps
+│   │   ├── 🐍 s1_preprocess_data_hucsr.py
+│   │   ├── 🐍 s2_create_model.py
+│   │   └── 🐍 s3_inference.py
+│   ├── 🐍 preprocess_rsna.py
+│   ├── 🐍 s1_improved_3dcnn_tep.py
+│   ├── 🐍 s1_improved_3dcnn_tep_copy1.py
+│   ├── 🐍 s2_load_images_hucsr.py
+│   ├── 🐍 s3_fine_tunning.py
+│   ├── 🐍 s4_inference_tep.py
+│   └── 🐍 s4_inference_tep_v2.py
+├── 📁 utils
+│   ├── 🐍 __init__.py
+│   ├── 🐍 config.py
+│   ├── 🐍 logger.py
+│   └── 🐍 visualization.py
+├── ⚙️ .gitignore
+├── 📄 Makefile
+├── 📝 README.MD
+├── 🐍 main.py
+├── 📄 requirements-cpu.txt
+├── 📄 requirements.txt
+└── 🐍 test.py
 ```
