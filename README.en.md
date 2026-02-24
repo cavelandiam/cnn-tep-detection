@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18752763.svg)](https://doi.org/10.5281/zenodo.18752763)
+
 # Introduction to WSL2 for Ubuntu 22.04 LTS
 
 To ensure full compatibility with deep learning libraries and leverage the performance of NVIDIA GPUs, this project is developed in an environment based on Windows Subsystem for Linux 2 (WSL2) running Ubuntu 22.04 LTS.
