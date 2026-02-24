@@ -149,3 +149,5 @@ To install all packages, you must be in the virtual environment and run the foll
 ├── 📄 requirements.txt
 └── 🐍 test.py
 ```
+
+Thanks to Hospital Universitario Clínica San Rafael for the data, PyTorch/Torchvision community, and everyone supporting open medical AI research in resource-limited settings!
